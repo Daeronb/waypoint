@@ -17,7 +17,15 @@ header{display:flex;align-items:baseline;gap:10px;padding:14px 16px 8px;border-b
 .hstamp{flex:1;color:var(--muted);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase}
 #menuBtn{background:none;border:1px solid var(--line);border-radius:8px;color:var(--sec);font-size:1rem;padding:2px 10px;cursor:pointer}
 main{padding:14px 14px 24px;max-width:640px;margin:0 auto}
-section{display:flex;flex-direction:column;gap:10px}
+section{display:flex;flex-direction:column;gap:10px;scroll-margin-top:8px}
+
+/* section dividers — clear demarcation between the four layers on the single page */
+.secdiv{display:flex;align-items:baseline;gap:10px;margin:26px 2px 4px;padding-top:16px;border-top:2px solid var(--sec)}
+#view-engine .secdiv{margin-top:6px;padding-top:6px;border-top:none}
+.secdiv .secn{font-family:var(--serif);font-size:.95rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.secdiv b{font-family:var(--serif);font-size:1.5rem;letter-spacing:.01em}
+.secdiv .secsub{flex:1;color:var(--sec);font-size:.8rem}
+.floorwarn{color:var(--warn)!important}
 
 /* labels & footers */
 .lbl{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}

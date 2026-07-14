@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.0.1';
+const APP_VERSION='1.0.2';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -60,6 +60,13 @@ function verdict(budget,req){
   return{cls:'bad',glyph:'✕',word:'short',m};
 }
 function anchorC(){return COUNTRIES.find(c=>c.cc===state.plan.anchor)||COUNTRIES[0];}
+const SAFETY_NET=300000;  // the NL apartment safety net, in today’s money
+function floorCheck(floor){
+  const real=floor/Math.pow(1.02,6);
+  const below=real<SAFETY_NET;
+  return{real,below,txt:'Ends 2032 at '+fmtE(floor)+' — floor held by construction. At 2%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
+}
+function secDiv(n,name,sub){return '<div class="secdiv" id="sd-'+name.toLowerCase()+'"><span class="secn">'+n+'</span><b>'+name+'</b><span class="secsub">'+esc(sub)+'</span></div>';}
 
 /* ---------- shared bits ---------- */
 function chip(cls,glyph,txt){return '<span class="chip '+cls+'"><b>'+glyph+'</b> '+esc(txt)+'</span>';}
@@ -68,15 +75,16 @@ function stampLine(d){return '<span class="stamp">stamped '+esc(d)+'</span>';}
 /* ---------- ENGINE view ---------- */
 function renderEngine(){
   const p=state.plan,en=engineNumbers(),di=driftInfo(),bl=currentBlend();
-  const real2032=p.floor/Math.pow(1.02,6);
+  const fc=floorCheck(p.floor);
   let h='';
+  h+=secDiv('01','Engine','what €350k yields');
   h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
   h+='<div class="hero"><div class="heron" id="heroW">'+fmtE(en.w)+'</div><div class="herosub">per month · sustainable to <span id="heroFloor">'+fmtE(p.floor)+'</span> · '+HORIZON_LABEL+'</div>';
   h+='<div class="herobk" id="heroBk">≈ '+fmtE(en.yieldMo)+' yield + '+fmtE(en.draw)+' draw-down · computed on the declining balance</div></div>';
   h+='<div class="card"><div class="lbl">The two dials</div>';
   h+='<div class="slrow"><div class="slhead"><span>Start principal</span><span class="num" id="prV">'+fmtE(p.principal)+'</span></div><input type="range" id="prS" min="300000" max="400000" step="5000" value="'+p.principal+'"></div>';
   h+='<div class="slrow"><div class="slhead"><span>Acceptable 2032 floor</span><span class="num" id="flV">'+fmtE(p.floor)+'</span></div><input type="range" id="flS" min="275000" max="'+p.principal+'" step="5000" value="'+Math.min(p.floor,p.principal)+'"></div>';
-  h+='<div class="foot" id="chk2032">Ends 2032 at '+fmtE(p.floor)+' — floor held by construction. At 2%/yr inflation that is ≈ '+fmtE(real2032)+' in today’s money — still the NL apartment safety net.</div></div>';
+  h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chk2032">'+fc.txt+'</div></div>';
   h+='<div class="card"><div class="lbl">Instrument mix</div>';
   for(const b of BLENDS){
     const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,HORIZON_MO);
@@ -90,7 +98,7 @@ function renderEngine(){
   h+='<div class="slhead"><span>Risk sleeve (≈€50k crypto + ≈€45k entering)</span></div>';
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';
   h+='<div id="lensT"></div></div>';
-  h+='<div class="lbl sect">Instrument cards</div>';
+  h+='<div class="lbl sect">Yield instrument cards</div>';
   for(const id in INSTRUMENTS){
     const ins=INSTRUMENTS[id],open=ui.inst===id;
     const yl=ins.live&&liveDFR()!=null?pct(instYield(id))+' (live: DFR '+(MMF_SPREAD<0?'−':'+')+Math.abs(MMF_SPREAD).toFixed(2)+')':pct(ins.yld);
@@ -123,7 +131,7 @@ function updateEngineNumbers(){
   $('#heroW').textContent=fmtE(en.w);$('#heroFloor').textContent=fmtE(p.floor);
   $('#heroBk').textContent='≈ '+fmtE(en.yieldMo)+' yield + '+fmtE(en.draw)+' draw-down · computed on the declining balance';
   $('#prV').textContent=fmtE(p.principal);$('#flV').textContent=fmtE(p.floor);
-  $('#chk2032').textContent='Ends 2032 at '+fmtE(p.floor)+' — floor held by construction. At 2%/yr inflation that is ≈ '+fmtE(p.floor/Math.pow(1.02,6))+' in today’s money — still the NL apartment safety net.';
+  const fc=floorCheck(p.floor),ck=$('#chk2032');ck.textContent=fc.txt;ck.classList.toggle('floorwarn',fc.below);
   const fl=$('#flS');fl.max=p.principal;if(+fl.value>p.principal)fl.value=p.principal;
   document.querySelectorAll('#view-engine .pick').forEach(pk=>{
     const id=pk.querySelector('input').value,b=BLENDS.find(x=>x.id===id);
@@ -133,8 +141,10 @@ function updateEngineNumbers(){
 }
 function bindEngine(){
   $('#prS').oninput=e=>{state.plan.principal=+e.target.value;if(state.plan.floor>state.plan.principal)state.plan.floor=state.plan.principal;save();updateEngineNumbers();};
+  $('#prS').onchange=()=>renderMatch();
   $('#flS').oninput=e=>{state.plan.floor=Math.min(+e.target.value,state.plan.principal);save();updateEngineNumbers();};
-  document.querySelectorAll('input[name=blend]').forEach(r=>r.onchange=e=>{state.plan.blend=e.target.value;save();renderEngine();});
+  $('#flS').onchange=()=>renderMatch();
+  document.querySelectorAll('input[name=blend]').forEach(r=>r.onchange=e=>{state.plan.blend=e.target.value;save();renderEngine();renderMatch();});
   $('#slv').onchange=e=>{state.plan.sleeve=Math.max(0,+e.target.value||0);save();renderLens();};
   document.querySelectorAll('#view-engine .cc .chead').forEach(hd=>hd.onclick=()=>{const id=hd.parentElement.dataset.inst;ui.inst=(ui.inst===id?null:id);renderEngine();});
 }
@@ -145,6 +155,7 @@ function reqFor(c){return(state.plan.colMode==='f'?c.col.f:c.col.n)+INSURANCE;}
 function renderMatch(){
   const p=state.plan,en=engineNumbers();
   let h='';
+  h+=secDiv('02','Match','where the budget lands');
   h+='<div class="card"><div class="matchhead"><div><div class="lbl">Budget from Engine</div><div class="heron sm num">'+fmtE(en.w)+'<span class="permo">/mo</span></div></div>';
   h+='<div class="colswitch"><button data-m="f" class="'+(p.colMode==='f'?'on':'')+'">frugal</button><button data-m="n" class="'+(p.colMode==='n'?'on':'')+'">normal</button></div></div>';
   h+='<div class="foot">Frugal is calibrated to experienced-nomad level (TH anchor €800, guides ×0.7) — not tourist guides. Every row = COL + €'+INSURANCE+' IMG Global insurance. Visa costs + flights come on top.</div></div>';
@@ -160,7 +171,7 @@ function renderMatch(){
     if(c.roles.includes('anchor'))tags+='<span class="tag ok">anchor</span>';
     if(c.demoted)tags+='<span class="tag bad">demoted anchor</span>';
     h+='<div class="card cc'+(open?' open':'')+'" data-cc="'+c.cc+'"><div class="chead"><div><b>'+c.f+' '+esc(c.n)+'</b> <span class="sub">'+esc(c.col.city)+'</span>'+tags;
-    h+='<div class="sub num">'+fmtE(col)+' + '+fmtE(INSURANCE)+' ins = '+fmtE(r.req)+'</div></div>';
+    h+='<div class="sub num">'+fmtE(col)+' + '+fmtE(INSURANCE)+' insurance = '+fmtE(r.req)+'</div></div>';
     h+='<span class="chip '+r.v.cls+'"><b>'+r.v.glyph+'</b> '+r.v.word+' '+(r.v.m>=0?'+':'−')+fmtE(Math.abs(r.v.m)).slice(1)+'</span></div>';
     if(open){h+='<div class="cbody">'+stampLine(c.stamp);
       h+='<div class="kv"><span>Stay</span>'+esc(c.stay||'—')+'</div>';
@@ -198,7 +209,8 @@ function renderMatch(){
 
 /* ---------- PATH view ---------- */
 function renderPath(){
-  let h='<div class="foot">Linear plan, plain checkboxes. Dependencies are text on purpose — real decisions are fuzzy; computed unlock logic was rejected for v1.</div>';
+  let h=secDiv('03','Path','the linear sequence');
+  h+='<div class="foot">Linear plan, plain checkboxes. Dependencies are text on purpose — real decisions are fuzzy; computed unlock logic was rejected for v1.</div>';
   for(const ph of PATH){
     const done=ph.steps.filter(s=>state.steps[s.id]).length;
     h+='<div class="phase"><div class="phead"><b>'+esc(ph.name)+'</b><span class="sub">'+esc(ph.when)+'</span><span class="num prog">'+done+'/'+ph.steps.length+'</span></div>';
@@ -214,7 +226,8 @@ function renderPath(){
 
 /* ---------- PLAYBOOKS view ---------- */
 function renderBooks(){
-  let h='<div class="foot">Contingency cards on a linear plan — the branches live here, not in the timeline.</div>';
+  let h=secDiv('04','Playbooks','contingencies');
+  h+='<div class="foot">Contingency cards on a linear plan — the branches live here, not in the timeline.</div>';
   for(const b of PLAYBOOKS){
     const open=ui.book===b.id;
     h+='<div class="card cc book-'+b.accent+(open?' open':'')+'" data-book="'+b.id+'"><div class="chead"><div><span class="bicon">'+b.icon+'</span> <b>'+esc(b.title)+'</b>'+(b.sub?'<div class="sub">'+esc(b.sub)+'</div>':'')+'</div><span class="sub">'+(open?'−':'+')+'</span></div>';
@@ -226,15 +239,16 @@ function renderBooks(){
   document.querySelectorAll('#view-books .cc .chead').forEach(hd=>hd.onclick=()=>{const id=hd.parentElement.dataset.book;ui.book=(ui.book===id?null:id);renderBooks();});
 }
 
-/* ---------- tabs / menu / init ---------- */
-const VIEWS=(typeof document!=='undefined')?[...document.querySelectorAll('#tabbar button')].map(b=>b.dataset.view):[];
+/* ---------- nav: one page, scrollspy + scroll-to ---------- */
+const VIEWS=['engine','match','path','books'];
 let curView='engine';
-function showView(v){curView=v;for(const x of VIEWS){$('#view-'+x).hidden=(x!==v);}document.querySelectorAll('#tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.view===v));renderAll();}
-function renderAll(){
-  if(curView==='engine')renderEngine();
-  if(curView==='match')renderMatch();
-  if(curView==='path')renderPath();
-  if(curView==='books')renderBooks();
+function setActive(v){curView=v;document.querySelectorAll('#tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.view===v));}
+function gotoView(v){const el=$('#view-'+v);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+function renderAll(){renderEngine();renderMatch();renderPath();renderBooks();}
+function setupSpy(){
+  const secs=VIEWS.map(v=>$('#view-'+v)).filter(Boolean);
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)setActive(e.target.id.replace('view-',''));});},{rootMargin:'-45% 0px -50% 0px',threshold:0});
+  secs.forEach(s=>obs.observe(s));
 }
 function openMenu(){
   $('#sheet').innerHTML='<div class="lbl">Waypoint v'+APP_VERSION+'</div>'
@@ -255,10 +269,12 @@ async function checkUpdates(){
   }catch(e){toast('Could not check — offline?');}
 }
 function init(){
-  document.querySelectorAll('#tabbar button').forEach(b=>b.onclick=()=>showView(b.dataset.view));
+  document.querySelectorAll('#tabbar button').forEach(b=>b.onclick=()=>gotoView(b.dataset.view));
   $('#menuBtn').onclick=openMenu;
   $('#sheetWrap').onclick=e=>{if(e.target.id==='sheetWrap')$('#sheetWrap').hidden=true;};
-  showView('engine');
+  renderAll();
+  setupSpy();
+  setActive('engine');
   fetchECB();
   if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
