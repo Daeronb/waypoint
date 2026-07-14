@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.0.2';
+const APP_VERSION='1.1.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -93,7 +93,7 @@ function renderEngine(){
     h+='<span class="pickbody"><span class="pickhead"><b>'+esc(b.name)+'</b><span class="num">'+pct(y)+' · '+fmtE(w)+'/mo</span></span>';
     h+='<span class="picksub">'+esc(b.sub)+'</span><span class="pickcomp">'+comp+'</span></span></label>';
   }
-  h+='<div class="foot">≥3% is reachable today only with IG credit as the biggest sleeve. The gap to max-safety is ~€115/mo — the floor dial can absorb that on its own.</div></div>';
+  h+='<div class="foot">Every mix keeps ≈€100k crash-deployable and the apartment core on fixed maturity dates (his 225/100/25 structure). Yields are NET of fund fees. Max-safety → max-yield gap ≈ €110/mo — the floor dial can absorb that on its own.</div></div>';
   h+='<div class="card"><div class="lbl">Crypto sleeve — a lens, not a branch</div>';
   h+='<div class="slhead"><span>Risk sleeve (≈€50k crypto + ≈€45k entering)</span></div>';
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';

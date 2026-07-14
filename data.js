@@ -1,6 +1,10 @@
 'use strict';
-/* Waypoint v1 — data layer. Snapshot 2026-07-14.
-   Sources: research packages 1-4 (Personal apps/waypoint/research-*.md).
+/* Waypoint v1.1 — data layer. Snapshot 2026-07-14.
+   Sources: research packages 1-5 (Personal apps/waypoint/research/research-*.md).
+   v1.1 (research-5): all instrument yields are now NET of fund fees (TER) — the old
+   blends quoted gross YTMs, which overstated income by ~0.12-0.20%. Blends rebuilt
+   around Joël's real structure: ≈€100k crash-deployable dry powder + ≈€225k apartment
+   core + ≈€25k accepted 4-year burn. Term deposits retired (see dep card + research-5).
    Not financial, tax, legal or immigration advice — verify load-bearing items locally. */
 
 const DATA_STAMP='2026-07-14';
@@ -11,6 +15,8 @@ const HORIZON_MO=60;      // Jan 2028 → Dec 2032 (pivot 2028 = constant, not e
 const HORIZON_LABEL='2028 → 2032';
 const STALE_DAYS=183;
 
+/* All yld values are NET of TER (fund fee) — YTM/YTW figures published by fund
+   providers exclude fees, so net = published yield − TER. Schatz has no wrapper. */
 const INSTRUMENTS={
   mmf:{name:'Money-market ETF',ref:'Xtrackers XEON (LU0290358497) · TER 0.10%',yld:2.17,live:true,stamp:'2026-07-10',
     risk:'Counterparty (synthetic swap, UCITS-capped at 10%). Zero duration, zero credit.',
@@ -18,7 +24,14 @@ const INSTRUMENTS={
     crash:'The dry-powder king. Mar 2020: overnight-swap ETFs kept accruing, no NAV dent. Spendable within days even in a 1929-style event.',
     hold:'UCITS ETF — holdable at IBKR/Swissquote wherever you are.',
     powder:1},
-  govt:{name:'Short govt-bond ETF 1–3y',ref:'iShares IBGS · WAM 1.7y',yld:2.68,stamp:'2026-06-22',
+  frn:{name:'Floating-rate IG ETF',ref:'Amundi FRNE (LU1681041114) · TER 0.18% · yld = estimate',yld:2.50,stamp:'2026-07-14',
+    risk:'IG credit spread, near-zero duration — coupons RESET quarterly with €STR, so rate moves barely touch the price (1y volatility 0.21%).',
+    liq:'Intraday.',
+    crash:'Worst dip ever −3.8% (Mar 2020), 5-year max drawdown −1.46%; recovers in weeks. Second-line dry powder.',
+    hold:'UCITS ETF.',
+    powder:3,
+    note:'≈ MMF + ~0.3% for a small credit sleeve, and it floats UP if the ECB keeps hiking. Yield is an ESTIMATE (€STR + spread − TER; fund publishes no YTM) — verify the trailing return at purchase.'},
+  govt:{name:'Short govt-bond ETF 1–3y',ref:'iShares IBGS · TER 0.20% · WAM 1.7y · gross YTM 2.68%',yld:2.48,stamp:'2026-06-22',
     risk:'Small duration (≈ −1.7% per +100bp); eurozone sovereign mix, mild IT/ES spread risk.',
     liq:'Intraday, deep market.',
     crash:'Flight-to-quality asset — typically RALLIES in equity crashes. Sell high to buy the bottom. Second-best dry powder.',
@@ -30,39 +43,62 @@ const INSTRUMENTS={
     crash:'Rallies in crises; the classic 1929 survivor.',
     hold:'Needs a bond-capable broker → a point for IBKR; many retail EU brokers can’t.',
     powder:2},
-  erne:{name:'Ultrashort IG ETF',ref:'iShares ERNE · WAM 0.7y',yld:2.69,stamp:'2026-06-04',
+  ib28:{name:'iBonds Dec 2028 — fixed-maturity IG',ref:'iShares IVOA/IB28 · TER 0.12% · gross YTW 3.18% · pays out cash ~1 Jan 2029',yld:3.06,stamp:'2026-05-07',
+    risk:'IG credit (~390 issuers) + duration 2.1 that SHRINKS to zero at maturity. Hold to Dec 2028 and today’s yield is locked, end value known.',
+    liq:'Trades like a stock — sell any weekday, cash T+2, from anywhere. Early sale = market price: worst case ≈ −2–4% if sold into a rate spike or panic, fading to ~0% near maturity.',
+    crash:'Self-healing by construction: whatever the dip, pull-to-par ends it by Dec 2028 (bar defaults — IG default rate ~0.1–0.2%/yr, spread over ~390 names).',
+    hold:'UCITS ETF.',
+    powder:4},
+  ib30:{name:'iBonds Dec 2030 — fixed-maturity IG',ref:'iShares 30IG/30IA · TER 0.12% · gross YTW 3.44% · pays out cash ~1 Jan 2031',yld:3.32,stamp:'2026-05-08',star:'the apartment tranche',
+    risk:'IG credit (~310 issuers) + duration 3.8 shrinking to zero at maturity. Locked yield to Dec 2030.',
+    liq:'Sell any weekday, cash T+2. Early sale worst case today ≈ −4–6% (rate spike + panic combined), shrinking every year toward zero at maturity.',
+    crash:'Self-healing: any drawdown ends at the printed date. Maturity lands cash EXACTLY in the 2030–2032 return-to-NL window — then re-park or spend.',
+    hold:'UCITS ETF.',
+    powder:4},
+  ig:{name:'IG corp-bond ETF 1–5y (evergreen)',ref:'iShares € Corp 1-5yr · TER 0.20% · WAM 3y · gross YTM 3.20%',yld:3.00,stamp:'2026-06-26',
+    risk:'IG credit spread + ~2.8 duration — and NO maturity date: the −7% question stays open-ended (fund rolls bonds forever).',
+    liq:'Intraday — but see crash behavior.',
+    crash:'Mar 2020: −6/−7% AND traded at a discount to NAV — selling INTO a panic costs the discount on top. Recovered within months. Hold-through-storm money, not dry powder.',
+    hold:'UCITS ETF.',
+    powder:4,
+    note:'Superseded in all blends by the iBonds pair (same net yield, but with a repair date on the calendar). Still the tool if an evergreen rolling IG sleeve is ever wanted.'},
+  erne:{name:'Ultrashort IG ETF',ref:'iShares ERNE · TER 0.09% · WAM 0.7y · gross YTM 2.69%',yld:2.60,stamp:'2026-06-04',
     risk:'IG credit spread, minimal duration.',
     liq:'Intraday.',
     crash:'Mar 2020: low-single-% dip, recovered within weeks after the ECB backstop.',
     hold:'UCITS ETF.',
     powder:3,
-    note:'Yields the same as govt 1–3y right now — you’re not being paid for the credit risk. Skippable unless spreads widen.'},
-  ig:{name:'IG corp-bond ETF 1–5y',ref:'iShares € Corp 1-5yr · TER 0.20% · WAM 3y',yld:3.27,stamp:'2026-06-22',star:'the ≥3% ticket',
-    risk:'IG credit spread + ~2.8 duration.',
-    liq:'Intraday — but see crash behavior.',
-    crash:'Mar 2020: −6/−7% AND traded at a discount to NAV — selling INTO a panic costs the discount on top. Recovered within months. Hold-through-storm money, not dry powder.',
-    hold:'UCITS ETF.',
-    powder:4},
-  dep:{name:'Term-deposit ladder',ref:'Raisin marketplace · 1y ≈2.99% / 2y ≈3.05%',yld:3.05,stamp:'2026-07-14',
+    note:'Sits between the FRN and govt on every axis without beating either. Skippable unless spreads widen.'},
+  dep:{name:'Term-deposit ladder — RETIRED',ref:'Raisin marketplace · 1y ≈2.99% / 2y ≈3.05% gross',yld:3.05,stamp:'2026-07-14',
     risk:'Bank credit, capped by the €100k/person/bank guarantee → €350k must split across 4+ banks.',
     liq:'None — locked to maturity (death/bankruptcy-grade exceptions only).',
     crash:'Zero mark-to-market, nominal guaranteed — and zero dry powder. Anti-powder: locked money can’t buy a bottom.',
-    hold:'⚠ Raisin is residence-tied. Only ladder maturities that end BEFORE deregistration, and get Raisin NL’s emigration policy in writing first.',
-    powder:5}
+    hold:'⚠ Raisin is residence-tied — the worst property for a nomad plan.',
+    powder:5,
+    note:'RETIRED from all blends (research-5, Jul 2026): the iBonds ETFs dominate on every axis — same locked-yield idea but higher net yield, sellable any day, no €100k-per-bank juggling, no residency tie. Card kept so future passes remember WHY deposits lost.'}
 };
 
 const POWDER_RANK=['','pure dry powder','rallies in a crash','mild dip, quick recovery','hold through the storm','anti-powder (locked)'];
 
+/* Blends v1.1 (research-5) — every mix is built around the SAME structure Joël gave:
+   ≈29% (≈€100k) dry powder that never falls in a crash and sells in 2–4 business days
+   (crash-deploy: cheap stocks/BTC), + a core that lands intact for the NL apartment
+   (~€225–250k, iBonds maturities Dec 2028 → cash Jan 2029, Dec 2030 → cash Jan 2031).
+   Ids kept from v1.0 ('allig' now = Max yield) so a saved plan in localStorage survives.
+   All yields NET of fees — old gross blends: safety 2.62, target3 3.02, allig 3.27. */
 const BLENDS=[
-  {id:'safety',name:'Max safety',sub:'storm bucket only — crash-proof, liquid or guaranteed',mix:{govt:.40,schatz:.30,mmf:.20,dep:.10}},
-  {id:'target3',name:'3% target',sub:'IG as the biggest sleeve — the price of ≥3% today',mix:{ig:.50,dep:.25,govt:.15,mmf:.10}},
-  {id:'allig',name:'All-in IG',sub:'max yield, max spread exposure — hold-through-storm',mix:{ig:1}}
+  {id:'safety',name:'Max safety',sub:'≈€100k powder (MMF+govt) + core in Schatz rolls & iBonds-2028 — nothing meaningfully red, ever',
+    mix:{mmf:.12,govt:.17,schatz:.42,ib28:.29}},
+  {id:'target3',name:'3% target',sub:'≈€100k powder + iBonds ladder 2028/2030 — locked yields, repair dates on the calendar',
+    mix:{mmf:.11,govt:.18,ib28:.21,ib30:.50}},
+  {id:'allig',name:'Max yield',sub:'FRN-boosted powder + everything else in iBonds-2030 — beats old all-in IG on yield AND structure',
+    mix:{frn:.14,govt:.15,ib30:.71}}
 ];
 
 const BROKERS=[
   {n:'IBKR',star:true,v:'ok',glyph:'✓',word:'survives',d:'Keeps clients on relocation. Open while still NL-resident (signup wants A tax residency), update to the anchor later. Trades bonds (Schatz). Withholding follows declared residency.'},
   {n:'Swissquote',star:true,v:'ok',glyph:'✓',word:'survives',d:'Built for expats — “keep the same account every time you move”. CHF 10k min, non-resident surcharge ~CHF 10–30/mo (cheap insurance). Swiss custody = outside the EU regulator, still CRS-reports to declared residence.'},
-  {n:'Raisin',v:'warn',glyph:'!',word:'conditional',d:'Residence-tied platform + deposits locked to maturity. Usable only with maturities timed to end before deregistration; confirm the emigration policy in writing.'},
+  {n:'Raisin',v:'warn',glyph:'!',word:'retired',d:'Residence-tied platform + deposits locked to maturity — retired from the plan (research-5): iBonds fixed-maturity ETFs at IBKR do the same job with none of the residency risk.'},
   {n:'Saxo',v:'warn',glyph:'?',word:'unverified',d:'Entity-based (NL under Saxo Bank); non-EU-move policy not confirmed. Ask directly only if a third leg is wanted.'},
   {n:'DEGIRO',v:'bad',glyph:'✕',word:'dies on exit',d:'Supported-country list; moving outside → forced close/transfer (documented). Exit before leaving NL.'},
   {n:'Trade Republic',v:'bad',glyph:'✕',word:'dies on exit',d:'Requires permanent residence in a supported country; a move can trigger termination.'}
@@ -151,11 +187,11 @@ const PATH=[
     {id:'p4',t:'Re-stamp yield snapshots after the 23 Jul 2026 ECB decision',dep:'Hiking cycle — the app warns when the live anchor moves off the snapshots.'},
     {id:'p5',t:'Deploy the ~€45k into the market; record lot dates',dep:'The CZ 3-year clock runs per lot — 2026 buys are exempt only from 2029.'},
     {id:'p6',t:'Line up IMG Global insurance (~€120/mo)',dep:'His researched winner — already inside every burn number in Match.'},
-    {id:'p7',t:'Get Raisin NL’s emigration policy in writing',dep:'Deposits are residence-tied and locked; only maturities ending before deregistration.'}]},
+    {id:'p7',t:'Skip term deposits — iBonds replaced them',dep:'Research-5: fixed-maturity iBonds ETFs beat Raisin deposits on yield, liquidity AND residency. Nothing residence-tied should hold the €350k.'}]},
   {id:'exit',name:'Exit',when:'2027 · before the 2028 pivot',steps:[
     {id:'x1',t:'Sell apartment + company (≈ €350k)',dep:''},
     {id:'x2',t:'Park the €350k in the chosen blend at IBKR/Swissquote',dep:'Position BEFORE deregistering — full product access needs a residence.'},
-    {id:'x3',t:'Any term deposits: maturity date < deregistration date',dep:'Locked money on a residence-tied platform is exactly the bad scenario.'},
+    {id:'x3',t:'Check the iBonds maturity dates line up with the plan',dep:'Dec 2028 tranche → cash Jan 2029 (re-park in MMF); Dec 2030 tranche → cash Jan 2031, right in the apartment window. If return slips past 2032, roll into a later iBonds rung.'},
     {id:'x4',t:'Set up cold-storage estate access',dep:'Someone must be able to reach the coins if something happens abroad — see Playbooks.'},
     {id:'x5',t:'Deregister from NL',dep:'Before 1 Jan 2028 — vermogensaanwasbelasting treated as fixed (the pivot constant).'}]},
   {id:'nomad',name:'Nomad',when:'2028 → · resident nowhere',steps:[
@@ -185,9 +221,10 @@ const PLAYBOOKS=[
     {h:'Before 2028 (still NL-resident)',p:'Fly home and sell as an NL resident — clean, no exotic moves. His own correction: pre-exit, NL IS the emergency plan.'},
     {h:'Nomad gap (no TRC yet)',p:'Weakest position — DAC8/CARF reports to the last declared residence. Prefer accelerating the anchor TRC over selling big while resident nowhere. A hub trip (SG/HK/Dubai, €500–1,500/wk + flights) solves logistics, not tax.'},
     {h:'After the TRC',p:'Sell via the anchor’s clean route (GE anywhere · TH onshore before 2030 · CZ aged lots). Kraken + broker residency must already point at the anchor — that’s the Path sequencing rule.'}]},
-  {id:'crash',icon:'▼',accent:'warn',title:'Crash — hold the storm bucket',sub:'and maybe buy the bottom',body:[
-    {h:'What holds',p:'MMF: no dent. Govt/Schatz: typically rally. Deposits: nominal guaranteed but locked. IG 1–5y: −6/−7% plus a NAV discount if sold into the panic — do NOT sell it there; Mar 2020 recovered within months.'},
-    {h:'Dry-powder rank',p:'MMF → govt/Schatz (sell high) → ultrashort IG → IG 1–5y → deposits (anti-powder). Buy-the-bottom optionality is a PROPERTY of the instruments, noted per card — deliberately not built out as a strategy.'}]},
+  {id:'crash',icon:'▼',accent:'warn',title:'Crash — deploy the powder, hold the core',sub:'the ≈€100k sleeve exists for exactly this',body:[
+    {h:'What holds',p:'MMF: no dent. FRN: −1 to −4% briefly, recovers in weeks. Govt/Schatz: typically RALLY — sell high. iBonds: dip self-heals by the printed maturity date, so do not sell mid-panic unless truly forced. Evergreen IG 1–5y (no longer in any blend): −6/−7% plus a NAV discount if sold into the panic.'},
+    {h:'Deploying the ≈€100k',p:'Powder sleeve (MMF/FRN + govt) sells any weekday, cash in 2–4 business days, from anywhere via IBKR. His structure: this is the slice earmarked to buy cheap stocks/BTC at a bottom — the apartment core stays untouched.'},
+    {h:'Property crash while abroad',p:'If NL property also craters and he wants the apartment EARLY: iBonds sell same-day too, worst case ≈ −4–6% mid-panic (shrinking yearly). An apartment bought 15–30% off more than covers that haircut.'}]},
   {id:'return',icon:'↩',accent:'warn',title:'Forced early return',body:[
     {h:'',p:'Re-register in NL → back in the NL tax net, whatever it is by then. The Engine’s floor is the point: principal intact means the apartment rebuy stays possible at ANY exit time. Broker accounts (IBKR/Swissquote) survive the move back too.'}]},
   {id:'stay',icon:'⚓',accent:'ok',title:'Relationship / staying long-term',body:[
