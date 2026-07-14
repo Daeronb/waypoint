@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Waypoint</title>
+<meta name="theme-color" content="#f5efe3">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header>
+  <div class="brand">Waypoint</div>
+  <div class="hstamp">field notes · 14 Jul 2026</div>
+  <button id="menuBtn" aria-label="Menu">☰</button>
+</header>
+<main>
+  <section id="view-engine" hidden></section>
+  <section id="view-match" hidden></section>
+  <section id="view-path" hidden></section>
+  <section id="view-books" hidden></section>
+</main>
+<nav id="tabbar">
+  <button data-view="engine">Engine</button>
+  <button data-view="match">Match</button>
+  <button data-view="path">Path</button>
+  <button data-view="books">Playbooks</button>
+</nav>
+<div id="sheetWrap" hidden><div id="sheet"></div></div>
+<div id="toast"></div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
