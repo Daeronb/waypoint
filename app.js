@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.4.0';
+const APP_VERSION='1.8.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -11,7 +11,7 @@ const pct=v=>v.toFixed(2)+'%';
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._h);toast._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 /* ---------- state ---------- */
-function defaults(){return{plan:{principal:0,floor:0,blend:'target3',colMode:'f',anchor:'PH',sleeve:0},steps:{},ecb:null};} /* v1.4: fresh devices start at 0/0/0 (his call) — he sets his own numbers, localStorage keeps them. v1.2: default anchor = PH; saved plans keep their own pick */
+function defaults(){return{plan:{principal:0,floor:0,months:60,blend:'target3',colMode:'f',anchor:'PH',sleeve:0},steps:{},ecb:null};} /* v1.5: months = plan horizon (Jan 2028 → end), third dial, default 60 = Dec 2032 baseline; earlier off-ramp+return = shorter horizon = higher monthly draw for the same floor. v1.4: fresh devices start at 0/0/0 (his call). v1.2: default anchor = PH; saved plans keep their own picks */
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(!s)return defaults();const d=defaults();s.plan=Object.assign(d.plan,s.plan||{});s.steps=s.steps||{};return s;}catch(e){return defaults();}}
 function save(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}}
 let state=(typeof localStorage!=='undefined')?load():defaults();
@@ -49,10 +49,12 @@ function monthlyBudget(P,F,yPct,n){const i=yPct/100/12;if(i<=0)return(P-F)/n;con
 function currentBlend(){return BLENDS.find(b=>b.id===state.plan.blend)||BLENDS[1];}
 function engineNumbers(){
   const p=state.plan,y=blendYield(currentBlend().mix);
-  const w=monthlyBudget(p.principal,p.floor,y,HORIZON_MO);
+  const w=monthlyBudget(p.principal,p.floor,y,p.months);
   const ym=p.principal*y/100/12;
   return{y,w,yieldMo:ym,draw:Math.max(0,w-ym)};
 }
+/* months since Jan 2028 → calendar label (6 → Jun 2028, 36 → Dec 2030, 60 → Dec 2032) */
+function endLabel(mo){const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return MN[(mo-1)%12]+' '+(2028+Math.floor((mo-1)/12));}
 function verdict(budget,req){
   const m=budget-req;
   if(m>=0)return{cls:'ok',glyph:'✓',word:'funded',m};
@@ -61,11 +63,12 @@ function verdict(budget,req){
 }
 function anchorC(){return COUNTRIES.find(c=>c.cc===state.plan.anchor)||COUNTRIES[0];}
 const SAFETY_NET=300000;  // the NL apartment safety net, in today’s money
-function floorCheck(floor){
-  if(floor<=0)return{real:0,below:false,txt:'Dials at zero — set the start principal and floor to see the 2032 inflation check.'};
-  const real=floor/Math.pow(1.02,6);
+function floorCheck(floor,months){
+  if(floor<=0)return{real:0,below:false,txt:'Dials at zero — set the start principal and floor to see the inflation check.'};
+  const yrs=(18+months)/12; /* mid-2026 (today’s money) → Jan 2028 is 18 mo, then the plan horizon */
+  const real=floor/Math.pow(1.02,yrs);
   const below=real<SAFETY_NET;
-  return{real,below,txt:'Ends 2032 at '+fmtE(floor)+' — floor held by construction. At 2%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
+  return{real,below,txt:'Ends '+endLabel(months)+' at '+fmtE(floor)+' — floor held by construction. At 2%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
 }
 function secDiv(n,name,sub){return '<div class="secdiv" id="sd-'+name.toLowerCase()+'"><span class="secn">'+n+'</span><b>'+name+'</b><span class="secsub">'+esc(sub)+'</span></div>';}
 
@@ -73,24 +76,28 @@ function secDiv(n,name,sub){return '<div class="secdiv" id="sd-'+name.toLowerCas
 function chip(cls,glyph,txt){return '<span class="chip '+cls+'"><b>'+glyph+'</b> '+esc(txt)+'</span>';}
 function stampLine(d){return '<span class="stamp">stamped '+esc(d)+'</span>';}
 /* small verification mark for figures totalled line-by-line in Joël's own COL ledger (not guide estimates) */
-function vmark(){return '<span class="vmark" title="Hand-costed line-by-line from your COL verification ledger — real lifestyle (condo w/ pool+gym, 330g beef/day, cafe-working), ex-insurance. Not a guide estimate.">✓ hand-costed</span>';}
+function vmark(){return '<span class="vmark" title="Hand-costed line-by-line from your COL verification ledger — his real lifestyle, accommodation & protein noted per place (only Chiang Mai is pool+gym; beef where it is his staple, a chicken/fish mix where beef is dear); ex-insurance. Not a guide estimate.">✓ hand-costed</span>';}
+function poolmark(){return '<span class="vmark pool" title="The only base costed with a pool+gym condo — every other place is a regular condo or lean studio.">★ pool+gym</span>';}
+function mixmark(){return '<span class="vmark mix" title="Beef is not the main protein here — costed as a local meat/fish mix instead: goat-forward in India (beef is banned), chicken-forward on the Thai islands (imported beef is dear).">◆ beef not main</span>';}
 
 /* ---------- ENGINE view ---------- */
 function renderEngine(){
   const p=state.plan,en=engineNumbers(),di=driftInfo(),bl=currentBlend();
-  const fc=floorCheck(p.floor);
+  const fc=floorCheck(p.floor,p.months);
   let h='';
   h+=secDiv('01','Engine','what €350k yields');
   h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
-  h+='<div class="hero"><div class="heron" id="heroW">'+fmtE(en.w)+'</div><div class="herosub">per month · sustainable to <span id="heroFloor">'+fmtE(p.floor)+'</span> · '+HORIZON_LABEL+'</div>';
+  h+='<div class="hero"><div class="heron" id="heroW">'+fmtE(en.w)+'</div><div class="herosub">per month · sustainable to <span id="heroFloor">'+fmtE(p.floor)+'</span> · 2028 → <span id="heroEnd">'+endLabel(p.months)+'</span></div>';
   h+='<div class="herobk" id="heroBk">≈ '+fmtE(en.yieldMo)+' yield + '+fmtE(en.draw)+' draw-down · computed on the declining balance</div></div>';
-  h+='<div class="card"><div class="lbl">The two dials</div>';
+  h+='<div class="card"><div class="lbl">The three dials</div>';
   h+='<div class="slrow"><div class="slhead"><span>Start principal</span><span class="num" id="prV">'+fmtE(p.principal)+'</span></div><input type="range" id="prS" min="0" max="450000" step="5000" value="'+p.principal+'"></div>';
-  h+='<div class="slrow"><div class="slhead"><span>Acceptable 2032 floor</span><span class="num" id="flV">'+fmtE(p.floor)+'</span></div><input type="range" id="flS" min="0" max="'+p.principal+'" step="5000" value="'+Math.min(p.floor,p.principal)+'"></div>';
-  h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chk2032">'+fc.txt+'</div></div>';
+  h+='<div class="slrow"><div class="slhead"><span>Acceptable floor at plan end</span><span class="num" id="flV">'+fmtE(p.floor)+'</span></div><input type="range" id="flS" min="0" max="'+p.principal+'" step="5000" value="'+Math.min(p.floor,p.principal)+'"></div>';
+  h+='<div class="slrow"><div class="slhead"><span>Plan end — off-ramp &amp; possible return</span><span class="num" id="tmV">'+endLabel(p.months)+' · '+p.months+' mo</span></div><input type="range" id="tmS" min="6" max="60" step="6" value="'+p.months+'"></div>';
+  h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chk2032">'+fc.txt+'</div>';
+  h+='<div class="foot">A shorter plan spreads the same principal→floor drawdown over fewer months — sell &amp; return earlier and the monthly budget rises. Dec 2032 = the baseline fork.</div></div>';
   h+='<div class="card"><div class="lbl">Instrument mix</div>';
   for(const b of BLENDS){
-    const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,HORIZON_MO);
+    const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,p.months);
     const comp=Object.keys(b.mix).map(k=>Math.round(b.mix[k]*100)+'% '+esc(INSTRUMENTS[k].name)).join(' · ');
     h+='<label class="pick'+(b.id===p.blend?' on':'')+'"><input type="radio" name="blend" value="'+b.id+'"'+(b.id===p.blend?' checked':'')+'>';
     h+='<span class="pickbody"><span class="pickhead"><b>'+esc(b.name)+'</b><span class="num">'+pct(y)+' · '+fmtE(w)+'/mo</span></span>';
@@ -133,11 +140,12 @@ function updateEngineNumbers(){
   $('#heroW').textContent=fmtE(en.w);$('#heroFloor').textContent=fmtE(p.floor);
   $('#heroBk').textContent='≈ '+fmtE(en.yieldMo)+' yield + '+fmtE(en.draw)+' draw-down · computed on the declining balance';
   $('#prV').textContent=fmtE(p.principal);$('#flV').textContent=fmtE(p.floor);
-  const fc=floorCheck(p.floor),ck=$('#chk2032');ck.textContent=fc.txt;ck.classList.toggle('floorwarn',fc.below);
+  $('#tmV').textContent=endLabel(p.months)+' · '+p.months+' mo';$('#heroEnd').textContent=endLabel(p.months);
+  const fc=floorCheck(p.floor,p.months),ck=$('#chk2032');ck.textContent=fc.txt;ck.classList.toggle('floorwarn',fc.below);
   const fl=$('#flS');fl.max=p.principal;if(+fl.value>p.principal)fl.value=p.principal;
   document.querySelectorAll('#view-engine .pick').forEach(pk=>{
     const id=pk.querySelector('input').value,b=BLENDS.find(x=>x.id===id);
-    const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,HORIZON_MO);
+    const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,p.months);
     pk.querySelector('.pickhead .num').textContent=pct(y)+' · '+fmtE(w)+'/mo';
   });
 }
@@ -146,6 +154,8 @@ function bindEngine(){
   $('#prS').onchange=()=>renderMatch();
   $('#flS').oninput=e=>{state.plan.floor=Math.min(+e.target.value,state.plan.principal);save();updateEngineNumbers();};
   $('#flS').onchange=()=>renderMatch();
+  $('#tmS').oninput=e=>{state.plan.months=Math.min(60,Math.max(6,+e.target.value||60));save();updateEngineNumbers();};
+  $('#tmS').onchange=()=>renderMatch();
   document.querySelectorAll('input[name=blend]').forEach(r=>r.onchange=e=>{state.plan.blend=e.target.value;save();renderEngine();renderMatch();});
   $('#slv').onchange=e=>{state.plan.sleeve=Math.max(0,+e.target.value||0);save();renderLens();};
   document.querySelectorAll('#view-engine .cc .chead').forEach(hd=>hd.onclick=()=>{const id=hd.parentElement.dataset.inst;ui.inst=(ui.inst===id?null:id);renderEngine();});
@@ -162,7 +172,7 @@ function renderMatch(){
   h+='<div class="colswitch"><button data-m="f" class="'+(p.colMode==='f'?'on':'')+'">frugal</button><button data-m="n" class="'+(p.colMode==='n'?'on':'')+'">normal</button></div></div>';
   h+='<div class="foot">Frugal is calibrated to experienced-nomad level (TH anchor €800, guides ×0.7) — not tourist guides. Every row = COL + €'+INSURANCE+' IMG Global insurance. Visa costs + flights come on top.</div></div>';
   h+='<div class="lbl sect">Live-through — can the Engine fund it?</div>';
-  h+='<div class="foot">'+vmark()+' = totalled line-by-line from your own COL ledger (real lifestyle — condo w/ pool+gym, 330g beef/day, cafe-working; ex-insurance). Frugal now shows that real number where costed; normal stays the looser guide band. Unmarked countries are still guide-calibrated (frugal = guide ×0.7).</div>';
+  h+='<div class="foot">'+vmark()+' = totalled line-by-line from your own COL ledger (his real lifestyle, ex-insurance; accommodation & protein noted per place). '+poolmark()+' = the one pool+gym base (Chiang Mai only). '+mixmark()+' = beef is not the staple there (chicken/fish mix). Frugal shows that real number where costed; normal stays the looser guide band. Unmarked countries are still guide-calibrated (frugal = guide ×0.7).</div>';
   const lives=COUNTRIES.filter(c=>c.roles.includes('live'));
   const rows=lives.map(c=>({c,req:reqFor(c),v:verdict(en.w,reqFor(c))}));
   rows.sort((a,b)=>b.v.m-a.v.m);
@@ -173,12 +183,13 @@ function renderMatch(){
     if(c.fx)tags+='<span class="tag warn">FX HIGH</span>';
     if(c.roles.includes('anchor'))tags+='<span class="tag ok">anchor</span>';
     if(c.demoted)tags+='<span class="tag bad">demoted anchor</span>';
+    if(c.avoid)tags+='<span class="tag bad">residency: hard-avoid</span>';
     h+='<div class="card cc'+(open?' open':'')+'" data-cc="'+c.cc+'"><div class="chead"><div><b>'+c.f+' '+esc(c.n)+'</b> <span class="sub">'+esc(c.col.city)+'</span>'+(c.col.verified?' '+vmark():'')+tags;
     h+='<div class="sub num">'+fmtE(col)+' + '+fmtE(INSURANCE)+' insurance = '+fmtE(r.req)+'</div></div>';
     h+='<span class="chip '+r.v.cls+'"><b>'+r.v.glyph+'</b> '+r.v.word+' '+(r.v.m>=0?'+':'−')+fmtE(Math.abs(r.v.m)).slice(1)+'</span></div>';
     if(c.places){h+='<div class="places"><div class="placelbl">Places costed'+(state.plan.colMode==='n'?' · real figures (frugal basis)':'')+'</div>';
       for(const pl of c.places){const preq=pl.f+INSURANCE,pv=verdict(en.w,preq);
-        h+='<div class="placerow"><span class="chip '+pv.cls+' pmini"><b>'+pv.glyph+'</b></span><div class="pinfo"><b>'+esc(pl.name)+'</b> <span class="sub">'+esc(pl.sub||'')+'</span>'+(pl.verified?' '+vmark():'')+'<div class="sub num">'+fmtE(pl.f)+' + '+fmtE(INSURANCE)+' = '+fmtE(preq)+' · '+pv.word+' '+(pv.m>=0?'+':'−')+fmtE(Math.abs(pv.m)).slice(1)+'</div>'+(pl.note?'<div class="pnote sub">'+esc(pl.note)+'</div>':'')+'</div></div>';}
+        h+='<div class="placerow"><span class="chip '+pv.cls+' pmini"><b>'+pv.glyph+'</b></span><div class="pinfo"><b>'+esc(pl.name)+'</b> <span class="sub">'+esc(pl.sub||'')+'</span>'+(pl.verified?' '+vmark():'')+(pl.pool?' '+poolmark():'')+(pl.beefMix?' '+mixmark():'')+'<div class="sub num">'+fmtE(pl.f)+' + '+fmtE(INSURANCE)+' = '+fmtE(preq)+' · '+pv.word+' '+(pv.m>=0?'+':'−')+fmtE(Math.abs(pv.m)).slice(1)+'</div>'+(pl.note?'<div class="pnote sub">'+esc(pl.note)+'</div>':'')+'</div></div>';}
       h+='</div>';}
     if(open){h+='<div class="cbody">'+stampLine(c.stamp);
       h+='<div class="kv"><span>Stay</span>'+esc(c.stay||'—')+'</div>';
@@ -187,6 +198,7 @@ function renderMatch(){
       if(c.fx)h+='<div class="kv"><span>FX sensitivity</span>'+esc(c.fx)+'</div>';
       if(c.note)h+='<div class="kv"><span>Note</span>'+esc(c.note)+'</div>';
       if(c.demoted)h+='<div class="notep">'+esc(c.demoted)+'</div>';
+      if(c.avoid)h+='<div class="notep">'+esc(c.avoid)+'</div>';
       h+='</div>';}
     h+='</div>';
   }

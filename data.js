@@ -20,6 +20,18 @@
    Cebu (condo) + lean-beach Siquijor + Valencia/Dumaguete — each hand-costed,
    plus a country-average row. Hand-costed figures carry `verified:true` and show
    a ✓ hand-costed mark in Match. Un-costed countries (GE/CZ/ID/SI) unchanged.
+   v1.7 (2026-07-16): ACCOMMODATION + PROTEIN refinements from the living ledger —
+   only Chiang Mai keeps the pool+gym condo; VN/KH/MY + PH-Cebu re-costed to a regular
+   condo (no pool+gym) so frugal drops: VN 1024→974, KH 941→911, MY 1045→975,
+   PH-Cebu 1078→1048 (PH mean 889→879). Thai islands switch protein to a chicken-
+   forward mix (0/80/20 — imported island beef too dear): Koh Phangan 1297→1214,
+   Koh Lanta 1224→1130. New marks: ★ pool+gym (Chiang Mai only) · ◆ beef-not-main
+   (the two islands).
+   v1.8 (2026-07-16): INDIA folded in as a live-only country (NEVER an anchor) — 6
+   hand-costed places (Tiru 652 · Dharamkot 688 · Mysore 710 · Arambol 858 · Varkala
+   870 · Assagao 998; country f = mean 796). All carry ◆ beef-not-main (goat-forward
+   mix, beef banned). New `avoid` field = LOUD residency hard-avoid warning (182/FY →
+   30% worldwide crypto + the 60/365 trap) with a red "residency: hard-avoid" tag.
    Not financial, tax, legal or immigration advice — verify load-bearing items locally. */
 
 const DATA_STAMP='2026-07-16';
@@ -122,9 +134,9 @@ const BROKERS=[
 /* Countries — 13, role-tagged. Adding one = one entry, no code. */
 const COUNTRIES=[
   {cc:'PH',n:'Philippines',f:'🇵🇭',roles:['anchor','live'],stamp:'2026-07-16',primary:true,
-    col:{f:889,n:1250,city:'3 places costed',conf:'med',verified:true,note:'Frugal = mean of the three hand-costed places listed below (his real lifestyle, ex-insurance); normal = guide estimate. Manila higher, provinces lower.'},
+    col:{f:879,n:1250,city:'3 places costed',conf:'med',verified:true,note:'Frugal = mean of the three hand-costed places listed below (his real lifestyle, ex-insurance); normal = guide estimate. Manila higher, provinces lower.'},
     places:[
-      {name:'Cebu',sub:'1BR condo, pool+gym',f:1078,conf:'med',verified:true,note:'Standard build — pool+gym condo ~15min out, mainland beef supply. Priciest PH place.'},
+      {name:'Cebu',sub:'regular 1BR condo',f:1048,conf:'med',verified:true,note:'Regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym). Mainland beef supply, ~15min out. Priciest PH place.'},
       {name:'Siquijor',sub:'lean beach island',f:850,conf:'med',verified:true,note:'Home wifi weak → Eden/Starlink coworking (~$45/wk) doubles as workspace (biggest line); no pool/gym; beef stocked on Dumaguete ferry runs.'},
       {name:'Valencia / Dumaguete',sub:'lean, mainland-priced',f:739,conf:'med',verified:true,note:'Cheapest costed — real supermarkets, mainland beef ~€7/kg, no coworking premium, BI office in town for visa extensions.'}],
     stay:'30 days free, then famously extendable — up to ~36 months without leaving. SRRV (age 40+, ~$15–25k refundable deposit, $1.5k once + $360/yr) is optional convenience, not required.',
@@ -135,8 +147,8 @@ const COUNTRIES=[
       off:'0% — individual foreign-source gains, incl. crypto sold on a foreign exchange, are untaxed at ANY residency status. No remittance basis for aliens: wiring the proceeds into PH to live on is FINE (the opposite of TH). Kraken supported.',
       gates:['§42(E) “sold within” question: if the sell-click happens on PH soil, BIR could argue PH-source (BOAC “income-producing activity” hook). Foreign-source is the better view (place-of-delivery, Shell v. Sipocot) but unsettled — mitigation = guardrail 9, the hub-click: execute the sale from SG/HK/AE (see Playbooks). Written lawyer opinion pending.',
         'Source rule bites coaching done on PH soil — perform/bill offshore or accept up to 35% on PH-day income.']}},
-  {cc:'GE',n:'Georgia',f:'🇬🇪',roles:['anchor','live'],stamp:'2026-07-14',
-    col:{f:725,n:1350,city:'Tbilisi',conf:'high',note:'winter heating spike'},
+  {cc:'GE',n:'Georgia',f:'🇬🇪',roles:['anchor','live'],stamp:'2026-07-16',
+    col:{f:1160,n:1350,city:'Tbilisi',conf:'med',verified:true,note:'frugal = hand-costed line-by-line for a ~6-month off-ramp stay (his real lifestyle, ex-insurance): PLAIN 1BR, NO pool+gym (a luxury feature in Tbilisi), works mostly from home (lighter cafe spend). Lands far above the old €725 guide — pool+gym does not translate, no cheap tropical shake/street-food culture, European beef + groceries, winter gas-heating spike. normal = guide estimate'},
     stay:'365 days visa-free (EU passport), renewable by border run — 183 days reachable with no permit at all.',
     work:'IE + Small Business Status → 1% on turnover ≤500k GEL (~€170k). ⚠ “Consultancy” is SBS-excluded — if coaching is classed as consulting, fallback = 20% PIT on GE-performed work.',
     anchor:{verdict:'best value — cheapest credible TRC, 0% crypto',
@@ -146,6 +158,10 @@ const COUNTRIES=[
       gates:['Verify coaching ≠ consulting for SBS with a local advisor before counting on the 1%']}},
   {cc:'TH',n:'Thailand',f:'🇹🇭',roles:['anchor','live'],stamp:'2026-07-16',
     col:{f:921,n:1400,city:'Chiang Mai',conf:'med',verified:true,note:'frugal = hand-costed line-by-line (his real lifestyle, ex-insurance) — supersedes the old €800 lived anchor · normal = guide estimate · Bangkok +15–20% · re-confirm on next stay'},
+    places:[
+      {name:'Chiang Mai',sub:'his anchor city',f:921,verified:true,pool:true,note:'The representative cheap-TH base (his lived anchor, now hand-costed). ★ The ONLY pool+gym base in the whole plan — every other place is a regular condo or lean studio. The two islands below are pricier lifestyle alternatives.'},
+      {name:'Koh Phangan',sub:'wellness island + coworking',f:1214,verified:true,beefMix:true,note:'+32% over Chiang Mai. Island rent (Srithanu/Haad Yuan wellness hub tightens supply), higher elec, + coworking (beacHub/Inner Space). ◆ BEEF NOT THE MAIN FOCUS: protein = chicken-forward mix (0% beef / 80% chicken / 20% fish) — imported island beef ~€12/kg not worth it (dropped the line ~€83/mo). Srithanu is itself a yoga/coaching hub.'},
+      {name:'Koh Lanta',sub:'quiet beach island',f:1130,verified:true,beefMix:true,note:'+23% over Chiang Mai. Cheaper & quieter than Phangan; KoHub (~6.5k THB/mo) doubles as the reliable internet. ◆ BEEF NOT THE MAIN FOCUS: chicken-forward mix (0/80/20) — imported island beef ~€13/kg not worth it (dropped the line ~€94/mo).'}],
     stay:'DTV: 5-year multi-entry, 180 days/entry + 180-day extension, ~10k THB fee, show ~€13k funds. LTR out of reach ($80k/yr income bar).',
     work:'By the book: work performed while IN Thailand = Thai-source, 5–35% PIT regardless of remittance (DTV permits it immigration-wise, tax law doesn’t exempt it). Enforcement on nomads currently thin — the app shows the honest number.',
     anchor:{verdict:'the backup anchor — 0% two ways, each conditional (bank gate / no-remit leash)',
@@ -166,18 +182,30 @@ const COUNTRIES=[
       off:'0% on lots held 3+ years, capped 40M CZK/yr (~€1.6M); disposals <100k CZK/yr not even reported. ⚠ NOT HIS FALLBACK (demoted Jul 16 2026): the exemption is PER-LOT and every sell/rebuy resets the clock — the LINK stack was actively traded, so the provably-uninterrupted 3y slice is likely SMALL. Same flaw that killed the Germany idea (1-year hold). Holding-period regimes don’t fit this lot history; source-based regimes (PH, TH, GE) do. The Koinly report will quantify the clean slice — informational only, not an anchor strategy.',
       gates:['Per-lot clock RESETS on every sell/rebuy — trading history, not purchase year, decides. Only never-traded lots qualify today; 2026 buys unlock 2029. Koinly lot report = the ground truth.']}},
   {cc:'VN',n:'Vietnam',f:'🇻🇳',roles:['live'],stamp:'2026-07-14',
-    col:{f:1024,n:1100,city:'Da Nang',conf:'med',verified:true,note:'frugal = hand-costed line-by-line (his real lifestyle, ex-insurance) · normal = guide estimate (band is tight — Da Nang rent rose in 2026)'},
+    col:{f:974,n:1100,city:'Da Nang',conf:'med',verified:true,note:'frugal = hand-costed line-by-line (his real lifestyle, ex-insurance); regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym) · normal = guide estimate (band is tight — Da Nang rent rose in 2026)'},
     stay:'90-day e-visa, repeatable.'},
   {cc:'KH',n:'Cambodia',f:'🇰🇭',roles:['live'],stamp:'2026-07-16',
-    col:{f:941,n:1150,city:'Siem Reap',conf:'med',verified:true,note:'frugal = hand-costed line-by-line for Siem Reap (his real lifestyle, ex-insurance) · normal = guide estimate (Phnom Penh) · fresh 2026 data, thinnest sourcing of the set'},
+    col:{f:911,n:1150,city:'Siem Reap',conf:'med',verified:true,note:'frugal = hand-costed line-by-line for Siem Reap (his real lifestyle, ex-insurance); regular 1BR, NO pool+gym, outer area (Jul 2026) · normal = guide estimate (Phnom Penh) · fresh 2026 data, thinnest sourcing of the set'},
     stay:'E-class “ordinary” visa on arrival, then extend 1/3/6/12 months indefinitely — ~$300/yr for the 12-month via agent. Easiest long-stay in SE Asia.',
     work:'Non-residents: Cambodian-source only. RESIDENTS are taxed on WORLDWIDE income — the old “territorial 0%” framing is dead.',
     demoted:'DEMOTED as anchor (Jul 16 2026) — the previous card was WRONG. The 20% CGT is LIVE since 1 Jan 2026 for investment assets, goodwill, IP and foreign currency (only the real-estate CGT is deferred to 2027), and residents are taxed on their WORLDWIDE gains. Abode-based residency is the trap: do NOT establish an abode or residency here in a sale year — passing through as a non-resident is fine. Crypto banking remains BANNED onshore (central-bank bar), so there is no local off-ramp either way. Scenario E retired — see the decision-tree playbook.'},
   {cc:'ID',n:'Indonesia',f:'🇮🇩',roles:['live'],stamp:'2026-07-14',
     col:{f:900,n:1400,city:'Canggu',conf:'med',note:'Bali premium; rest of ID much cheaper, nomad infra thin'},
     stay:'30-day VOA + 30-day extension; longer stays = visa runs or B211A-type paperwork.'},
+  {cc:'IN',n:'India',f:'🇮🇳',roles:['live'],stamp:'2026-07-16',
+    col:{f:796,n:1100,city:'6 places costed',conf:'med',verified:true,note:'Frugal = mean of the 6 hand-costed places below (his real lifestyle, ex-insurance; lean studio, no pool+gym; protein = goat-forward local mix — beef banned). Bimodal range: inland spiritual towns €652–710 = his CHEAPEST tier ever costed; Goa/Kerala beach €858–998 = mid-tier. normal = comfort-band estimate.'},
+    places:[
+      {name:'Tiruvannamalai',sub:'spiritual · cheapest costed',f:652,conf:'med',verified:true,beefMix:true,note:'Deepest year-round spiritual community (Ramana/Arunachala satsang). His cheapest costed line yet. Weak wifi (strong SIM), hot, no beach; best Nov–Feb.'},
+      {name:'Dharamkot',sub:'Himalayan meditation hub',f:688,conf:'med',verified:true,beefMix:true,note:'Vipassana/Tibetan + seeker community, BEST coworking (VOID Life/NomadGao). Cool ~2000m, no beach; go spring or autumn, not deep winter.'},
+      {name:'Mysore',sub:'Ashtanga capital',f:710,conf:'med',verified:true,beefMix:true,note:'Gokulam shalas, serious daily practice, good meat sourcing, mild year-round. Caveat: lineage in transition post-Sharath (†Nov 2024). Inland.'},
+      {name:'Arambol',sub:'Goa beach + healing scene',f:858,conf:'med',verified:true,beefMix:true,note:'The one beach town with a real grassroots healing/coaching scene (drum circle, ecstatic dance, breathwork, TTCs). Weak village wifi; Nov–Mar season.'},
+      {name:'Varkala',sub:'Kerala cliff beach',f:870,conf:'med',verified:true,beefMix:true,note:'Red-cliff beach + best diet fit (daily fish, Kerala beef legal). Wellness tourism more than deep community; weak wifi (Fort Kochi fallback).'},
+      {name:'Assagao',sub:'best wifi (priciest)',f:998,conf:'med',verified:true,beefMix:true,note:'Leafy N-Goa: best wifi ~95Mbps + NomadGao coworking + best meat/fish sourcing, ride to Arambol/beaches. No beachfront; priciest India node.'}],
+    stay:'Dutch e-Tourist visa = 90 days MAX per visit (NL is NOT in the 180-day group). A ~4–5 month stay = split: ~88 days → exit (Sri Lanka/Nepal/Dubai) → ~88 days on the same 1/5-year multi-entry visa. No FRRO registration under 180 continuous days.',
+    work:'Work performed while IN India = India-source, progressive PIT — but as a sub-182-day non-resident only India-day income is in scope. Perform/bill offshore where possible.',
+    avoid:'⚠ RESIDENCY = HARD-AVOID — a sub-180-day EXPERIENCE only, never an anchor. 182+ days in an Indian FY (Apr–Mar) → resident → crypto taxed 30% + cess WORLDWIDE (§115BBH), exactly what the off-ramp exists to avoid. The 60-day + 365-days-over-prior-4-years limb ALSO catches foreigners: a repeat yearly visitor whose 4-year total hits 365 is caught at just 60 days. Rule: never >181 days/FY; if visiting yearly, cap the long-run average ~90 days/yr.'},
   {cc:'MY',n:'Malaysia',f:'🇲🇾',roles:['live'],stamp:'2026-07-14',
-    col:{f:1045,n:1300,city:'Penang',conf:'med',verified:true,note:'frugal = hand-costed line-by-line for Penang (his real lifestyle, ex-insurance) · normal = guide estimate (KL) · best infrastructure-per-euro in SE Asia'},
+    col:{f:975,n:1300,city:'Penang',conf:'med',verified:true,note:'frugal = hand-costed line-by-line for Penang (his real lifestyle, ex-insurance); regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym) · normal = guide estimate (KL) · best infrastructure-per-euro in SE Asia'},
     stay:'90 days visa-free.',
     demoted:'Demoted as anchor: MM2H Silver = $150k deposit + MANDATORY RM600k property purchase (kills keep-principal-liquid); DE Rantau non-tech bar $60k/yr. Tax outcome was fine (no CGT non-trading, FSI exempt to 2036) — the visa economics are broken.'},
   {cc:'SI',n:'Slovenia',f:'🇸🇮',roles:['live'],stamp:'2026-07-14',
@@ -185,7 +213,7 @@ const COUNTRIES=[
     stay:'EU — unlimited.',
     demoted:'Demoted as anchor: 25% tax on crypto→fiat from 1 Jan 2026 (swaps exempt, pre-2026 gains grandfathered). For a mostly-post-2026 gain that’s a ~25% haircut — the old “SI 0%” claim is dead. CZ takes the EU slot.'},
   {cc:'JP',n:'Japan',f:'🇯🇵',roles:['live'],stamp:'2026-07-14',
-    col:{f:1472,n:1900,city:'Fukuoka',conf:'med',verified:true,note:'frugal = hand-costed line-by-line (his real lifestyle, ex-insurance) — beef + cafe meals run 2–3× SE Asia, so his real Fukuoka cost lands ABOVE the old guide numbers · normal = +~30% comfort band, ESTIMATE (guide-normal was below his real cost, so it was raised to keep the band valid) · Tokyo higher again'},
+    col:{f:1472,n:1900,city:'Fukuoka',conf:'med',verified:true,note:'frugal = hand-costed line-by-line (his real lifestyle, ex-insurance); regular 1LDK, no pool+gym (Japan norm) — beef + cafe meals run 2–3× SE Asia, so his real Fukuoka cost lands ABOVE the old guide numbers · normal = +~30% comfort band, ESTIMATE (guide-normal was below his real cost, so it was raised to keep the band valid) · Tokyo higher again'},
     fx:'HIGH — the euro case is a weak-yen bet; if EUR/JPY strengthens 20%, frugal Fukuoka rises to ~€1,770',
     blocks:'90-day blocks',
     stay:'90 days per entry, HARD CAP — NL is not on the bilateral extension list (AT/DE/IE/LI/MX/CH/UK only). Nomad visa ¥10M/yr, 6mo, non-renewable = out of reach. Pattern: quarterly Fukuoka blocks; immigration scrutinizes serial re-entries.',
@@ -216,7 +244,7 @@ const PATH=[
   {id:'nomad',name:'Nomad',when:'2028 → · resident nowhere',steps:[
     {id:'n1',t:'Stay under day-thresholds everywhere (~183d rule of thumb)',dep:'Guardrail 5: never 182 in India (30% worldwide crypto), never 180 in any worldwide-tax country. PH is SAFE to exceed (territorial at any status); TH only with the no-remit leash; KH no longer safe to exceed (worldwide CGT on residents).'},
     {id:'n2',t:'Make PH the FIRST stop, rent a real place, set the Kraken address to it — brokers stay as-is',dep:'SUPERSEDES the old after-TRC rule. A real rented PH address (address ≠ TRC): gets NL off the account early — CARF/DAC8 reporting follows the declared address — and avoids re-KYC in the middle of a pump window. Never a fabricated address; stale-but-genuine beats a last-minute change. IBKR/Swissquote keep NL until the TRC exists (“resident nowhere” is grey at brokers; both tolerate the gap).'},
-    {id:'n3',t:'Re-confirm the hand-costed COL numbers on the first stays',dep:'The ✓ hand-costed frugal figures (TH €921, VN €1,024, PH places…) are desk-costed from his real lifestyle — validate on the ground; the ledger in waypoint/research is the living source. (Supersedes the old “TH €800 lived anchor” check.)'},
+    {id:'n3',t:'Re-confirm the hand-costed COL numbers on the first stays',dep:'The ✓ hand-costed frugal figures (TH €921, VN €974, PH places…) are desk-costed from his real lifestyle — validate on the ground; the ledger in waypoint/research is the living source. (Supersedes the old “TH €800 lived anchor” check.)'},
     {id:'n4',t:'Monitor the moving parts',dep:'TH bank-on-DTV policy, TH remittance decree, GE coaching-vs-consulting — all flagged on the country cards — plus the NL inwonerschapsfictie/exit-tax motion: recheck every Prinsjesdag (3rd Tue of Sep) until actual departure (see Playbooks).'}]},
   {id:'anchor',name:'Anchor',when:'when a base is chosen',steps:[
     {id:'a1',t:'Establish TRC at the anchor',dep:'PH 180d cumulative in the calendar year (the 0% does NOT need it — the TRC is paper/corroboration) · GE 183d · TH 180d + filing · CZ home/183d.'},
