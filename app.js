@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.2.0';
+const APP_VERSION='1.3.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -71,6 +71,8 @@ function secDiv(n,name,sub){return '<div class="secdiv" id="sd-'+name.toLowerCas
 /* ---------- shared bits ---------- */
 function chip(cls,glyph,txt){return '<span class="chip '+cls+'"><b>'+glyph+'</b> '+esc(txt)+'</span>';}
 function stampLine(d){return '<span class="stamp">stamped '+esc(d)+'</span>';}
+/* small verification mark for figures totalled line-by-line in Joël's own COL ledger (not guide estimates) */
+function vmark(){return '<span class="vmark" title="Hand-costed line-by-line from your COL verification ledger — real lifestyle (condo w/ pool+gym, 330g beef/day, cafe-working), ex-insurance. Not a guide estimate.">✓ hand-costed</span>';}
 
 /* ---------- ENGINE view ---------- */
 function renderEngine(){
@@ -160,6 +162,7 @@ function renderMatch(){
   h+='<div class="colswitch"><button data-m="f" class="'+(p.colMode==='f'?'on':'')+'">frugal</button><button data-m="n" class="'+(p.colMode==='n'?'on':'')+'">normal</button></div></div>';
   h+='<div class="foot">Frugal is calibrated to experienced-nomad level (TH anchor €800, guides ×0.7) — not tourist guides. Every row = COL + €'+INSURANCE+' IMG Global insurance. Visa costs + flights come on top.</div></div>';
   h+='<div class="lbl sect">Live-through — can the Engine fund it?</div>';
+  h+='<div class="foot">'+vmark()+' = totalled line-by-line from your own COL ledger (real lifestyle — condo w/ pool+gym, 330g beef/day, cafe-working; ex-insurance). Frugal now shows that real number where costed; normal stays the looser guide band. Unmarked countries are still guide-calibrated (frugal = guide ×0.7).</div>';
   const lives=COUNTRIES.filter(c=>c.roles.includes('live'));
   const rows=lives.map(c=>({c,req:reqFor(c),v:verdict(en.w,reqFor(c))}));
   rows.sort((a,b)=>b.v.m-a.v.m);
@@ -170,9 +173,13 @@ function renderMatch(){
     if(c.fx)tags+='<span class="tag warn">FX HIGH</span>';
     if(c.roles.includes('anchor'))tags+='<span class="tag ok">anchor</span>';
     if(c.demoted)tags+='<span class="tag bad">demoted anchor</span>';
-    h+='<div class="card cc'+(open?' open':'')+'" data-cc="'+c.cc+'"><div class="chead"><div><b>'+c.f+' '+esc(c.n)+'</b> <span class="sub">'+esc(c.col.city)+'</span>'+tags;
+    h+='<div class="card cc'+(open?' open':'')+'" data-cc="'+c.cc+'"><div class="chead"><div><b>'+c.f+' '+esc(c.n)+'</b> <span class="sub">'+esc(c.col.city)+'</span>'+(c.col.verified?' '+vmark():'')+tags;
     h+='<div class="sub num">'+fmtE(col)+' + '+fmtE(INSURANCE)+' insurance = '+fmtE(r.req)+'</div></div>';
     h+='<span class="chip '+r.v.cls+'"><b>'+r.v.glyph+'</b> '+r.v.word+' '+(r.v.m>=0?'+':'−')+fmtE(Math.abs(r.v.m)).slice(1)+'</span></div>';
+    if(c.places){h+='<div class="places"><div class="placelbl">Places costed'+(state.plan.colMode==='n'?' · real figures (frugal basis)':'')+'</div>';
+      for(const pl of c.places){const preq=pl.f+INSURANCE,pv=verdict(en.w,preq);
+        h+='<div class="placerow"><span class="chip '+pv.cls+' pmini"><b>'+pv.glyph+'</b></span><div class="pinfo"><b>'+esc(pl.name)+'</b> <span class="sub">'+esc(pl.sub||'')+'</span>'+(pl.verified?' '+vmark():'')+'<div class="sub num">'+fmtE(pl.f)+' + '+fmtE(INSURANCE)+' = '+fmtE(preq)+' · '+pv.word+' '+(pv.m>=0?'+':'−')+fmtE(Math.abs(pv.m)).slice(1)+'</div>'+(pl.note?'<div class="pnote sub">'+esc(pl.note)+'</div>':'')+'</div></div>';}
+      h+='</div>';}
     if(open){h+='<div class="cbody">'+stampLine(c.stamp);
       h+='<div class="kv"><span>Stay</span>'+esc(c.stay||'—')+'</div>';
       if(c.work)h+='<div class="kv"><span>Coaching income</span>'+esc(c.work)+'</div>';

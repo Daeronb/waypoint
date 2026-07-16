@@ -97,6 +97,19 @@ input[type=range]{width:100%;accent-color:var(--sec)}
 .brow:last-of-type{border-bottom:none}
 .lrow{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
 
+/* verification mark — hand-costed figures (symbol + word, never colour alone) */
+.vmark{display:inline-flex;gap:4px;align-items:center;font-size:.64rem;letter-spacing:.04em;color:var(--ok);
+  background:var(--okbg);border:1px solid var(--okbd);border-radius:4px;padding:0 5px;vertical-align:middle;white-space:nowrap}
+
+/* places-within-a-country (PH: Cebu / Siquijor / Valencia) */
+.places{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
+.placelbl{font-size:.64rem;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.placerow{display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-top:1px dashed var(--line)}
+.placerow:first-of-type{border-top:none}
+.chip.pmini{padding:1px 6px;font-size:.72rem;flex:none;margin-top:1px}
+.pinfo{flex:1;min-width:0}
+.pnote{margin-top:2px}
+
 /* path */
 .phase{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
 .phead{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
