@@ -147,11 +147,11 @@ const COUNTRIES=[
     col:{f:1200,n:1700,city:'Prague',conf:'high',note:'Brno −15%'},
     stay:'EU — unlimited; report to the Foreign Police within 30 days.',
     work:'živnost + paušální daň band 1: CZK 9,984/mo (~€400) flat, covering income tax + social + health in one payment, up to ~1.5M CZK revenue. Simplest regime on the list.',
-    anchor:{verdict:'the EU slot — 0% on aged lots, ~€400/mo all-in work tax',
+    anchor:{verdict:'the EU slot — 0% on aged lots (a small slice of his stack), ~€400/mo all-in work tax',
       trc:'Days–weeks: permanent home with intent to stay (“stálý byt”) OR 183 days; certificate routine, ~€0.',
       coach:'~€400/mo flat all-in (paušální daň).',
-      off:'0% on lots held 3+ years, capped 40M CZK/yr (~€1.6M); disposals <100k CZK/yr not even reported. STRESS-TEST WINNER: the statutory 3y-hold 0% needs NO sourcing interpretation — the 2017 LINK stack already qualifies, and the Koinly lot documentation doubles as holding proof. Fallback anchor if the PH §42(E) lawyer opinion disappoints.',
-      gates:['Per-lot clock: coins bought 2026 are exempt only from 2029; the older ~€50k stack qualifies earlier. Track lot dates.']}},
+      off:'0% on lots held 3+ years, capped 40M CZK/yr (~€1.6M); disposals <100k CZK/yr not even reported. ⚠ NOT HIS FALLBACK (demoted Jul 16 2026): the exemption is PER-LOT and every sell/rebuy resets the clock — the LINK stack was actively traded, so the provably-uninterrupted 3y slice is likely SMALL. Same flaw that killed GE as an anchor. Holding-period regimes don’t fit this lot history; source-based regimes (PH, TH) do. The Koinly report will quantify the clean slice — informational only, not an anchor strategy.',
+      gates:['Per-lot clock RESETS on every sell/rebuy — trading history, not purchase year, decides. Only never-traded lots qualify today; 2026 buys unlock 2029. Koinly lot report = the ground truth.']}},
   {cc:'VN',n:'Vietnam',f:'🇻🇳',roles:['live'],stamp:'2026-07-14',
     col:{f:700,n:1100,city:'Da Nang',conf:'high',note:'cheapest solid option'},
     stay:'90-day e-visa, repeatable.'},
@@ -207,11 +207,11 @@ const PATH=[
     {id:'a1',t:'Establish TRC at the anchor',dep:'GE 183d · TH 180d + filing · CZ home/183d · PY cédula + 4mo RUC.'},
     {id:'a2',t:'THEN switch IBKR/Swissquote residency to the anchor',dep:'AFTER the TRC exists, BEFORE any big sale — DAC8/CARF reporting goes to the declared residence. Kraken already points at PH since the first stop (the old “switch Kraken after TRC” rule is superseded — see Nomad).'},
     {id:'a3',t:'If TH: open Thai bank + Bitkub',dep:'THE gate — banks reject DTV holders; verify branch reality before committing to TH at all.'},
-    {id:'a4',t:'If CZ: confirm which lots have passed 3 years',dep:'Per-lot; 2026 buys unlock 2029.'},
+    {id:'a4',t:'If CZ: confirm which lots have passed 3 years',dep:'Per-lot, and the clock resets on every sell/rebuy — expect only a small never-traded slice to qualify (Koinly quantifies). This is why CZ is not the fallback.'},
     {id:'a5',t:'If GE: confirm SBS classification for coaching',dep:'“Consultancy” is excluded — local advisor; fallback is 20%.'}]},
   {id:'offramp',name:'Off-ramp',when:'the bull-run window',steps:[
     {id:'o0',t:'Fly to a hub and execute the sale physically in SG/HK/AE',dep:'Guardrail 9 — the hub-click, in EVERY scenario: even if “sold within” attached to the click location, local CGT is 0 → the PH §42(E) ambiguity becomes stakes-free. Cost: one layover.'},
-    {id:'o1',t:'Sell via the anchor’s clean route',dep:'PH: foreign exchange (Kraken) → Swissquote, click from the hub. GE: anywhere (foreign-source). TH: ONSHORE licensed exchange only, before 31 Dec 2029 — or Kraken abroad with ZERO remittance. CZ: 3y+ aged lots only.'},
+    {id:'o1',t:'Sell via the anchor’s clean route',dep:'PH: foreign exchange (Kraken) → Swissquote, click from the hub. GE: anywhere (foreign-source). TH: ONSHORE licensed exchange only, before 31 Dec 2029 — or Kraken abroad with ZERO remittance. CZ: never-traded 3y+ lots only — a small slice of the stack.'},
     {id:'o2',t:'File the return even when exempt',dep:'Exempt ≠ unreported (TH filing duty >120k THB; CZ <100k CZK/yr excepted).'},
     {id:'o3',t:'Sweep proceeds into the safe blend',dep:'Back to the Engine — the sleeve becomes principal.'}]},
   {id:'fork',name:'Fork',when:'≈2032 · the only real branch',steps:[
@@ -225,7 +225,7 @@ const PLAYBOOKS=[
   {id:'pump',icon:'▲',accent:'ok',title:'Sudden pump — cash out in 1–2 weeks',sub:'the emergency this plan is built around',body:[
     {h:'Before 2028 (still NL-resident)',p:'Fly home and sell as an NL resident — clean, no exotic moves. His own correction: pre-exit, NL IS the emergency plan.'},
     {h:'Nomad gap (no TRC yet) — the emergency sequence',p:'Fly TOWARD PH via a SG/HK/AE stop → execute the sale DURING the stop (guardrail 9: the hub-click) → land in PH for the presence/continuity story. PH is territorial 0% for aliens at ANY residency status — no 180 days needed. The old line “a hub trip solves logistics, not tax” was WRONG: clicking from a no-CGT jurisdiction also moots the sourcing ambiguity.'},
-    {h:'After the TRC',p:'Same click discipline: sell via the anchor’s clean route (PH foreign exchange · GE anywhere · TH onshore before 2030 · CZ aged lots) but execute the click from SG/HK/AE anyway — guardrail 9 applies in EVERY scenario. Kraken already points at PH (set at the first stop); IBKR/Swissquote must point at the anchor.'}]},
+    {h:'After the TRC',p:'Same click discipline: sell via the anchor’s clean route (PH foreign exchange · GE anywhere · TH onshore before 2030 · CZ aged lots, small slice) but execute the click from SG/HK/AE anyway — guardrail 9 applies in EVERY scenario. Kraken already points at PH (set at the first stop); IBKR/Swissquote must point at the anchor.'}]},
   {id:'tree',icon:'⑂',accent:'ok',title:'Off-ramp decision tree — scenarios A–F',sub:'the one justified branch · from the cash-out dossier, verified Jul 16 2026',body:[
     {h:'The principle',p:'A gain is taxed only if some jurisdiction has a claim at the MOMENT of sale — 0% = engineering a moment where no one does. And in every branch: guardrail 9, execute the actual click physically in SG/HK/AE.'},
     {h:'Q1 — NL cleanly exited?',p:'NO + pre-2028 → Scenario A: just sell; box 3 is a modest deemed-return wealth tax, tolerable in a true emergency. NO + 2028 or later → do NOT sell as an NL resident (real gains tax) — exit first. YES → NL has no claim; keep the exit documentation.'},
