@@ -1,13 +1,19 @@
 'use strict';
-/* Waypoint v1.1 — data layer. Snapshot 2026-07-14.
-   Sources: research packages 1-5 (Personal apps/waypoint/research/research-*.md).
+/* Waypoint v1.2 — data layer. Snapshot 2026-07-16.
+   Sources: research packages 1-6 (Personal apps/waypoint/research/research-*.md).
    v1.1 (research-5): all instrument yields are now NET of fund fees (TER) — the old
    blends quoted gross YTMs, which overstated income by ~0.12-0.20%. Blends rebuilt
    around Joël's real structure: ≈€100k crash-deployable dry powder + ≈€225k apartment
    core + ≈€25k accepted 4-year burn. Term deposits retired (see dep card + research-5).
+   v1.2 (research-6, 2026-07-16): OFF-RAMP CORRECTIONS — KH demoted (20% worldwide CGT
+   live since 1 Jan 2026; old card was wrong), PH promoted to PRIMARY anchor (+ §42(E)
+   sourcing flag), TH remittance warning widened (ATM/card spend counts), guardrail 9 =
+   hub-click (execute EVERY sale physically in SG/HK/AE), Kraken address rule superseded
+   (PH at the START of travels, not after TRC), NL exit-tax Prinsjesdag monitor,
+   A–F decision-tree playbook card (Scenario E retired).
    Not financial, tax, legal or immigration advice — verify load-bearing items locally. */
 
-const DATA_STAMP='2026-07-14';
+const DATA_STAMP='2026-07-16';
 const ECB_STAMP={dfr:2.25,asOf:'2026-06-17',estr:2.18,note:'ECB decides again 23 Jul 2026 — hiking cycle; re-stamp snapshots after'};
 const MMF_SPREAD=-0.08;   // MMF-ETF yield ≈ DFR − 0.08 (derivable live)
 const INSURANCE=120;      // IMG Global ~€120/mo — his researched pick, named so he remembers which one won
@@ -106,6 +112,16 @@ const BROKERS=[
 
 /* Countries — 13, role-tagged. Adding one = one entry, no code. */
 const COUNTRIES=[
+  {cc:'PH',n:'Philippines',f:'🇵🇭',roles:['anchor','live'],stamp:'2026-07-16',primary:true,
+    col:{f:750,n:1250,city:'Cebu',conf:'med',note:'Manila higher, provinces lower'},
+    stay:'30 days free, then famously extendable — up to ~36 months without leaving. SRRV (age 40+, ~$15–25k refundable deposit, $1.5k once + $360/yr) is optional convenience, not required.',
+    work:'Territorial for individuals: foreign-source coaching 0%. But work performed while IN PH = PH-source, progressive to 35% (same source rule as TH).',
+    anchor:{verdict:'THE primary off-ramp anchor — territorial 0% at ANY residency status',
+      trc:'180+ days present → resident alien; BIR tax-residency certificate is routine. The 0% does NOT depend on it: resident alien, NRAETB and NRANETB are ALL territorial — 180 days only buys the TRC paper. No special visa needed (tourist visa extends ~36 months); SRRV optional.',
+      coach:'0% foreign-source / up to 35% on PH-performed days.',
+      off:'0% — individual foreign-source gains, incl. crypto sold on a foreign exchange, are untaxed at ANY residency status. No remittance basis for aliens: wiring the proceeds into PH to live on is FINE (the opposite of TH). Kraken supported.',
+      gates:['§42(E) “sold within” question: if the sell-click happens on PH soil, BIR could argue PH-source (BOAC “income-producing activity” hook). Foreign-source is the better view (place-of-delivery, Shell v. Sipocot) but unsettled — mitigation = guardrail 9, the hub-click: execute the sale from SG/HK/AE (see Playbooks). Written lawyer opinion pending.',
+        'Source rule bites coaching done on PH soil — perform/bill offshore or accept up to 35% on PH-day income.']}},
   {cc:'GE',n:'Georgia',f:'🇬🇪',roles:['anchor','live'],stamp:'2026-07-14',
     col:{f:725,n:1350,city:'Tbilisi',conf:'high',note:'winter heating spike'},
     stay:'365 days visa-free (EU passport), renewable by border run — 183 days reachable with no permit at all.',
@@ -115,7 +131,7 @@ const COUNTRIES=[
       coach:'1% SBS if classification lands; else 20%.',
       off:'0% — 2019 MoF ruling: individual crypto gains = foreign-source under the territorial system. Unchanged 2026. Kraken supported.',
       gates:['Verify coaching ≠ consulting for SBS with a local advisor before counting on the 1%']}},
-  {cc:'TH',n:'Thailand',f:'🇹🇭',roles:['anchor','live'],stamp:'2026-07-14',
+  {cc:'TH',n:'Thailand',f:'🇹🇭',roles:['anchor','live'],stamp:'2026-07-16',
     col:{f:800,n:1400,city:'Chiang Mai',conf:'high',note:'frugal = his lived anchor · Bangkok +15–20% · re-confirm on next stay'},
     stay:'DTV: 5-year multi-entry, 180 days/entry + 180-day extension, ~10k THB fee, show ~€13k funds. LTR out of reach ($80k/yr income bar).',
     work:'By the book: work performed while IN Thailand = Thai-source, 5–35% PIT regardless of remittance (DTV permits it immigration-wise, tax law doesn’t exempt it). Enforcement on nomads currently thin — the app shows the honest number.',
@@ -125,37 +141,25 @@ const COUNTRIES=[
       off:'0% on crypto sold via Thai SEC-licensed exchanges (Min.Reg. 399), 1 Jan 2025 – 31 Dec 2029. Selling abroad + remitting = taxable. Filing still required above 120k THB — exempt ≠ unreported. Kraken supported (but the play is onshore: Bitkub).',
       gates:['THE gate: Thai banks (BBL/KBank/SCB) reject new accounts on DTV since the 2025–26 anti-scam crackdown — no Thai bank, no THB cash-out. Verify on the ground before committing.',
         'Window closes 31 Dec 2029 — the entire off-ramp must finish before.',
+        'Remittance is WIDER than wires: ATM withdrawals + card spend inside TH from the proceeds account COUNT. Amount-based (only what comes in is assessable), but income-first ordering on commingled money — keep proceeds in a dedicated non-commingled account and spend in TH from separate clean money. The leash is PERMANENT: remitting years later is still assessable if earned while TH-resident.',
         'Remittance relaxation = revived DRAFT decree (exempt if remitted in year earned or the next) — monitor, don’t plan on it.']}},
-  {cc:'CZ',n:'Czechia',f:'🇨🇿',roles:['anchor','live'],stamp:'2026-07-14',
+  {cc:'CZ',n:'Czechia',f:'🇨🇿',roles:['anchor','live'],stamp:'2026-07-16',
     col:{f:1200,n:1700,city:'Prague',conf:'high',note:'Brno −15%'},
     stay:'EU — unlimited; report to the Foreign Police within 30 days.',
     work:'živnost + paušální daň band 1: CZK 9,984/mo (~€400) flat, covering income tax + social + health in one payment, up to ~1.5M CZK revenue. Simplest regime on the list.',
     anchor:{verdict:'the EU slot — 0% on aged lots, ~€400/mo all-in work tax',
       trc:'Days–weeks: permanent home with intent to stay (“stálý byt”) OR 183 days; certificate routine, ~€0.',
       coach:'~€400/mo flat all-in (paušální daň).',
-      off:'0% on lots held 3+ years, capped 40M CZK/yr (~€1.6M); disposals <100k CZK/yr not even reported.',
+      off:'0% on lots held 3+ years, capped 40M CZK/yr (~€1.6M); disposals <100k CZK/yr not even reported. STRESS-TEST WINNER: the statutory 3y-hold 0% needs NO sourcing interpretation — the 2017 LINK stack already qualifies, and the Koinly lot documentation doubles as holding proof. Fallback anchor if the PH §42(E) lawyer opinion disappoints.',
       gates:['Per-lot clock: coins bought 2026 are exempt only from 2029; the older ~€50k stack qualifies earlier. Track lot dates.']}},
   {cc:'VN',n:'Vietnam',f:'🇻🇳',roles:['live'],stamp:'2026-07-14',
     col:{f:700,n:1100,city:'Da Nang',conf:'high',note:'cheapest solid option'},
     stay:'90-day e-visa, repeatable.'},
-  {cc:'PH',n:'Philippines',f:'🇵🇭',roles:['anchor','live'],stamp:'2026-07-14',
-    col:{f:750,n:1250,city:'Cebu',conf:'med',note:'Manila higher, provinces lower'},
-    stay:'30 days free, then famously extendable — up to ~36 months without leaving. SRRV (age 40+, ~$15–25k refundable deposit, $1.5k once + $360/yr) is optional convenience, not required.',
-    work:'Territorial for individuals: foreign-source coaching 0%. But work performed while IN PH = PH-source, progressive to 35% (same source rule as TH).',
-    anchor:{verdict:'clean territorial — 0% on foreign-source crypto, real 180-day TRC',
-      trc:'180+ days present → resident alien; BIR tax-residency certificate is routine. No special visa needed (tourist visa extends ~36 months); SRRV optional.',
-      coach:'0% foreign-source / up to 35% on PH-performed days.',
-      off:'0% — individual foreign-source capital gains, incl. crypto sold on a foreign exchange, are untaxed under the territorial system; remitting the cash in is fine. Kraken supported.',
-      gates:['Source rule bites coaching done on PH soil — perform/bill offshore or accept up to 35% on PH-day income.','Foreign-source = sell on a FOREIGN exchange; a local PH-exchange sale could be argued PH-source. Keep the off-ramp offshore.']}},
-  {cc:'KH',n:'Cambodia',f:'🇰🇭',roles:['anchor','live'],stamp:'2026-07-14',
+  {cc:'KH',n:'Cambodia',f:'🇰🇭',roles:['live'],stamp:'2026-07-16',
     col:{f:750,n:1150,city:'Phnom Penh',conf:'med',note:'Siem Reap cheaper; fewer nomads, numbers less tested'},
     stay:'E-class “ordinary” visa on arrival, then extend 1/3/6/12 months indefinitely — ~$300/yr for the 12-month via agent. Easiest long-stay in SE Asia.',
-    work:'Territorial: foreign-source coaching 0%. Cambodia-invoiced work = 0–20% PIT.',
-    anchor:{verdict:'easiest residency, territorial 0% — but crypto is legally grey',
-      trc:'182+ days or a permanent abode → tax resident; GDT issues a TRC, though less trodden than GE/TH. Visa side is trivial (indefinite E-visa extensions).',
-      coach:'0% foreign-source / 0–20% on Cambodia-invoiced.',
-      off:'0% in practice — foreign-source gains untaxed, no crypto-specific tax; the deferred 20% CGT (pushed to 2027+) targets Cambodian shares/property, not foreign crypto.',
-      gates:['Crypto banking is BANNED onshore — the central bank bars institutions from touching it, so there is NO Cambodian off-ramp; sell on a foreign exchange and remit. Kraken from abroad.','Least-documented crypto treatment on the list — insurance anchor, confirm with a local advisor before relying on it.']}},
+    work:'Non-residents: Cambodian-source only. RESIDENTS are taxed on WORLDWIDE income — the old “territorial 0%” framing is dead.',
+    demoted:'DEMOTED as anchor (Jul 16 2026) — the previous card was WRONG. The 20% CGT is LIVE since 1 Jan 2026 for investment assets, goodwill, IP and foreign currency (only the real-estate CGT is deferred to 2027), and residents are taxed on their WORLDWIDE gains. Abode-based residency is the trap: do NOT establish an abode or residency here in a sale year — passing through as a non-resident is fine. Crypto banking remains BANNED onshore (central-bank bar), so there is no local off-ramp either way. Scenario E retired — see the decision-tree playbook.'},
   {cc:'ID',n:'Indonesia',f:'🇮🇩',roles:['live'],stamp:'2026-07-14',
     col:{f:900,n:1400,city:'Canggu',conf:'med',note:'Bali premium; rest of ID much cheaper, nomad infra thin'},
     stay:'30-day VOA + 30-day extension; longer stays = visa runs or B211A-type paperwork.'},
@@ -173,9 +177,9 @@ const COUNTRIES=[
     blocks:'90-day blocks',
     stay:'90 days per entry, HARD CAP — NL is not on the bilateral extension list (AT/DE/IE/LI/MX/CH/UK only). Nomad visa ¥10M/yr, 6mo, non-renewable = out of reach. Pattern: quarterly Fukuoka blocks; immigration scrutinizes serial re-entries.',
     note:'Kraken restricted in JP — never an off-ramp jurisdiction. He’s learning Japanese (N4) and will visit regardless.'},
-  {cc:'SG',n:'Singapore',f:'🇸🇬',roles:['hub'],stamp:'2026-07-14',hub:{wb:650,wm:1100,note:'cheapest sleep is the problem; food/transport cheap'}},
-  {cc:'HK',n:'Hong Kong',f:'🇭🇰',roles:['hub'],stamp:'2026-07-14',hub:{wb:600,wm:1500,note:'best food value, worst hotel value'}},
-  {cc:'AE',n:'Dubai',f:'🇦🇪',roles:['hub'],stamp:'2026-07-14',hub:{wb:400,wm:1200,note:'cheapest budget hub; extras brutal'}}
+  {cc:'SG',n:'Singapore',f:'🇸🇬',roles:['hub'],stamp:'2026-07-16',hub:{wb:650,wm:1100,note:'cheapest sleep is the problem; food/transport cheap · execution venue for the click — no CGT'}},
+  {cc:'HK',n:'Hong Kong',f:'🇭🇰',roles:['hub'],stamp:'2026-07-16',hub:{wb:600,wm:1500,note:'best food value, worst hotel value · execution venue for the click — no CGT'}},
+  {cc:'AE',n:'Dubai',f:'🇦🇪',roles:['hub'],stamp:'2026-07-16',hub:{wb:400,wm:1200,note:'cheapest budget hub; extras brutal · execution venue for the click — no CGT'}}
 ];
 
 /* Path — linear sequence, plain checkboxes + text dependencies (computed unlock logic rejected for v1). */
@@ -183,7 +187,7 @@ const PATH=[
   {id:'prep',name:'Prepare',when:'now → 2027 · in NL',steps:[
     {id:'p1',t:'Open IBKR while still NL-resident',dep:'Before deregistering — NL/EU brokers re-KYC or close on emigration; IBKR survives relocation and trades bonds.'},
     {id:'p2',t:'Open Swissquote as backup',dep:'Same reason. CHF 10k min, expat-built, second regulator (Swiss custody).'},
-    {id:'p3',t:'Verify Kraken fully while NL-resident',dep:'KYC is easiest as a resident. The residency SWITCH comes later — after TRC, before any big sale.'},
+    {id:'p3',t:'Verify Kraken fully while NL-resident',dep:'KYC is easiest as a resident. The address switch comes EARLY — set Kraken to the first real PH address at the START of travels (supersedes the old after-TRC rule; see Nomad).'},
     {id:'p4',t:'Re-stamp yield snapshots after the 23 Jul 2026 ECB decision',dep:'Hiking cycle — the app warns when the live anchor moves off the snapshots.'},
     {id:'p5',t:'Deploy the ~€45k into the market; record lot dates',dep:'The CZ 3-year clock runs per lot — 2026 buys are exempt only from 2029.'},
     {id:'p6',t:'Line up IMG Global insurance (~€120/mo)',dep:'His researched winner — already inside every burn number in Match.'},
@@ -196,17 +200,18 @@ const PATH=[
     {id:'x5',t:'Deregister from NL',dep:'Before 1 Jan 2028 — vermogensaanwasbelasting treated as fixed (the pivot constant).'}]},
   {id:'nomad',name:'Nomad',when:'2028 → · resident nowhere',steps:[
     {id:'n1',t:'Stay under day-thresholds everywhere (~183d rule of thumb)',dep:''},
-    {id:'n2',t:'Leave broker/exchange residency as-is until the anchor TRC exists',dep:'“Resident nowhere” is grey at brokers; both tolerate the gap in practice.'},
+    {id:'n2',t:'Set the Kraken address to PH at the first stop — brokers stay as-is',dep:'SUPERSEDES the old after-TRC rule. A real rented PH address (address ≠ TRC): gets NL off the account early — CARF/DAC8 reporting follows the declared address — and avoids re-KYC in the middle of a pump window. Never a fabricated address; stale-but-genuine beats a last-minute change. IBKR/Swissquote keep NL until the TRC exists (“resident nowhere” is grey at brokers; both tolerate the gap).'},
     {id:'n3',t:'Re-confirm the TH €800 frugal anchor on the first stay',dep:'Chiang-Mai-era pricing; baht + inflation drift since.'},
-    {id:'n4',t:'Monitor the moving parts',dep:'TH bank-on-DTV policy, TH remittance decree, GE coaching-vs-consulting — all flagged on the country cards.'}]},
+    {id:'n4',t:'Monitor the moving parts',dep:'TH bank-on-DTV policy, TH remittance decree, GE coaching-vs-consulting — all flagged on the country cards — plus the NL inwonerschapsfictie/exit-tax motion: recheck every Prinsjesdag (3rd Tue of Sep) until actual departure (see Playbooks).'}]},
   {id:'anchor',name:'Anchor',when:'when a base is chosen',steps:[
     {id:'a1',t:'Establish TRC at the anchor',dep:'GE 183d · TH 180d + filing · CZ home/183d · PY cédula + 4mo RUC.'},
-    {id:'a2',t:'THEN switch residency at Kraken + IBKR/Swissquote',dep:'AFTER the TRC exists, BEFORE any big sale — DAC8/CARF reporting goes to the declared residence.'},
+    {id:'a2',t:'THEN switch IBKR/Swissquote residency to the anchor',dep:'AFTER the TRC exists, BEFORE any big sale — DAC8/CARF reporting goes to the declared residence. Kraken already points at PH since the first stop (the old “switch Kraken after TRC” rule is superseded — see Nomad).'},
     {id:'a3',t:'If TH: open Thai bank + Bitkub',dep:'THE gate — banks reject DTV holders; verify branch reality before committing to TH at all.'},
     {id:'a4',t:'If CZ: confirm which lots have passed 3 years',dep:'Per-lot; 2026 buys unlock 2029.'},
     {id:'a5',t:'If GE: confirm SBS classification for coaching',dep:'“Consultancy” is excluded — local advisor; fallback is 20%.'}]},
   {id:'offramp',name:'Off-ramp',when:'the bull-run window',steps:[
-    {id:'o1',t:'Sell via the anchor’s clean route',dep:'GE: anywhere (foreign-source). TH: ONSHORE licensed exchange only, before 31 Dec 2029. CZ: 3y+ lots only.'},
+    {id:'o0',t:'Fly to a hub and execute the sale physically in SG/HK/AE',dep:'Guardrail 9 — the hub-click, in EVERY scenario: even if “sold within” attached to the click location, local CGT is 0 → the PH §42(E) ambiguity becomes stakes-free. Cost: one layover.'},
+    {id:'o1',t:'Sell via the anchor’s clean route',dep:'PH: foreign exchange (Kraken) → Swissquote, click from the hub. GE: anywhere (foreign-source). TH: ONSHORE licensed exchange only, before 31 Dec 2029 — or Kraken abroad with ZERO remittance. CZ: 3y+ aged lots only.'},
     {id:'o2',t:'File the return even when exempt',dep:'Exempt ≠ unreported (TH filing duty >120k THB; CZ <100k CZK/yr excepted).'},
     {id:'o3',t:'Sweep proceeds into the safe blend',dep:'Back to the Engine — the sleeve becomes principal.'}]},
   {id:'fork',name:'Fork',when:'≈2032 · the only real branch',steps:[
@@ -219,8 +224,15 @@ const PATH=[
 const PLAYBOOKS=[
   {id:'pump',icon:'▲',accent:'ok',title:'Sudden pump — cash out in 1–2 weeks',sub:'the emergency this plan is built around',body:[
     {h:'Before 2028 (still NL-resident)',p:'Fly home and sell as an NL resident — clean, no exotic moves. His own correction: pre-exit, NL IS the emergency plan.'},
-    {h:'Nomad gap (no TRC yet)',p:'Weakest position — DAC8/CARF reports to the last declared residence. Prefer accelerating the anchor TRC over selling big while resident nowhere. A hub trip (SG/HK/Dubai, €500–1,500/wk + flights) solves logistics, not tax.'},
-    {h:'After the TRC',p:'Sell via the anchor’s clean route (GE anywhere · TH onshore before 2030 · CZ aged lots). Kraken + broker residency must already point at the anchor — that’s the Path sequencing rule.'}]},
+    {h:'Nomad gap (no TRC yet) — the emergency sequence',p:'Fly TOWARD PH via a SG/HK/AE stop → execute the sale DURING the stop (guardrail 9: the hub-click) → land in PH for the presence/continuity story. PH is territorial 0% for aliens at ANY residency status — no 180 days needed. The old line “a hub trip solves logistics, not tax” was WRONG: clicking from a no-CGT jurisdiction also moots the sourcing ambiguity.'},
+    {h:'After the TRC',p:'Same click discipline: sell via the anchor’s clean route (PH foreign exchange · GE anywhere · TH onshore before 2030 · CZ aged lots) but execute the click from SG/HK/AE anyway — guardrail 9 applies in EVERY scenario. Kraken already points at PH (set at the first stop); IBKR/Swissquote must point at the anchor.'}]},
+  {id:'tree',icon:'⑂',accent:'ok',title:'Off-ramp decision tree — scenarios A–F',sub:'the one justified branch · from the cash-out dossier, verified Jul 16 2026',body:[
+    {h:'The principle',p:'A gain is taxed only if some jurisdiction has a claim at the MOMENT of sale — 0% = engineering a moment where no one does. And in every branch: guardrail 9, execute the actual click physically in SG/HK/AE.'},
+    {h:'Q1 — NL cleanly exited?',p:'NO + pre-2028 → Scenario A: just sell; box 3 is a modest deemed-return wealth tax, tolerable in a true emergency. NO + 2028 or later → do NOT sell as an NL resident (real gains tax) — exit first. YES → NL has no claim; keep the exit documentation.'},
+    {h:'Q2 — tax-resident anywhere this year?',p:'NO (roaming) → Scenarios B/D: fly toward PH via a hub stop, sell during the stop, land in PH = 0% at any residency status; guard the hostile thresholds (India 182d, TH 180d). PH resident → Scenario C: sell (hub-click) = 0%. TH resident → Scenario F: Kraken → Swissquote, NEVER bring proceeds into TH by any channel = 0% on a permanent no-remit leash. Worldwide-tax country → failure mode: expect local tax, get an adviser.'},
+    {h:'Scenario E — Cambodia — RETIRED',p:'✕ Was “sell as KH resident, territorial 0%”. WRONG since 1 Jan 2026: 20% CGT on residents’ WORLDWIDE gains, on abode-based residency. Never establish a KH abode in a sale year; passing through as a non-resident is fine.'},
+    {h:'Q3 — always, before pressing sell',p:'Kraken address = PH (not NL)? Provenance dossier ready? Destination = Swissquote, not a remittance-country bank? Swissquote compliance pre-notified? Physically in SG/HK/AE for the click?'},
+    {h:'Retired note',p:'“Emergency = fly back to NL and sell” is PRE-EXIT only (Scenario A). Post-exit, returning would re-enter the NL tax net — the emergency route is the hub-click toward PH.'}]},
   {id:'crash',icon:'▼',accent:'warn',title:'Crash — deploy the powder, hold the core',sub:'the ≈€100k sleeve exists for exactly this',body:[
     {h:'What holds',p:'MMF: no dent. FRN: −1 to −4% briefly, recovers in weeks. Govt/Schatz: typically RALLY — sell high. iBonds: dip self-heals by the printed maturity date, so do not sell mid-panic unless truly forced. Evergreen IG 1–5y (no longer in any blend): −6/−7% plus a NAV discount if sold into the panic.'},
     {h:'Deploying the ≈€100k',p:'Powder sleeve (MMF/FRN + govt) sells any weekday, cash in 2–4 business days, from anywhere via IBKR. His structure: this is the slice earmarked to buy cheap stocks/BTC at a bottom — the apartment core stays untouched.'},
@@ -231,6 +243,13 @@ const PLAYBOOKS=[
     {h:'',p:'The anchor becomes home: local tax planning and real integration replace this app’s frame. Work income (coaching) becomes the main lever — the anchor cards’ work lines are the starting point.'}]},
   {id:'aow',icon:'◔',accent:'warn',title:'AOW gap',body:[
     {h:'',p:'Every year not NL-resident ≈ −2% state pension; 2028–2032 ≈ −8 to −10%. Voluntary continuation (vrijwillige voortzetting, SVB) must be requested within 1 year of leaving — it’s an Exit-phase decision, not a later one. Verify current terms with SVB before deregistering.'}]},
+  {id:'nlmotion',icon:'◉',accent:'warn',title:'Monitor — NL emigrant exit tax (inwonerschapsfictie)',body:[
+    {h:'',p:'Tweede Kamer motion (Oct 2024, explore-options stage — nothing enacted) to explore a residency fiction / exit tax for wealthy emigrants. Directly targets this profile. Recheck every Prinsjesdag (3rd Tuesday of September) until actual departure; if it advances, accelerating the exit beats waiting it out.'}]},
+  {id:'addr',icon:'✉',accent:'ok',title:'What the exchange address does — and doesn’t',body:[
+    {h:'Does',p:'Decides WHERE Kraken’s CARF/DAC8 report goes. That is all it steers.'},
+    {h:'Doesn’t',p:'It is not a tax claim: notification ≠ taxation, and address ≠ TRC. A report landing in PH about a territorial-0% gain is a non-event.'},
+    {h:'Stale is fine',p:'A genuine, once-real PH rental address that has gone stale beats a last-minute change during a pump (re-KYC risk, inconsistent story). Never a fabricated address — that IS the offence.'},
+    {h:'Rejected idea',p:'Keeping NL on Kraken “to avoid PH notification” inverts the threat model (NL is the claimant to starve; PH is the safe harbor) and requires a false self-certification. Rejected Jul 15 2026 — do not re-litigate.'}]},
   {id:'estate',icon:'▣',accent:'bad',title:'Estate / cold-storage access',body:[
     {h:'',p:'If something happens abroad, someone must reach the coins: written procedure + seed access split so no single loss is fatal (e.g. steel backup with a trusted person). Also: who can instruct IBKR/Swissquote? Set beneficiaries where supported. Do this before Exit, not on the road.'}]}
 ];

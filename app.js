@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.1.0';
+const APP_VERSION='1.2.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -11,7 +11,7 @@ const pct=v=>v.toFixed(2)+'%';
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._h);toast._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 /* ---------- state ---------- */
-function defaults(){return{plan:{principal:350000,floor:325000,blend:'target3',colMode:'f',anchor:'GE',sleeve:95000},steps:{},ecb:null};}
+function defaults(){return{plan:{principal:350000,floor:325000,blend:'target3',colMode:'f',anchor:'PH',sleeve:95000},steps:{},ecb:null};} /* v1.2: default anchor = PH (primary off-ramp anchor, research-6); saved plans keep their own pick */
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(!s)return defaults();const d=defaults();s.plan=Object.assign(d.plan,s.plan||{});s.steps=s.steps||{};return s;}catch(e){return defaults();}}
 function save(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}}
 let state=(typeof localStorage!=='undefined')?load():defaults();
@@ -188,18 +188,18 @@ function renderMatch(){
   for(const c of COUNTRIES.filter(x=>x.roles.includes('anchor'))){
     const a=c.anchor,on=p.anchor===c.cc;
     h+='<label class="pick anch'+(on?' on':'')+'"><input type="radio" name="anchor" value="'+c.cc+'"'+(on?' checked':'')+'>';
-    h+='<span class="pickbody"><span class="pickhead"><b>'+c.f+' '+esc(c.n)+'</b><span class="sub">'+esc(a.verdict)+'</span></span>';
+    h+='<span class="pickbody"><span class="pickhead"><b>'+c.f+' '+esc(c.n)+'</b>'+(c.primary?' <span class="star">⭐ primary</span>':'')+'<span class="sub">'+esc(a.verdict)+'</span></span>';
     h+='<span class="kv"><span>TRC</span>'+esc(a.trc)+'</span>';
     h+='<span class="kv"><span>Coaching</span>'+esc(a.coach)+'</span>';
     h+='<span class="kv"><span>Off-ramp</span>'+esc(a.off)+'</span>';
     for(const g of a.gates)h+='<span class="gate"><b>⚠</b> '+esc(g)+'</span>';
     h+='</span></label>';
   }
-  h+='<div class="lbl sect">Hubs — emergency off-ramp trips only</div><div class="card">';
+  h+='<div class="lbl sect">Hubs — execution venues, never places to live</div><div class="card">';
   for(const c of COUNTRIES.filter(x=>x.roles.includes('hub'))){
     h+='<div class="brow"><b>'+c.f+' '+esc(c.n)+'</b><div class="sub num">'+fmtE(c.hub.wb)+'–'+fmtE(c.hub.wm)+' / week · '+esc(c.hub.note)+'</div></div>';
   }
-  h+='<div class="foot">A 1–2 week cash-out trip = €500–1,500 + flights — a rounding error on the event that triggers it. Never a place to live.</div></div>';
+  h+='<div class="foot">Guardrail 9 — the hub-click: execute EVERY sale physically from SG/HK/AE. Local CGT is 0 even if the sale were deemed locally sourced, which moots the PH “sold within” question. A 1–2 week trip = €500–1,500 + flights — a rounding error on the event that triggers it. Never a place to live.</div></div>';
   h+='<div class="foot disc">Snapshot '+DATA_STAMP+' · not tax or immigration advice.</div>';
   $('#view-match').innerHTML=h;
   document.querySelectorAll('.colswitch button').forEach(b=>b.onclick=()=>{state.plan.colMode=b.dataset.m;save();renderMatch();});
@@ -234,7 +234,7 @@ function renderBooks(){
     if(open){h+='<div class="cbody">';for(const s of b.body){if(s.h)h+='<div class="kv"><span>'+esc(s.h)+'</span>'+esc(s.p)+'</div>';else h+='<div class="notep plain">'+esc(s.p)+'</div>';}h+='</div>';}
     h+='</div>';
   }
-  h+='<div class="foot disc">Not advice. The pre-2028 emergency plan is his own correction: fly back and sell as an NL resident.</div>';
+  h+='<div class="foot disc">Not advice. Pre-exit the emergency plan stays “fly back and sell as an NL resident”; post-exit the decision tree governs — never sell as an NL resident from 2028 on.</div>';
   $('#view-books').innerHTML=h;
   document.querySelectorAll('#view-books .cc .chead').forEach(hd=>hd.onclick=()=>{const id=hd.parentElement.dataset.book;ui.book=(ui.book===id?null:id);renderBooks();});
 }
