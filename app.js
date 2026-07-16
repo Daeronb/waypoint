@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.3.0';
+const APP_VERSION='1.4.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -11,7 +11,7 @@ const pct=v=>v.toFixed(2)+'%';
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._h);toast._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 /* ---------- state ---------- */
-function defaults(){return{plan:{principal:350000,floor:325000,blend:'target3',colMode:'f',anchor:'PH',sleeve:95000},steps:{},ecb:null};} /* v1.2: default anchor = PH (primary off-ramp anchor, research-6); saved plans keep their own pick */
+function defaults(){return{plan:{principal:0,floor:0,blend:'target3',colMode:'f',anchor:'PH',sleeve:0},steps:{},ecb:null};} /* v1.4: fresh devices start at 0/0/0 (his call) — he sets his own numbers, localStorage keeps them. v1.2: default anchor = PH; saved plans keep their own pick */
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(!s)return defaults();const d=defaults();s.plan=Object.assign(d.plan,s.plan||{});s.steps=s.steps||{};return s;}catch(e){return defaults();}}
 function save(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}}
 let state=(typeof localStorage!=='undefined')?load():defaults();
@@ -62,6 +62,7 @@ function verdict(budget,req){
 function anchorC(){return COUNTRIES.find(c=>c.cc===state.plan.anchor)||COUNTRIES[0];}
 const SAFETY_NET=300000;  // the NL apartment safety net, in today’s money
 function floorCheck(floor){
+  if(floor<=0)return{real:0,below:false,txt:'Dials at zero — set the start principal and floor to see the 2032 inflation check.'};
   const real=floor/Math.pow(1.02,6);
   const below=real<SAFETY_NET;
   return{real,below,txt:'Ends 2032 at '+fmtE(floor)+' — floor held by construction. At 2%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
@@ -84,8 +85,8 @@ function renderEngine(){
   h+='<div class="hero"><div class="heron" id="heroW">'+fmtE(en.w)+'</div><div class="herosub">per month · sustainable to <span id="heroFloor">'+fmtE(p.floor)+'</span> · '+HORIZON_LABEL+'</div>';
   h+='<div class="herobk" id="heroBk">≈ '+fmtE(en.yieldMo)+' yield + '+fmtE(en.draw)+' draw-down · computed on the declining balance</div></div>';
   h+='<div class="card"><div class="lbl">The two dials</div>';
-  h+='<div class="slrow"><div class="slhead"><span>Start principal</span><span class="num" id="prV">'+fmtE(p.principal)+'</span></div><input type="range" id="prS" min="300000" max="400000" step="5000" value="'+p.principal+'"></div>';
-  h+='<div class="slrow"><div class="slhead"><span>Acceptable 2032 floor</span><span class="num" id="flV">'+fmtE(p.floor)+'</span></div><input type="range" id="flS" min="275000" max="'+p.principal+'" step="5000" value="'+Math.min(p.floor,p.principal)+'"></div>';
+  h+='<div class="slrow"><div class="slhead"><span>Start principal</span><span class="num" id="prV">'+fmtE(p.principal)+'</span></div><input type="range" id="prS" min="0" max="450000" step="5000" value="'+p.principal+'"></div>';
+  h+='<div class="slrow"><div class="slhead"><span>Acceptable 2032 floor</span><span class="num" id="flV">'+fmtE(p.floor)+'</span></div><input type="range" id="flS" min="0" max="'+p.principal+'" step="5000" value="'+Math.min(p.floor,p.principal)+'"></div>';
   h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chk2032">'+fc.txt+'</div></div>';
   h+='<div class="card"><div class="lbl">Instrument mix</div>';
   for(const b of BLENDS){
@@ -97,7 +98,6 @@ function renderEngine(){
   }
   h+='<div class="foot">Every mix keeps ≈€100k crash-deployable and the apartment core on fixed maturity dates (his 225/100/25 structure). Yields are NET of fund fees. Max-safety → max-yield gap ≈ €110/mo — the floor dial can absorb that on its own.</div></div>';
   h+='<div class="card"><div class="lbl">Crypto sleeve — a lens, not a branch</div>';
-  h+='<div class="slhead"><span>Risk sleeve (≈€50k crypto + ≈€45k entering)</span></div>';
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';
   h+='<div id="lensT"></div></div>';
   h+='<div class="lbl sect">Yield instrument cards</div>';
