@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.8.0';
+const APP_VERSION='1.8.1';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -169,10 +169,10 @@ function renderMatch(){
   let h='';
   h+=secDiv('02','Match','where the budget lands');
   h+='<div class="card"><div class="matchhead"><div><div class="lbl">Budget from Engine</div><div class="heron sm num">'+fmtE(en.w)+'<span class="permo">/mo</span></div></div>';
-  h+='<div class="colswitch"><button data-m="f" class="'+(p.colMode==='f'?'on':'')+'">frugal</button><button data-m="n" class="'+(p.colMode==='n'?'on':'')+'">normal</button></div></div>';
-  h+='<div class="foot">Frugal is calibrated to experienced-nomad level (TH anchor €800, guides ×0.7) — not tourist guides. Every row = COL + €'+INSURANCE+' IMG Global insurance. Visa costs + flights come on top.</div></div>';
+  h+='<div class="colswitch"><button data-m="f" class="'+(p.colMode==='f'?'on':'')+'">Hand-costed</button><button data-m="n" class="'+(p.colMode==='n'?'on':'')+'">Comfort</button></div></div>';
+  h+='<div class="foot"><b>Hand-costed</b> = your real line-by-line cost from the COL ledger (lean lifestyle, ex-insurance) — not tourist guides. <b>Comfort</b> = a looser, roomier band on top. Every row = COL + €'+INSURANCE+' IMG Global insurance. Visa costs + flights come on top.</div></div>';
   h+='<div class="lbl sect">Live-through — can the Engine fund it?</div>';
-  h+='<div class="foot">'+vmark()+' = totalled line-by-line from your own COL ledger (his real lifestyle, ex-insurance; accommodation & protein noted per place). '+poolmark()+' = the one pool+gym base (Chiang Mai only). '+mixmark()+' = beef is not the staple there (chicken/fish mix). Frugal shows that real number where costed; normal stays the looser guide band. Unmarked countries are still guide-calibrated (frugal = guide ×0.7).</div>';
+  h+='<div class="foot">'+vmark()+' = totalled line-by-line from your own COL ledger (his real lifestyle, ex-insurance; accommodation & protein noted per place). '+poolmark()+' = the one pool+gym base (Chiang Mai only). '+mixmark()+' = beef is not the staple there (chicken/fish mix). The ✓ mark shows where the Hand-costed number is a real ledger total; unmarked countries are still guide-calibrated (guide ×0.7) even under this tab. Comfort is the looser, roomier band.</div>';
   const lives=COUNTRIES.filter(c=>c.roles.includes('live'));
   const rows=lives.map(c=>({c,req:reqFor(c),v:verdict(en.w,reqFor(c))}));
   rows.sort((a,b)=>b.v.m-a.v.m);
@@ -187,7 +187,7 @@ function renderMatch(){
     h+='<div class="card cc'+(open?' open':'')+'" data-cc="'+c.cc+'"><div class="chead"><div><b>'+c.f+' '+esc(c.n)+'</b> <span class="sub">'+esc(c.col.city)+'</span>'+(c.col.verified?' '+vmark():'')+tags;
     h+='<div class="sub num">'+fmtE(col)+' + '+fmtE(INSURANCE)+' insurance = '+fmtE(r.req)+'</div></div>';
     h+='<span class="chip '+r.v.cls+'"><b>'+r.v.glyph+'</b> '+r.v.word+' '+(r.v.m>=0?'+':'−')+fmtE(Math.abs(r.v.m)).slice(1)+'</span></div>';
-    if(c.places){h+='<div class="places"><div class="placelbl">Places costed'+(state.plan.colMode==='n'?' · real figures (frugal basis)':'')+'</div>';
+    if(c.places){h+='<div class="places"><div class="placelbl">Places costed'+(state.plan.colMode==='n'?' · real figures (hand-costed basis)':'')+'</div>';
       for(const pl of c.places){const preq=pl.f+INSURANCE,pv=verdict(en.w,preq);
         h+='<div class="placerow"><span class="chip '+pv.cls+' pmini"><b>'+pv.glyph+'</b></span><div class="pinfo"><b>'+esc(pl.name)+'</b> <span class="sub">'+esc(pl.sub||'')+'</span>'+(pl.verified?' '+vmark():'')+(pl.pool?' '+poolmark():'')+(pl.beefMix?' '+mixmark():'')+'<div class="sub num">'+fmtE(pl.f)+' + '+fmtE(INSURANCE)+' = '+fmtE(preq)+' · '+pv.word+' '+(pv.m>=0?'+':'−')+fmtE(Math.abs(pv.m)).slice(1)+'</div>'+(pl.note?'<div class="pnote sub">'+esc(pl.note)+'</div>':'')+'</div></div>';}
       h+='</div>';}
