@@ -97,6 +97,11 @@ input[type=range]{width:100%;accent-color:var(--sec)}
 .brow:last-of-type{border-bottom:none}
 .lrow{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
 
+/* running-total figure — the all-in monthly number, made to read at a glance out of the surrounding line */
+.tot{display:inline-block;font-weight:700;color:var(--ink);font-size:1rem;line-height:1.2;
+  background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:0 7px;
+  font-variant-numeric:tabular-nums;box-shadow:inset 0 -2px 0 var(--sec)}
+
 /* verification mark — hand-costed figures (symbol + word, never colour alone) */
 .vmark{display:inline-flex;gap:4px;align-items:center;font-size:.64rem;letter-spacing:.04em;color:var(--ok);
   background:var(--okbg);border:1px solid var(--okbd);border-radius:4px;padding:0 5px;vertical-align:middle;white-space:nowrap}

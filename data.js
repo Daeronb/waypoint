@@ -125,10 +125,7 @@ const BLENDS=[
 const BROKERS=[
   {n:'IBKR',star:true,v:'ok',glyph:'✓',word:'survives',d:'Keeps clients on relocation. Open while still NL-resident (signup wants A tax residency), update to the anchor later. Trades bonds (Schatz). Withholding follows declared residency.'},
   {n:'Swissquote',star:true,v:'ok',glyph:'✓',word:'survives',d:'Built for expats — “keep the same account every time you move”. CHF 10k min, non-resident surcharge ~CHF 10–30/mo (cheap insurance). Swiss custody = outside the EU regulator, still CRS-reports to declared residence.'},
-  {n:'Raisin',v:'warn',glyph:'!',word:'retired',d:'Residence-tied platform + deposits locked to maturity — retired from the plan (research-5): iBonds fixed-maturity ETFs at IBKR do the same job with none of the residency risk.'},
-  {n:'Saxo',v:'warn',glyph:'?',word:'unverified',d:'Entity-based (NL under Saxo Bank); non-EU-move policy not confirmed. Ask directly only if a third leg is wanted.'},
-  {n:'DEGIRO',v:'bad',glyph:'✕',word:'dies on exit',d:'Supported-country list; moving outside → forced close/transfer (documented). Exit before leaving NL.'},
-  {n:'Trade Republic',v:'bad',glyph:'✕',word:'dies on exit',d:'Requires permanent residence in a supported country; a move can trigger termination.'}
+  {n:'DEGIRO',v:'bad',glyph:'✕',word:'dies on exit',d:'The one you actually use — supported-country list; moving outside → forced close/transfer (documented). Exit before leaving NL.'}
 ];
 
 /* Countries — 13, role-tagged. Adding one = one entry, no code. */
