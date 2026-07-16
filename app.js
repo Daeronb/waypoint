@@ -85,7 +85,7 @@ function renderEngine(){
   const p=state.plan,en=engineNumbers(),di=driftInfo(),bl=currentBlend();
   const fc=floorCheck(p.floor,p.months);
   let h='';
-  h+=secDiv('01','Engine','');
+  h+=secDiv('01','Engine','what the principal yields');
   h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
   h+='<div class="hero"><div class="heron" id="heroW">'+fmtE(en.w)+'</div><div class="herosub">per month · sustainable to <span id="heroFloor">'+fmtE(p.floor)+'</span> · 2028 → <span id="heroEnd">'+endLabel(p.months)+'</span></div>';
   h+='<div class="herobk" id="heroBk">≈ '+fmtE(en.yieldMo)+' yield + '+fmtE(en.draw)+' draw-down · computed on the declining balance</div></div>';
