@@ -32,9 +32,20 @@
    870 · Assagao 998; country f = mean 796). All carry ◆ beef-not-main (goat-forward
    mix, beef banned). New `avoid` field = LOUD residency hard-avoid warning (182/FY →
    30% worldwide crypto + the 60/365 trap) with a red "residency: hard-avoid" tag.
+   v1.10 (session 2026-07-17): NEW iBONDS SHELF — iShares filled the ladder since
+   research-5: Dec 2029 (29GI, 3.18 net) and Dec 2031 (31IG, 3.57 net — matures AT
+   the default plan end) added as cards. All three blends rebuilt on the new shelf,
+   SAME ids: safety swaps ib28→ib29 (same skeleton, +€10/mo); target3 becomes
+   MODULAR — €100k powder + €133k iBonds-2030 completion tranche ≈ €234k that can
+   buy the NL home outright at ANY early-return date while a €116k iBonds-2031
+   lock rides to maturity untouched (dual-destination powder, his framing);
+   allig core moves ib30→ib31 (+€51/mo). ib28 RETIRED from blends (dominated by
+   ib29; card kept). Crossover iBonds (IX29, 4.18 net, IG+BB mix) evaluated and
+   REJECTED — breaks the pure-IG principle. Re-verify all yields after the ECB
+   decision of 23 Jul 2026 (stamps are Apr/May 2026).
    Not financial, tax, legal or immigration advice — verify load-bearing items locally. */
 
-const DATA_STAMP='2026-07-16';
+const DATA_STAMP='2026-07-17';
 const ECB_STAMP={dfr:2.25,asOf:'2026-06-17',estr:2.18,note:'ECB decides again 23 Jul 2026 — hiking cycle; re-stamp snapshots after'};
 const MMF_SPREAD=-0.08;   // MMF-ETF yield ≈ DFR − 0.08 (derivable live)
 const INSURANCE=120;      // IMG Global ~€120/mo — his researched pick, named so he remembers which one won
@@ -75,11 +86,24 @@ const INSTRUMENTS={
     liq:'Trades like a stock — sell any weekday, cash T+2, from anywhere. Early sale = market price: worst case ≈ −2–4% if sold into a rate spike or panic, fading to ~0% near maturity.',
     crash:'Self-healing by construction: whatever the dip, pull-to-par ends it by Dec 2028 (bar defaults — IG default rate ~0.1–0.2%/yr, spread over ~390 names).',
     hold:'UCITS ETF.',
+    powder:4,
+    note:'RETIRED from all blends (Jul 2026): the new Dec 2029 rung pays 3.18% net for the same fixed-maturity idea one year longer — it dominates every role this fund played. Card kept so the ladder history stays visible.'},
+  ib29:{name:'iBonds Dec 2029 — fixed-maturity IG',ref:'iShares 29GI (dist, IE000IHURBR0) · TER 0.12% · gross YTW 3.30% · pays out cash ~1 Jan 2030',yld:3.18,stamp:'2026-04-30',
+    risk:'IG credit (~353 issuers) + duration 3.0 that SHRINKS to zero at maturity. Hold to Dec 2029 and today’s yield is locked, end value known.',
+    liq:'Sell any weekday, cash T+2, from anywhere. Early sale worst case today ≈ −3–4% (rate spike + panic combined), fading to ~0% near maturity.',
+    crash:'Self-healing: pull-to-par ends any dip by Dec 2029 (bar defaults — IG ~0.1–0.2%/yr, spread over ~350 names).',
+    hold:'UCITS ETF.',
     powder:4},
   ib30:{name:'iBonds Dec 2030 — fixed-maturity IG',ref:'iShares 30IG/30IA · TER 0.12% · gross YTW 3.44% · pays out cash ~1 Jan 2031',yld:3.32,stamp:'2026-05-08',star:'the apartment tranche',
     risk:'IG credit (~310 issuers) + duration 3.8 shrinking to zero at maturity. Locked yield to Dec 2030.',
     liq:'Sell any weekday, cash T+2. Early sale worst case today ≈ −4–6% (rate spike + panic combined), shrinking every year toward zero at maturity.',
     crash:'Self-healing: any drawdown ends at the printed date. Maturity lands cash EXACTLY in the 2030–2032 return-to-NL window — then re-park or spend.',
+    hold:'UCITS ETF.',
+    powder:4},
+  ib31:{name:'iBonds Dec 2031 — fixed-maturity IG',ref:'iShares 31IG (dist, IE000I2WYEU9) / IG31 (acc) · TER 0.12% · gross YTM 3.69% · pays out cash ~1 Jan 2032',yld:3.57,stamp:'2026-05-15',star:'the plan-end lock',
+    risk:'IG credit (~261 issuers) + duration 4.7 shrinking to zero at maturity. The highest locked yield on the shelf — and it matures AT the default plan end (Dec 2031).',
+    liq:'Sell any weekday, cash T+2. Early sale worst case today ≈ −5–8% (rate spike + panic combined), decaying fast as maturity nears: ≈ −3–4% by 2029, ≈ −1% by 2031. Partial sales are fine — it’s an ETF, sell only the euros needed.',
+    crash:'Self-healing: pull-to-par by Dec 2031. In the blends this is the slice that never needs to move — plans changing is what the powder and the 2030 rung are for.',
     hold:'UCITS ETF.',
     powder:4},
   ig:{name:'IG corp-bond ETF 1–5y (evergreen)',ref:'iShares € Corp 1-5yr · TER 0.20% · WAM 3y · gross YTM 3.20%',yld:3.00,stamp:'2026-06-26',
@@ -107,19 +131,24 @@ const INSTRUMENTS={
 
 const POWDER_RANK=['','pure dry powder','rallies in a crash','mild dip, quick recovery','hold through the storm','anti-powder (locked)'];
 
-/* Blends v1.1 (research-5) — every mix is built around the SAME structure Joël gave:
-   ≈29% (≈€100k) dry powder that never falls in a crash and sells in 2–4 business days
-   (crash-deploy: cheap stocks/BTC), + a core that lands intact for the NL apartment
-   (~€225–250k, iBonds maturities Dec 2028 → cash Jan 2029, Dec 2030 → cash Jan 2031).
-   Ids kept from v1.0 ('allig' now = Max yield) so a saved plan in localStorage survives.
-   All yields NET of fees — old gross blends: safety 2.62, target3 3.02, allig 3.27. */
+/* Blends v1.10 (new iBonds shelf, 2026-07-17) — same spine: ≈29% (≈€100k) dry powder
+   that never falls in a crash and sells in 2–4 business days, + a core locked to
+   printed maturity dates inside the 2030–2032 return window. Ids kept ('target3'
+   now renders "Modular") so a saved plan in localStorage survives.
+   DUAL-DESTINATION POWDER (his framing, Jul 2026): the €100k powder is an option on
+   whichever opportunity shows up — crash-deploy into cheap stocks/BTC, OR the first
+   tranche of an early NL home purchase. One pot, one choice, made at the moment;
+   a crash makes property AND stocks cheap at once, so using it one way foregoes
+   the other. The Modular blend is built so powder + the 2030 rung together reach
+   apartment money (≈€234k) without ever breaking the 2031 lock.
+   All yields NET of fees — v1.1 blends for history: safety 2.71, target3 2.99, allig 3.08. */
 const BLENDS=[
-  {id:'safety',name:'Max safety',sub:'≈€100k powder (MMF+govt) + core in Schatz rolls & iBonds-2028 — nothing meaningfully red, ever',
-    mix:{mmf:.12,govt:.17,schatz:.42,ib28:.29}},
-  {id:'target3',name:'3% target',sub:'≈€100k powder + iBonds ladder 2028/2030 — locked yields, repair dates on the calendar',
-    mix:{mmf:.11,govt:.18,ib28:.21,ib30:.50}},
-  {id:'allig',name:'Max yield',sub:'FRN-boosted powder + everything else in iBonds-2030 — beats old all-in IG on yield AND structure',
-    mix:{frn:.14,govt:.15,ib30:.71}}
+  {id:'safety',name:'Max safety',sub:'≈€100k powder (MMF+govt) + core in Schatz rolls & iBonds-2029 — nothing meaningfully red, ever; ≈€245k sellable within days',
+    mix:{mmf:.12,govt:.17,schatz:.42,ib29:.29}},
+  {id:'target3',name:'Modular',sub:'DUAL-DESTINATION powder: €100k powder + €133k iBonds-2030 ≈ €234k that can buy the NL home outright at ANY early-return date (early-exit cost ≈ −1–3% worst case, €0 from Jan 2031) — or stays invested as crash powder + apartment tranche if plans hold. The €116k iBonds-2031 lock rides to maturity untouched either way.',
+    mix:{mmf:.05,govt:.24,ib30:.38,ib31:.33}},
+  {id:'allig',name:'Max yield',sub:'FRN-boosted powder + everything else locked in iBonds-2031 to plan end — max extraction; an early home purchase here means waiting for the Jan 2032 cash-out or shaving small slices off the lock early',
+    mix:{frn:.14,govt:.15,ib31:.71}}
 ];
 
 const BROKERS=[
