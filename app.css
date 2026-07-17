@@ -100,9 +100,9 @@ input[type=range]{width:100%;accent-color:var(--sec)}
 .hubname{flex:none;white-space:nowrap;min-width:6.5em}
 .lrow{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
 
-/* running-total figure — the all-in monthly number, lifted just enough to read at a glance */
-.tot{font-weight:700;color:var(--ink);font-size:.9rem;font-variant-numeric:tabular-nums;
-  background:rgba(109,98,80,.08);border-radius:5px;padding:1px 6px;vertical-align:baseline;white-space:nowrap}
+/* running-total figure — the all-in monthly number, lifted enough to read at a glance (middle ground: soft border + tint, no underline) */
+.tot{font-weight:700;color:var(--ink);font-size:.92rem;font-variant-numeric:tabular-nums;
+  background:rgba(109,98,80,.11);border:1px solid var(--line);border-radius:5px;padding:1px 7px;vertical-align:baseline;white-space:nowrap}
 
 /* verification mark — hand-costed figures (symbol + word, never colour alone) */
 .vmark{display:inline-flex;gap:4px;align-items:center;font-size:.64rem;letter-spacing:.04em;color:var(--ok);
