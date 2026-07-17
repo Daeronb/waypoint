@@ -86,7 +86,6 @@ function renderEngine(){
   const fc=floorCheck(p.floor,p.months);
   let h='';
   h+=secDiv('01','Engine','what the principal yields');
-  h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
   h+='<div class="hero"><div class="heron" id="heroW">'+fmtE(en.w)+'</div><div class="herosub">per month · sustainable to <span id="heroFloor">'+fmtE(p.floor)+'</span> · 2028 → <span id="heroEnd">'+endLabel(p.months)+'</span></div>';
   h+='<div class="herobk" id="heroBk">≈ '+fmtE(en.yieldMo)+' yield + '+fmtE(en.draw)+' draw-down · computed on the declining balance</div></div>';
   h+='<div class="card"><div class="lbl">The three dials</div>';
@@ -108,6 +107,7 @@ function renderEngine(){
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';
   h+='<div id="lensT"></div></div>';
   h+='<div class="lbl sect">Yield instrument cards</div>';
+  h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
   for(const id in INSTRUMENTS){
     const ins=INSTRUMENTS[id],open=ui.inst===id;
     const yl=ins.live&&liveDFR()!=null?pct(instYield(id))+' (live: DFR '+(MMF_SPREAD<0?'−':'+')+Math.abs(MMF_SPREAD).toFixed(2)+')':pct(ins.yld);
@@ -118,7 +118,7 @@ function renderEngine(){
       h+='</div>';}
     h+='</div>';
   }
-  h+='<div class="lbl sect">Where the €350k sits — broker survivability</div>';
+  h+='<div class="lbl sect">Where the capital sits — broker survivability</div>';
   h+='<div class="card">';
   for(const b of BROKERS){h+='<div class="brow"><span class="chip '+b.v+'"><b>'+b.glyph+'</b> '+esc(b.word)+'</span><div><b>'+esc(b.n)+(b.star?' ⭐':'')+'</b><div class="sub">'+esc(b.d)+'</div></div></div>';}
   h+='<div class="foot">Load-bearing: most NL/EU brokers close accounts on deregistration. Open IBKR + Swissquote while still NL-resident — see Path.</div></div>';
@@ -216,7 +216,7 @@ function renderMatch(){
   }
   h+='<div class="lbl sect">Hubs — execution venues, never places to live</div><div class="card">';
   for(const c of COUNTRIES.filter(x=>x.roles.includes('hub'))){
-    h+='<div class="brow"><b>'+c.f+' '+esc(c.n)+'</b><div class="sub num">'+fmtE(c.hub.wb)+'–'+fmtE(c.hub.wm)+' / week · '+esc(c.hub.note)+'</div></div>';
+    h+='<div class="brow hubrow"><b class="hubname">'+c.f+' '+esc(c.n)+'</b><div class="sub num">'+fmtE(c.hub.wb)+'–'+fmtE(c.hub.wm)+' / week · '+esc(c.hub.note)+'</div></div>';
   }
   h+='<div class="foot">Guardrail 9 — the hub-click: execute EVERY sale physically from SG/HK/AE. Local CGT is 0 even if the sale were deemed locally sourced, which moots the PH “sold within” question. A 1–2 week trip = €500–1,500 + flights — a rounding error on the event that triggers it. Never a place to live.</div></div>';
   h+='<div class="foot disc">Snapshot '+DATA_STAMP+' · not tax or immigration advice.</div>';
