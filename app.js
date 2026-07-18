@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.12.0';
+const APP_VERSION='1.13.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -109,6 +109,7 @@ function renderEngine(){
       h+='<span class="bdet">';
       for(const k in b.mix){
         h+='<span class="brow2"><span><b>'+Math.round(b.mix[k]*100)+'%</b> '+esc(INSTRUMENTS[k].name)+'</span><span class="num">'+pct(instYield(k))+(p.principal>0?' · '+fmtK(p.principal*b.mix[k]):'')+'</span></span>';
+        h+='<span class="bref">'+esc(INSTRUMENTS[k].ref)+' · stamped '+esc(INSTRUMENTS[k].stamp)+'</span>';
         if(b.why&&b.why[k])h+='<span class="bwhy">'+esc(b.why[k])+'</span>';
       }
       h+='</span>';
@@ -122,22 +123,11 @@ function renderEngine(){
   h+='<label class="pick'+(p.blend==='custom'?' on':'')+'"><input type="radio" name="blend" value="custom"'+(p.blend==='custom'?' checked':'')+'>';
   h+='<span class="pickbody"><span class="pickhead"><b>Custom yield</b><span class="num cywrap"><input type="number" id="cyIn" class="cyin" inputmode="decimal" min="0" max="12" step="0.01" value="'+cy+'">% · <span id="cyW">'+fmtE(cw)+'/mo</span></span></span>';
   h+='<span class="picksub">What-if dial — type any net yield and this row shows the sustainable monthly. Select it and the hero + Match run on it; the three mixes above stay untouched.</span></span></label>';
+  h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
   h+='<div class="foot">Every mix keeps ≈€100k of dry powder — a DUAL-DESTINATION pot: crash-deploy into cheap assets, or the first tranche of an early home purchase (Modular is built around this). Core on fixed maturity dates, yields NET of fund fees. Max-safety → max-yield gap ≈ €150/mo — the floor dial can absorb that on its own.</div></div>';
   h+='<div class="card"><div class="lbl">Crypto sleeve — a lens, not a branch</div>';
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';
   h+='<div id="lensT"></div></div>';
-  h+='<div class="lbl sect">Yield instrument cards</div>';
-  h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
-  for(const id in INSTRUMENTS){
-    const ins=INSTRUMENTS[id],open=ui.inst===id;
-    const yl=ins.live&&liveDFR()!=null?pct(instYield(id))+' (live: DFR '+(MMF_SPREAD<0?'−':'+')+Math.abs(MMF_SPREAD).toFixed(2)+')':pct(ins.yld);
-    h+='<div class="card cc'+(open?' open':'')+'" data-inst="'+id+'"><div class="chead"><div><b>'+esc(ins.name)+'</b>'+(ins.star?' <span class="star">⭐ '+esc(ins.star)+'</span>':'')+'<div class="sub">'+esc(ins.ref)+'</div></div><div class="num big">'+yl+'</div></div>';
-    if(open){h+='<div class="cbody">'+stampLine(ins.stamp);
-      h+='<div class="kv"><span>Risk</span>'+esc(ins.risk)+'</div><div class="kv"><span>Liquidity</span>'+esc(ins.liq)+'</div><div class="kv"><span>Crash behavior</span>'+esc(ins.crash)+'</div><div class="kv"><span>Dry powder</span>#'+ins.powder+' — '+esc(POWDER_RANK[ins.powder])+'</div><div class="kv"><span>Holdable abroad</span>'+esc(ins.hold)+'</div>';
-      if(ins.note)h+='<div class="notep">'+esc(ins.note)+'</div>';
-      h+='</div>';}
-    h+='</div>';
-  }
   h+='<div class="lbl sect">Where the capital sits — broker survivability</div>';
   h+='<div class="card">';
   for(const b of BROKERS){h+='<div class="brow"><span class="chip '+b.v+'"><b>'+b.glyph+'</b> '+esc(b.word)+'</span><div><b>'+esc(b.n)+(b.star?' ⭐':'')+'</b><div class="sub">'+esc(b.d)+'</div></div></div>';}
@@ -187,11 +177,10 @@ function bindEngine(){
   cyi.oninput=e=>{state.plan.customY=+e.target.value;save();updateEngineNumbers();};
   cyi.onchange=e=>{state.plan.customY=custY();e.target.value=state.plan.customY;save();updateEngineNumbers();if(state.plan.blend==='custom')renderMatch();};
   $('#slv').onchange=e=>{state.plan.sleeve=Math.max(0,+e.target.value||0);save();renderLens();};
-  document.querySelectorAll('#view-engine .cc .chead').forEach(hd=>hd.onclick=()=>{const id=hd.parentElement.dataset.inst;ui.inst=(ui.inst===id?null:id);renderEngine();});
 }
 
 /* ---------- MATCH view ---------- */
-const ui={inst:null,cc:null,book:null,blend:null}; /* blend = which mix breakdown is open (v1.12) */
+const ui={cc:null,book:null,blend:null}; /* blend = which mix breakdown is open (v1.12; v1.13 removed inst — instrument cards retired, breakdowns carry the shelf) */
 function reqFor(c){return(state.plan.colMode==='f'?c.col.f:c.col.n)+INSURANCE;}
 function renderMatch(){
   const p=state.plan,en=engineNumbers();

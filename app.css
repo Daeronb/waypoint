@@ -99,6 +99,8 @@ input[type=range]{width:100%;accent-color:var(--sec)}
 .brow2{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:6px;font-size:.8rem}
 .brow2 .num{white-space:nowrap;font-size:.78rem}
 .bwhy{display:block;color:var(--muted);font-size:.74rem;line-height:1.4;margin-top:1px}
+.bref{display:block;color:var(--muted);font-size:.66rem;letter-spacing:.02em;margin-top:1px}
+#view-engine .anchorline{margin-top:10px}
 .gate{display:block;background:var(--warnbg);border:1px solid var(--warnbd);color:var(--warn);border-radius:8px;padding:6px 9px;font-size:.76rem;margin-top:7px}
 
 /* match */
