@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.11.0';
+const APP_VERSION='1.12.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -99,11 +99,24 @@ function renderEngine(){
   h+='<div class="foot">A shorter plan spreads the same principal→floor drawdown over fewer months — sell &amp; return earlier and the monthly budget rises. Dec 2032 = the baseline fork.</div></div>';
   h+='<div class="card"><div class="lbl">Instrument mix</div>';
   for(const b of BLENDS){
-    const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,p.months);
+    const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,p.months),open=ui.blend===b.id;
     const comp=Object.keys(b.mix).map(k=>Math.round(b.mix[k]*100)+'% '+esc(INSTRUMENTS[k].name)).join(' · ');
     h+='<label class="pick'+(b.id===p.blend?' on':'')+'"><input type="radio" name="blend" value="'+b.id+'"'+(b.id===p.blend?' checked':'')+'>';
     h+='<span class="pickbody"><span class="pickhead"><b>'+esc(b.name)+'</b><span class="num">'+pct(y)+' · '+fmtE(w)+'/mo</span></span>';
-    h+='<span class="picksub">'+esc(b.sub)+'</span><span class="pickcomp">'+comp+'</span></span></label>';
+    h+='<span class="picksub">'+esc(b.sub)+'</span>';
+    /* v1.12: expandable per-instrument breakdown — share, net yield, live € amount + why it earned its place */
+    if(open){
+      h+='<span class="bdet">';
+      for(const k in b.mix){
+        h+='<span class="brow2"><span><b>'+Math.round(b.mix[k]*100)+'%</b> '+esc(INSTRUMENTS[k].name)+'</span><span class="num">'+pct(instYield(k))+(p.principal>0?' · '+fmtK(p.principal*b.mix[k]):'')+'</span></span>';
+        if(b.why&&b.why[k])h+='<span class="bwhy">'+esc(b.why[k])+'</span>';
+      }
+      h+='</span>';
+    }else{
+      h+='<span class="pickcomp">'+comp+'</span>';
+    }
+    h+='<button type="button" class="btgl" data-bd="'+b.id+'">'+(open?'▾ hide the why':'▸ why this mix — every instrument’s place')+'</button>';
+    h+='</span></label>';
   }
   const cy=custY(),cw=monthlyBudget(p.principal,p.floor,cy,p.months);
   h+='<label class="pick'+(p.blend==='custom'?' on':'')+'"><input type="radio" name="blend" value="custom"'+(p.blend==='custom'?' checked':'')+'>';
@@ -157,6 +170,9 @@ function updateEngineNumbers(){
     const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,p.months);
     pk.querySelector('.pickhead .num').textContent=pct(y)+' · '+fmtE(w)+'/mo';
   });
+  if(ui.blend){const bd=BLENDS.find(x=>x.id===ui.blend);if(bd){const ks=Object.keys(bd.mix);
+    document.querySelectorAll('#view-engine .bdet .brow2 .num').forEach((el,i)=>{const k=ks[i];if(!k)return;
+      el.textContent=pct(instYield(k))+(p.principal>0?' · '+fmtK(p.principal*bd.mix[k]):'');});}}
 }
 function bindEngine(){
   $('#prS').oninput=e=>{state.plan.principal=+e.target.value;if(state.plan.floor>state.plan.principal)state.plan.floor=state.plan.principal;save();updateEngineNumbers();};
@@ -166,6 +182,7 @@ function bindEngine(){
   $('#tmS').oninput=e=>{state.plan.months=Math.min(60,Math.max(6,+e.target.value||60));save();updateEngineNumbers();};
   $('#tmS').onchange=()=>renderMatch();
   document.querySelectorAll('input[name=blend]').forEach(r=>r.onchange=e=>{state.plan.blend=e.target.value;save();renderEngine();renderMatch();});
+  document.querySelectorAll('#view-engine .btgl').forEach(bt=>bt.onclick=e=>{e.preventDefault();e.stopPropagation();ui.blend=(ui.blend===bt.dataset.bd?null:bt.dataset.bd);renderEngine();});
   const cyi=$('#cyIn');
   cyi.oninput=e=>{state.plan.customY=+e.target.value;save();updateEngineNumbers();};
   cyi.onchange=e=>{state.plan.customY=custY();e.target.value=state.plan.customY;save();updateEngineNumbers();if(state.plan.blend==='custom')renderMatch();};
@@ -174,7 +191,7 @@ function bindEngine(){
 }
 
 /* ---------- MATCH view ---------- */
-const ui={inst:null,cc:null,book:null};
+const ui={inst:null,cc:null,book:null,blend:null}; /* blend = which mix breakdown is open (v1.12) */
 function reqFor(c){return(state.plan.colMode==='f'?c.col.f:c.col.n)+INSURANCE;}
 function renderMatch(){
   const p=state.plan,en=engineNumbers();
