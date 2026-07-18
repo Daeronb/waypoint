@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.10.0';
+const APP_VERSION='1.11.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -11,7 +11,7 @@ const pct=v=>v.toFixed(2)+'%';
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._h);toast._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 /* ---------- state ---------- */
-function defaults(){return{plan:{principal:0,floor:0,months:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0},steps:{},ecb:null};} /* v1.9: default months = 48 = Dec 2031 (his pick). v1.5: months = plan horizon (Jan 2028 → end), third dial; earlier off-ramp+return = shorter horizon = higher monthly draw for the same floor. v1.4: fresh devices start at 0/0/0 (his call). v1.2: default anchor = PH; saved plans keep their own picks */
+function defaults(){return{plan:{principal:0,floor:0,months:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0,customY:3},steps:{},ecb:null};} /* v1.11: customY = the what-if net yield behind the 4th 'Custom yield' row (plan.blend may be 'custom'). v1.9: default months = 48 = Dec 2031 (his pick). v1.5: months = plan horizon (Jan 2028 → end), third dial; earlier off-ramp+return = shorter horizon = higher monthly draw for the same floor. v1.4: fresh devices start at 0/0/0 (his call). v1.2: default anchor = PH; saved plans keep their own picks */
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(!s)return defaults();const d=defaults();s.plan=Object.assign(d.plan,s.plan||{});s.steps=s.steps||{};return s;}catch(e){return defaults();}}
 function save(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}}
 let state=(typeof localStorage!=='undefined')?load():defaults();
@@ -47,8 +47,11 @@ function blendYield(mix){let y=0;for(const k in mix)y+=mix[k]*instYield(k);retur
    balance, lands exactly on the floor after n months. Annuity form — not linear. */
 function monthlyBudget(P,F,yPct,n){const i=yPct/100/12;if(i<=0)return(P-F)/n;const g=Math.pow(1+i,n);return(P*g-F)*i/(g-1);}
 function currentBlend(){return BLENDS.find(b=>b.id===state.plan.blend)||BLENDS[1];}
+/* v1.11: the 4th row — his own what-if net yield. Clamped 0–12; when plan.blend==='custom' the whole app runs on it. */
+function custY(){const v=+state.plan.customY;return isFinite(v)?Math.min(12,Math.max(0,Math.round(v*100)/100)):0;}
+function currentYield(){return state.plan.blend==='custom'?custY():blendYield(currentBlend().mix);}
 function engineNumbers(){
-  const p=state.plan,y=blendYield(currentBlend().mix);
+  const p=state.plan,y=currentYield();
   const w=monthlyBudget(p.principal,p.floor,y,p.months);
   const ym=p.principal*y/100/12;
   return{y,w,yieldMo:ym,draw:Math.max(0,w-ym)};
@@ -102,6 +105,10 @@ function renderEngine(){
     h+='<span class="pickbody"><span class="pickhead"><b>'+esc(b.name)+'</b><span class="num">'+pct(y)+' · '+fmtE(w)+'/mo</span></span>';
     h+='<span class="picksub">'+esc(b.sub)+'</span><span class="pickcomp">'+comp+'</span></span></label>';
   }
+  const cy=custY(),cw=monthlyBudget(p.principal,p.floor,cy,p.months);
+  h+='<label class="pick'+(p.blend==='custom'?' on':'')+'"><input type="radio" name="blend" value="custom"'+(p.blend==='custom'?' checked':'')+'>';
+  h+='<span class="pickbody"><span class="pickhead"><b>Custom yield</b><span class="num cywrap"><input type="number" id="cyIn" class="cyin" inputmode="decimal" min="0" max="12" step="0.01" value="'+cy+'">% · <span id="cyW">'+fmtE(cw)+'/mo</span></span></span>';
+  h+='<span class="picksub">What-if dial — type any net yield and this row shows the sustainable monthly. Select it and the hero + Match run on it; the three mixes above stay untouched.</span></span></label>';
   h+='<div class="foot">Every mix keeps ≈€100k of dry powder — a DUAL-DESTINATION pot: crash-deploy into cheap assets, or the first tranche of an early home purchase (Modular is built around this). Core on fixed maturity dates, yields NET of fund fees. Max-safety → max-yield gap ≈ €150/mo — the floor dial can absorb that on its own.</div></div>';
   h+='<div class="card"><div class="lbl">Crypto sleeve — a lens, not a branch</div>';
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';
@@ -144,7 +151,9 @@ function updateEngineNumbers(){
   const fc=floorCheck(p.floor,p.months),ck=$('#chk2032');ck.textContent=fc.txt;ck.classList.toggle('floorwarn',fc.below);
   const fl=$('#flS');fl.max=p.principal;if(+fl.value>p.principal)fl.value=p.principal;
   document.querySelectorAll('#view-engine .pick').forEach(pk=>{
-    const id=pk.querySelector('input').value,b=BLENDS.find(x=>x.id===id);
+    const id=pk.querySelector('input').value;
+    if(id==='custom'){$('#cyW').textContent=fmtE(monthlyBudget(p.principal,p.floor,custY(),p.months))+'/mo';return;}
+    const b=BLENDS.find(x=>x.id===id);
     const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,p.months);
     pk.querySelector('.pickhead .num').textContent=pct(y)+' · '+fmtE(w)+'/mo';
   });
@@ -157,6 +166,9 @@ function bindEngine(){
   $('#tmS').oninput=e=>{state.plan.months=Math.min(60,Math.max(6,+e.target.value||60));save();updateEngineNumbers();};
   $('#tmS').onchange=()=>renderMatch();
   document.querySelectorAll('input[name=blend]').forEach(r=>r.onchange=e=>{state.plan.blend=e.target.value;save();renderEngine();renderMatch();});
+  const cyi=$('#cyIn');
+  cyi.oninput=e=>{state.plan.customY=+e.target.value;save();updateEngineNumbers();};
+  cyi.onchange=e=>{state.plan.customY=custY();e.target.value=state.plan.customY;save();updateEngineNumbers();if(state.plan.blend==='custom')renderMatch();};
   $('#slv').onchange=e=>{state.plan.sleeve=Math.max(0,+e.target.value||0);save();renderLens();};
   document.querySelectorAll('#view-engine .cc .chead').forEach(hd=>hd.onclick=()=>{const id=hd.parentElement.dataset.inst;ui.inst=(ui.inst===id?null:id);renderEngine();});
 }

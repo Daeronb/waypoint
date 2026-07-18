@@ -77,6 +77,12 @@ input[type=range]{width:100%;accent-color:var(--sec)}
 .numin{width:100%;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:7px 10px;
   font:inherit;font-variant-numeric:tabular-nums;color:var(--ink);margin:6px 0}
 
+/* custom-yield inline input — the 4th what-if row in Instrument mix (v1.11) */
+.cywrap{display:inline-flex;align-items:center;gap:3px}
+.cyin{width:4.4em;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:2px 6px;
+  font:inherit;font-size:.9rem;font-variant-numeric:tabular-nums;color:var(--ink);text-align:right}
+.cyin:focus{outline:none;border-color:var(--sec)}
+
 /* pickers (blends, anchors) */
 .pick{display:flex;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px;margin:8px 0;cursor:pointer}
 .pick.on{border-color:var(--sec);box-shadow:0 0 0 1px var(--sec)}
