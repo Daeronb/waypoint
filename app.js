@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.13.0';
+const APP_VERSION='1.13.1';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -124,7 +124,7 @@ function renderEngine(){
   h+='<span class="pickbody"><span class="pickhead"><b>Custom yield</b><span class="num cywrap"><input type="number" id="cyIn" class="cyin" inputmode="decimal" min="0" max="12" step="0.01" value="'+cy+'">% · <span id="cyW">'+fmtE(cw)+'/mo</span></span></span>';
   h+='<span class="picksub">What-if dial — type any net yield and this row shows the sustainable monthly. Select it and the hero + Match run on it; the three mixes above stay untouched.</span></span></label>';
   h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
-  h+='<div class="foot">Every mix keeps ≈€100k of dry powder — a DUAL-DESTINATION pot: crash-deploy into cheap assets, or the first tranche of an early home purchase (Modular is built around this). Core on fixed maturity dates, yields NET of fund fees. Max-safety → max-yield gap ≈ €150/mo — the floor dial can absorb that on its own.</div></div>';
+  h+='<div class="foot">Every mix keeps ≈€100k of dry powder — a DUAL-DESTINATION pot: crash-deploy into cheap assets, or the first tranche of an early home purchase (Modular is built around this). Core on fixed maturity dates, yields NET of fund fees. Max-safety → max-yield gap ≈ €150/mo — the floor dial can absorb that on its own. The iBonds core is also marginable — a second €100k of crisis firepower without selling (see Playbooks → Crash).</div></div>';
   h+='<div class="card"><div class="lbl">Crypto sleeve — a lens, not a branch</div>';
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';
   h+='<div id="lensT"></div></div>';
