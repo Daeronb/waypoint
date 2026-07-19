@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.16.0';
+const APP_VERSION='1.17.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -137,7 +137,7 @@ function renderEngine(){
   h+='<span class="pickbody"><span class="pickhead"><b>Custom yield</b><span class="num cywrap"><input type="number" id="cyIn" class="cyin" inputmode="decimal" min="0" max="12" step="0.01" value="'+cy+'">% · <span id="cyW">'+fmtE(cw)+'/mo</span></span></span>';
   h+='<span class="picksub">What-if dial — type any net yield and this row shows the sustainable monthly. Select it and the hero + Match run on it; the four mixes above stay untouched.</span></span></label>';
   h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
-  h+='<div class="foot">The first three mixes keep ≈€100k of crash-proof dry powder — a DUAL-DESTINATION pot: crash-deploy into cheap assets, or the first tranche of an early home purchase (Modular is built around this). Deploy is the deliberate exception: a bounded-loss iBonds-2029 sleeve + €25k float instead (small known haircut, healed by a printed date). Core on fixed maturity dates, yields NET of fund fees. Max-safety → Deploy gap ≈ €190/mo — the floor dial can absorb that on its own. The iBonds core is also marginable — a second €100k of crisis firepower without selling (see Playbooks → Crash).</div></div>';
+  h+='<div class="foot">The first three mixes keep ≈€100k of crash-proof dry powder — a DUAL-DESTINATION pot: crash-deploy into cheap assets, or the first tranche of an early home purchase (Early home is built around this). Priced powder is the deliberate exception: a bounded-loss iBonds-2029 sleeve + €25k float instead (small known haircut, healed by a printed date). Core on fixed maturity dates, yields NET of fund fees. Never red → Priced powder gap ≈ €190/mo — the floor dial can absorb that on its own. The iBonds core is also marginable — a second €100k of crisis firepower without selling (see Playbooks → Crash).</div></div>';
   h+='<div class="card"><div class="lbl">Crypto sleeve — a lens, not a branch</div>';
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';
   h+='<div id="lensT"></div></div>';
