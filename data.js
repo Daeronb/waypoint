@@ -141,7 +141,11 @@ const MONITORS=[
   {t:'PH lawyer — written §42(E) opinion pending',
     d:'The sharpened three-part question is in the dossier. The hub-click (guardrail 9) moots the ambiguity meanwhile; the opinion decides how much the continuity stay matters. Path p9.'},
   {t:'AOW buy-in — the 1-year window opens at departure',
-    d:'Vrijwillige voortzetting must be requested at SVB within 1 year of leaving NL — decide it at Exit, not later. Becomes a dated deadline the day the BRP uitschrijving happens.'}
+    d:'Vrijwillige voortzetting must be requested at SVB within 1 year of leaving NL — decide it at Exit, not later. Becomes a dated deadline the day the BRP uitschrijving happens.'},
+  {t:'Osaka (JP) — cheap-rent lead to scope',
+    d:'A YouTube listing showed Osaka rentals from ~¥90,000/mo (~€450 at the current rate) — well under the Fukuoka anchor (~€600 rent, all-in €1,355). Look into it: verify the figure (long-term vs teaser, ward, size, deposit/key-money), then hand-cost Osaka as a possible cheaper JP base. Japan is a visit-regardless country (N4), so a cheaper base there is high value.'},
+  {t:'Flip the ✓ hand-costed banner — mark the UN-costed places instead',
+    d:'The ✓ hand-costed mark now sits on nearly every place, so it no longer signals anything. Invert it: drop the badge from the hand-costed majority and instead flag the few places still on guide estimates (not yet hand-costed), so the marker carries information again. A UI/data pass — not urgent, do it in a build session.'}
 ];
 
 /* All yld values are NET of TER (fund fee) — YTM/YTW figures published by fund
