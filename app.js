@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.21.0';
+const APP_VERSION='1.22.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -98,7 +98,7 @@ function stampLine(d){const a=stampAge(d),old=a>STALE_DAYS;return '<span class="
 /* small verification mark for figures totalled line-by-line in Joël's own COL ledger (not guide estimates) */
 function vmark(){return '<span class="vmark" title="Hand-costed line-by-line from your COL verification ledger — his real lifestyle, accommodation & protein noted per place (only Chiang Mai + Cebu are pool+gym; beef where it is his staple, a chicken/fish mix where beef is dear); ex-insurance. Not a guide estimate.">✓ hand-costed</span>';}
 function poolmark(){return '<span class="vmark pool" title="Costed with a pool+gym condo (Chiang Mai + Cebu) — every other place is a regular condo or lean studio.">★ pool+gym</span>';}
-function mixmark(){return '<span class="vmark mix" title="Beef is not the main protein here — costed as a local meat/fish mix instead: goat-forward in India (beef is banned), chicken-forward on the Thai islands (imported beef is dear).">◆ beef not main</span>';}
+function mixmark(){return '<span class="vmark mix" title="Beef is not the main protein here — costed as a local meat/fish mix instead: goat-forward in India (beef is banned), chicken-forward on the Thai islands (imported beef is dear), pork/chicken/fish in Hindu Bali (Ubud + Amed, imported beef dear).">◆ beef not main</span>';}
 
 /* ---------- ENGINE view ---------- */
 function renderEngine(){
