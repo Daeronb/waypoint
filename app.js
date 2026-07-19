@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.19.1';
+const APP_VERSION='1.20.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -109,7 +109,7 @@ function renderEngine(){
   h+='<div class="hero"><div class="heron" id="heroW">'+fmtE(en.w)+'</div><div class="herosub">per month · sustainable to <span id="heroFloor">'+fmtE(p.floor)+'</span> · 2028 → <span id="heroEnd">'+endLabel(p.months)+'</span></div>';
   h+='<div class="herobk" id="heroBk">≈ '+fmtE(en.yieldMo)+' yield + '+fmtE(en.draw)+' draw-down · computed on the declining balance</div></div>';
   h+='<div class="card"><div class="lbl">The three dials</div>';
-  h+='<div class="slrow"><div class="slhead"><span>Start principal</span><span class="num" id="prV">'+fmtE(p.principal)+'</span></div><input type="range" id="prS" min="0" max="450000" step="5000" value="'+p.principal+'"></div>';
+  h+='<div class="slrow"><div class="slhead"><span>Start principal</span><span class="num" id="prV">'+fmtE(p.principal)+'</span></div><input type="range" id="prS" min="0" max="600000" step="5000" value="'+p.principal+'"></div>';
   h+='<div class="slrow"><div class="slhead"><span>Acceptable floor at plan end</span><span class="num" id="flV">'+fmtE(p.floor)+'</span></div><input type="range" id="flS" min="0" max="'+p.principal+'" step="5000" value="'+Math.min(p.floor,p.principal)+'"></div>';
   h+='<div class="slrow"><div class="slhead"><span>Plan end — off-ramp &amp; possible return</span><span class="num" id="tmV">'+endLabel(p.months)+' · '+p.months+' mo</span></div><input type="range" id="tmS" min="6" max="60" step="6" value="'+p.months+'"></div>';
   h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chk2032">'+fc.txt+'</div>';
