@@ -77,6 +77,15 @@
    the enactment-speed analysis (fast-path ceiling ≈3.5 months via the Belastingplan
    incl. press-release retroactivity, Dec 2025 status = exploration only + punted to
    the next cabinet, watch formation docs too, NL–PH treaty/TRC blunting).
+   v1.19 (2026-07-19): RENT REPRICING from Joël's Airbnb monthly-rate scan — even
+   Dec–Jan HIGH-season monthly rates sit below several ledger estimates (kept as the
+   conservative number; 6-month/yearly contracts likely lower still). Rent: Cebu
+   370→280, Da Nang 360→270, Assagao 360→320; UP: Penang 330→360, Valencia/Dumaguete
+   260→320, Fukuoka 470→600 — but Fukuoka recalibrated overall (utilities →50 usually
+   included in the Airbnb price, groceries →150, daytime food →150, protein →110).
+   New Hand-costed ex-ins: Da Nang 884 (VN), Cebu 958 + Valencia 799 (PH mean
+   879→869), Penang 1005 (MY), Assagao 958 (IN mean 796→789), Fukuoka 1355 (JP; fx
+   +20% line 1770→1630). Ledger rows carry the Reality-check/Revised/Adjusted trail.
    Not financial, tax, legal or immigration advice — verify load-bearing items locally. */
 
 const DATA_STAMP='2026-07-19';
@@ -252,12 +261,12 @@ const BROKERS=[
 
 /* Countries — 13, role-tagged. Adding one = one entry, no code. */
 const COUNTRIES=[
-  {cc:'PH',n:'Philippines',f:'🇵🇭',roles:['anchor','live'],stamp:'2026-07-16',primary:true,
-    col:{f:879,n:1250,city:'3 places costed',conf:'med',verified:true,note:'Hand-costed = mean of the three hand-costed places listed below (his real lifestyle, ex-insurance); Comfort = guide estimate. Manila higher, provinces lower.'},
+  {cc:'PH',n:'Philippines',f:'🇵🇭',roles:['anchor','live'],stamp:'2026-07-19',primary:true,
+    col:{f:869,n:1250,city:'3 places costed',conf:'med',verified:true,note:'Hand-costed = mean of the three hand-costed places listed below (his real lifestyle, ex-insurance); Comfort = guide estimate. Manila higher, provinces lower.'},
     places:[
-      {name:'Cebu',sub:'regular 1BR condo',f:1048,conf:'med',verified:true,note:'Regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym). Mainland beef supply, ~15min out. Priciest PH place.'},
+      {name:'Cebu',sub:'regular 1BR condo',f:958,conf:'med',verified:true,note:'Regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym). Mainland beef supply, ~15min out. Rent repriced Jul 2026 from Airbnb monthly rates: ~€280 even Dec–Jan high season (was €370); 6-mo/yearly contracts likely lower. Priciest PH place.'},
       {name:'Siquijor',sub:'lean beach island',f:850,conf:'med',verified:true,note:'Home wifi weak → Eden/Starlink coworking (~$45/wk) doubles as workspace (biggest line); no pool/gym; beef stocked on Dumaguete ferry runs.'},
-      {name:'Valencia / Dumaguete',sub:'lean, mainland-priced',f:739,conf:'med',verified:true,note:'Cheapest costed — real supermarkets, mainland beef ~€7/kg, no coworking premium, BI office in town for visa extensions.'}],
+      {name:'Valencia / Dumaguete',sub:'lean, mainland-priced',f:799,conf:'med',verified:true,note:'Cheapest PH place — real supermarkets, mainland beef ~€7/kg, no coworking premium, BI office in town for visa extensions. Rent repriced UP Jul 2026: Airbnb monthly ~€320 Dec–Jan high season (the €260 lean estimate was too optimistic); contracts likely lower.'}],
     stay:'30 days free, then famously extendable — up to ~36 months without leaving. SRRV (age 40+, ~$15–25k refundable deposit, $1.5k once + $360/yr) is optional convenience, not required.',
     work:'Territorial for individuals: foreign-source coaching 0%. But work performed while IN PH = PH-source, progressive to 35% (same source rule as TH).',
     anchor:{verdict:'THE primary off-ramp anchor — territorial 0% at ANY residency status',
@@ -301,8 +310,8 @@ const COUNTRIES=[
       coach:'~€400/mo flat all-in (paušální daň).',
       off:'0% on lots held 3+ years, capped 40M CZK/yr (~€1.6M); disposals <100k CZK/yr not even reported. ⚠ NOT HIS FALLBACK (demoted Jul 16 2026): the exemption is PER-LOT and every sell/rebuy resets the clock — the LINK stack was actively traded, so the provably-uninterrupted 3y slice is likely SMALL. Same flaw that killed the Germany idea (1-year hold). Holding-period regimes don’t fit this lot history; source-based regimes (PH, TH, GE) do. The Koinly report will quantify the clean slice — informational only, not an anchor strategy.',
       gates:['Per-lot clock RESETS on every sell/rebuy — trading history, not purchase year, decides. Only never-traded lots qualify today; 2026 buys unlock 2029. Koinly lot report = the ground truth.']}},
-  {cc:'VN',n:'Vietnam',f:'🇻🇳',roles:['live'],stamp:'2026-07-14',
-    col:{f:974,n:1100,city:'Da Nang',conf:'med',verified:true,note:'Hand-costed = line-by-line (his real lifestyle, ex-insurance); regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym) · Comfort = guide estimate (band is tight — Da Nang rent rose in 2026)'},
+  {cc:'VN',n:'Vietnam',f:'🇻🇳',roles:['live'],stamp:'2026-07-19',
+    col:{f:884,n:1100,city:'Da Nang',conf:'med',verified:true,note:'Hand-costed = line-by-line (his real lifestyle, ex-insurance); regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym) · rent repriced Jul 2026 from Airbnb monthly rates: ~€270 even Dec–Jan high season (was €360); contracts likely lower · Comfort = guide estimate'},
     stay:'90-day e-visa, repeatable.',
     res:'⚠ Not just days: 183+ days OR a leased dwelling held ≥183 days in the tax year — a long lease ALONE can make you Vietnamese tax-resident below the day count. Keep stays short AND leases short.'},
   {cc:'KH',n:'Cambodia',f:'🇰🇭',roles:['live'],stamp:'2026-07-16',
@@ -315,20 +324,20 @@ const COUNTRIES=[
     col:{f:900,n:1400,city:'Canggu',conf:'med',note:'Bali premium; rest of ID much cheaper, nomad infra thin'},
     stay:'30-day VOA + 30-day extension; longer stays = visa runs or B211A-type paperwork.',
     res:'⚠ Not just days: 183+ days OR presence with INTENT to reside (long-term housing, a KITAS permit) — the intent test can catch below the day count. Visa-run tourism is fine; don’t sign a year lease.'},
-  {cc:'IN',n:'India',f:'🇮🇳',roles:['live'],stamp:'2026-07-16',
-    col:{f:796,n:1100,city:'6 places costed',conf:'med',verified:true,note:'Hand-costed = mean of the 6 hand-costed places below (his real lifestyle, ex-insurance; lean studio, no pool+gym; protein = goat-forward local mix — beef banned). Bimodal range: inland spiritual towns €652–710 = his CHEAPEST tier ever costed; Goa/Kerala beach €858–998 = mid-tier. Comfort = a roomier estimate.'},
+  {cc:'IN',n:'India',f:'🇮🇳',roles:['live'],stamp:'2026-07-19',
+    col:{f:789,n:1100,city:'6 places costed',conf:'med',verified:true,note:'Hand-costed = mean of the 6 hand-costed places below (his real lifestyle, ex-insurance; lean studio, no pool+gym; protein = goat-forward local mix — beef banned). Bimodal range: inland spiritual towns €652–710 = his CHEAPEST tier ever costed; Goa/Kerala beach €858–958 = mid-tier. Comfort = a roomier estimate.'},
     places:[
       {name:'Tiruvannamalai',sub:'spiritual · cheapest costed',f:652,conf:'med',verified:true,beefMix:true,note:'Deepest year-round spiritual community (Ramana/Arunachala satsang). His cheapest costed line yet. Weak wifi (strong SIM), hot, no beach; best Nov–Feb.'},
       {name:'Dharamkot',sub:'Himalayan meditation hub',f:688,conf:'med',verified:true,beefMix:true,note:'Vipassana/Tibetan + seeker community, BEST coworking (VOID Life/NomadGao). Cool ~2000m, no beach; go spring or autumn, not deep winter.'},
       {name:'Mysore',sub:'Ashtanga capital',f:710,conf:'med',verified:true,beefMix:true,note:'Gokulam shalas, serious daily practice, good meat sourcing, mild year-round. Caveat: lineage in transition post-Sharath (†Nov 2024). Inland.'},
       {name:'Arambol',sub:'Goa beach + healing scene',f:858,conf:'med',verified:true,beefMix:true,note:'The one beach town with a real grassroots healing/coaching scene (drum circle, ecstatic dance, breathwork, TTCs). Weak village wifi; Nov–Mar season.'},
       {name:'Varkala',sub:'Kerala cliff beach',f:870,conf:'med',verified:true,beefMix:true,note:'Red-cliff beach + best diet fit (daily fish, Kerala beef legal). Wellness tourism more than deep community; weak wifi (Fort Kochi fallback).'},
-      {name:'Assagao',sub:'best wifi (priciest)',f:998,conf:'med',verified:true,beefMix:true,note:'Leafy N-Goa: best wifi ~95Mbps + NomadGao coworking + best meat/fish sourcing, ride to Arambol/beaches. No beachfront; priciest India node.'}],
+      {name:'Assagao',sub:'best wifi (priciest)',f:958,conf:'med',verified:true,beefMix:true,note:'Leafy N-Goa: best wifi ~95Mbps + NomadGao coworking + best meat/fish sourcing, ride to Arambol/beaches. No beachfront; priciest India node. Rent repriced Jul 2026 from Airbnb monthly rates: ~€320 even Dec–Jan high season (was €360).'}],
     stay:'Dutch e-Tourist visa = 90 days MAX per visit (NL is NOT in the 180-day group). A ~4–5 month stay = split: ~88 days → exit (Sri Lanka/Nepal/Dubai) → ~88 days on the same 1/5-year multi-entry visa. No FRRO registration under 180 continuous days.',
     work:'Work performed while IN India = India-source, progressive PIT — but as a sub-182-day non-resident only India-day income is in scope. Perform/bill offshore where possible.',
     avoid:'⚠ RESIDENCY = HARD-AVOID — a sub-180-day EXPERIENCE only, never an anchor. 182+ days in an Indian FY (Apr–Mar) → resident → crypto taxed 30% + cess WORLDWIDE (§115BBH), exactly what the off-ramp exists to avoid. The 60-day + 365-days-over-prior-4-years limb ALSO catches foreigners: a repeat yearly visitor whose 4-year total hits 365 is caught at just 60 days. Rule: never >181 days/FY; if visiting yearly, cap the long-run average ~90 days/yr.'},
-  {cc:'MY',n:'Malaysia',f:'🇲🇾',roles:['live'],stamp:'2026-07-14',
-    col:{f:975,n:1300,city:'Penang',conf:'med',verified:true,note:'Hand-costed = line-by-line for Penang (his real lifestyle, ex-insurance); regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym) · Comfort = guide estimate (KL) · best infrastructure-per-euro in SE Asia'},
+  {cc:'MY',n:'Malaysia',f:'🇲🇾',roles:['live'],stamp:'2026-07-19',
+    col:{f:1005,n:1300,city:'Penang',conf:'med',verified:true,note:'Hand-costed = line-by-line for Penang (his real lifestyle, ex-insurance); regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym) · rent repriced UP Jul 2026: Airbnb monthly ~€360, pricier than the €330 estimate · Comfort = guide estimate (KL) · best infrastructure-per-euro in SE Asia'},
     stay:'90 days visa-free.',
     demoted:'Demoted as anchor: MM2H Silver = $150k deposit + MANDATORY RM600k property purchase (kills keep-principal-liquid); DE Rantau non-tech bar $60k/yr. Tax outcome was fine (no CGT non-trading, FSI exempt to 2036) — the visa economics are broken.'},
   {cc:'SI',n:'Slovenia',f:'🇸🇮',roles:['live'],stamp:'2026-07-14',
@@ -336,9 +345,9 @@ const COUNTRIES=[
     stay:'EU — unlimited.',
     res:'⚠ EU-style home tests: a permanent dwelling or centre of vital interests can attach residency below 183 days — not just a day count.',
     demoted:'Demoted as anchor: 25% tax on crypto→fiat from 1 Jan 2026 (swaps exempt, pre-2026 gains grandfathered). For a mostly-post-2026 gain that’s a ~25% haircut — the old “SI 0%” claim is dead. CZ takes the EU slot.'},
-  {cc:'JP',n:'Japan',f:'🇯🇵',roles:['live'],stamp:'2026-07-14',
-    col:{f:1472,n:1900,city:'Fukuoka',conf:'med',verified:true,note:'Hand-costed = line-by-line (his real lifestyle, ex-insurance); regular 1LDK, no pool+gym (Japan norm) — beef + cafe meals run 2–3× SE Asia, so his real Fukuoka cost lands ABOVE the old guide numbers · Comfort = a +~30% band, ESTIMATE (guide-normal was below his real cost, so it was raised to keep the band valid) · Tokyo higher again'},
-    fx:'HIGH — the euro case is a weak-yen bet; if EUR/JPY strengthens 20%, Hand-costed Fukuoka rises to ~€1,770',
+  {cc:'JP',n:'Japan',f:'🇯🇵',roles:['live'],stamp:'2026-07-19',
+    col:{f:1355,n:1900,city:'Fukuoka',conf:'med',verified:true,note:'Hand-costed = line-by-line (his real lifestyle, ex-insurance); regular 1LDK, no pool+gym (Japan norm) — beef + cafe meals still run 2–3× SE Asia · recalibrated Jul 2026: Airbnb monthly rent ~€600 (pricier than the ¥80k plain-1LDK estimate, but utilities usually included → €50) while groceries →€150, daytime food →€150, protein →€110 land below the first pass · Comfort = a +~30% band, ESTIMATE · Tokyo higher again'},
+    fx:'HIGH — the euro case is a weak-yen bet; if EUR/JPY strengthens 20%, Hand-costed Fukuoka rises to ~€1,630',
     blocks:'90-day blocks',
     stay:'90 days per entry, HARD CAP — NL is not on the bilateral extension list (AT/DE/IE/LI/MX/CH/UK only). Nomad visa ¥10M/yr, 6mo, non-renewable = out of reach. Pattern: quarterly Fukuoka blocks; immigration scrutinizes serial re-entries.',
     res:'⚠ Not just days: a jūsho (domicile — centre of life) attaches Japanese residency: a year-round apartment or a life visibly centred in JP can make you resident below any day count. Quarterly blocks in short-term lets are fine; don’t keep a standing JP apartment.',
@@ -369,7 +378,7 @@ const PATH=[
   {id:'nomad',name:'Nomad',when:'2028 → · resident nowhere',steps:[
     {id:'n1',t:'Residency discipline — days AND no dwelling AND no anchor',dep:'Guardrail 5, widened (Jul 2026): day limits alone are NOT the whole test — secondary tests (a lease kept at your disposal, an abode, a centre-of-life) catch BELOW the day count in VN/JP/KH/CZ/SI/ID (⚠ lines on those country cards). So: never 182 in India (30% worldwide crypto), never 180 in any worldwide-tax country, AND no dwelling kept available, AND no vital-interest anchor. PH is SAFE to exceed (territorial at any status); TH only with the no-remit leash; day-count-only set: TH/PH/GE/MY/IN.'},
     {id:'n2',t:'Make PH the FIRST stop, rent a real place, set the Kraken address to it — brokers stay as-is',dep:'SUPERSEDES the old after-TRC rule. A real rented PH address (address ≠ TRC): gets NL off the account early — CARF/DAC8 reporting follows the declared address — and avoids re-KYC in the middle of a pump window. Never a fabricated address; stale-but-genuine beats a last-minute change. IBKR/Swissquote keep NL until the TRC exists (“resident nowhere” is grey at brokers; both tolerate the gap).'},
-    {id:'n3',t:'Re-confirm the hand-costed COL numbers on the first stays',dep:'The ✓ hand-costed figures (TH €921, VN €974, PH places…) are desk-costed from his real lifestyle — validate on the ground; the ledger in waypoint/research is the living source. (Supersedes the old “TH €800 lived anchor” check.)'},
+    {id:'n3',t:'Re-confirm the hand-costed COL numbers on the first stays',dep:'The ✓ hand-costed figures (TH €921, VN €884, PH places…) are desk-costed from his real lifestyle (rents repriced Jul 2026 from Airbnb monthly rates) — validate on the ground; the ledger in waypoint/research is the living source. (Supersedes the old “TH €800 lived anchor” check.)'},
     {id:'n4',t:'Monitor the moving parts',dep:'The Agenda card at the top of this section is the live list: dated deadlines + standing monitors (TH bank-on-DTV, TH decree, GE SBS, PH §42(E), Prinsjesdag). This step = the habit of actually looking at it.'}]},
   {id:'anchor',name:'Anchor',when:'when a base is chosen',steps:[
     {id:'a1',t:'Establish TRC at the anchor',dep:'PH 180d cumulative in the calendar year (the 0% does NOT need it — the TRC is paper/corroboration) · GE 183d · TH 180d + filing · CZ home/183d.'},
