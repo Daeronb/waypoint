@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.13.1';
+const APP_VERSION='1.15.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -11,7 +11,7 @@ const pct=v=>v.toFixed(2)+'%';
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._h);toast._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 /* ---------- state ---------- */
-function defaults(){return{plan:{principal:0,floor:0,months:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0,customY:3},steps:{},ecb:null};} /* v1.11: customY = the what-if net yield behind the 4th 'Custom yield' row (plan.blend may be 'custom'). v1.9: default months = 48 = Dec 2031 (his pick). v1.5: months = plan horizon (Jan 2028 → end), third dial; earlier off-ramp+return = shorter horizon = higher monthly draw for the same floor. v1.4: fresh devices start at 0/0/0 (his call). v1.2: default anchor = PH; saved plans keep their own picks */
+function defaults(){return{plan:{principal:0,floor:0,months:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0,customY:3,spend:0},steps:{},ecb:null};} /* v1.15: spend = his typed actual monthly all-in spend for the surplus lens (0 = lens shows its prompt) */ /* v1.11: customY = the what-if net yield behind the 4th 'Custom yield' row (plan.blend may be 'custom'). v1.9: default months = 48 = Dec 2031 (his pick). v1.5: months = plan horizon (Jan 2028 → end), third dial; earlier off-ramp+return = shorter horizon = higher monthly draw for the same floor. v1.4: fresh devices start at 0/0/0 (his call). v1.2: default anchor = PH; saved plans keep their own picks */
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(!s)return defaults();const d=defaults();s.plan=Object.assign(d.plan,s.plan||{});s.steps=s.steps||{};return s;}catch(e){return defaults();}}
 function save(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}}
 let state=(typeof localStorage!=='undefined')?load():defaults();
@@ -73,6 +73,18 @@ function floorCheck(floor,months){
   const below=real<SAFETY_NET;
   return{real,below,txt:'Ends '+endLabel(months)+' at '+fmtE(floor)+' — floor held by construction. At 2%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
 }
+/* v1.15: SURPLUS LENS — type the real all-in monthly spend; if it undercuts the mix yield
+   the pot GROWS. Same declining-balance recurrence as monthlyBudget, run forward
+   (end = P·g − S·(g−1)/i over the plan months); the today's-euros figure uses the exact
+   floorCheck convention (2%/yr, 18 mo from mid-2026 to the Jan-2028 pivot + the horizon).
+   keep = the real-preservation spend: principal·(yield − 2%)/12 — spend under THAT and
+   the pot grows in real terms too, not just nominally. */
+function surplusProj(S){
+  const p=state.plan,y=currentYield(),i=y/100/12,n=p.months;
+  const g=Math.pow(1+i,n);
+  const end=i>0?p.principal*g-S*(g-1)/i:p.principal-S*n;
+  return{y,end,real:end/Math.pow(1.02,(18+n)/12),keep:Math.max(0,p.principal*(y-2)/100/12)};
+}
 function secDiv(n,name,sub){return '<div class="secdiv" id="sd-'+name.toLowerCase()+'"><span class="secn">'+n+'</span><b>'+name+'</b><span class="secsub">'+esc(sub)+'</span></div>';}
 
 /* ---------- shared bits ---------- */
@@ -122,9 +134,12 @@ function renderEngine(){
   const cy=custY(),cw=monthlyBudget(p.principal,p.floor,cy,p.months);
   h+='<label class="pick'+(p.blend==='custom'?' on':'')+'"><input type="radio" name="blend" value="custom"'+(p.blend==='custom'?' checked':'')+'>';
   h+='<span class="pickbody"><span class="pickhead"><b>Custom yield</b><span class="num cywrap"><input type="number" id="cyIn" class="cyin" inputmode="decimal" min="0" max="12" step="0.01" value="'+cy+'">% · <span id="cyW">'+fmtE(cw)+'/mo</span></span></span>';
-  h+='<span class="picksub">What-if dial — type any net yield and this row shows the sustainable monthly. Select it and the hero + Match run on it; the three mixes above stay untouched.</span></span></label>';
+  h+='<span class="picksub">What-if dial — type any net yield and this row shows the sustainable monthly. Select it and the hero + Match run on it; the four mixes above stay untouched.</span></span></label>';
   h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
-  h+='<div class="foot">Every mix keeps ≈€100k of dry powder — a DUAL-DESTINATION pot: crash-deploy into cheap assets, or the first tranche of an early home purchase (Modular is built around this). Core on fixed maturity dates, yields NET of fund fees. Max-safety → max-yield gap ≈ €150/mo — the floor dial can absorb that on its own. The iBonds core is also marginable — a second €100k of crisis firepower without selling (see Playbooks → Crash).</div></div>';
+  h+='<div class="foot">The first three mixes keep ≈€100k of crash-proof dry powder — a DUAL-DESTINATION pot: crash-deploy into cheap assets, or the first tranche of an early home purchase (Modular is built around this). Deploy is the deliberate exception: a bounded-loss iBonds-2029 sleeve + €25k float instead (small known haircut, healed by a printed date). Core on fixed maturity dates, yields NET of fund fees. Max-safety → Deploy gap ≈ €190/mo — the floor dial can absorb that on its own. The iBonds core is also marginable — a second €100k of crisis firepower without selling (see Playbooks → Crash).</div></div>';
+  h+='<div class="card"><div class="lbl">Actual spend — a lens, not a branch</div>';
+  h+='<input type="number" id="spIn" class="numin" inputmode="numeric" min="0" step="10" value="'+p.spend+'">';
+  h+='<div id="spT"></div></div>';
   h+='<div class="card"><div class="lbl">Crypto sleeve — a lens, not a branch</div>';
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';
   h+='<div id="lensT"></div></div>';
@@ -134,7 +149,20 @@ function renderEngine(){
   h+='<div class="foot">Load-bearing: most NL/EU brokers close accounts on deregistration. Open IBKR + Swissquote while still NL-resident — see Path.</div></div>';
   h+='<div class="foot disc">Snapshot '+DATA_STAMP+' · sources in the four research docs · not financial advice — verify before acting.</div>';
   $('#view-engine').innerHTML=h;
-  bindEngine();renderLens();
+  bindEngine();renderLens();renderSpend();
+}
+function renderSpend(){
+  const p=state.plan,el=$('#spT');if(!el)return;
+  if(!(p.spend>0)){el.innerHTML='<div class="foot">Type your real all-in monthly spend (COL + €120 insurance + visa amortisation). Spend under the mix yield and the pot GROWS — this shows where it lands by plan end, nominal and in today’s euros. The hero above stays the sustainable MAXIMUM; this lens runs the other direction.</div>';return;}
+  if(!(p.principal>0)){el.innerHTML='<div class="foot">Set the start-principal dial first — this lens projects it forward at your typed spend.</div>';return;}
+  const s=surplusProj(p.spend),d=s.end-p.principal,m1=p.principal*s.y/100/12-p.spend;
+  let h='<div class="lrow"><span>pot at '+endLabel(p.months)+'</span><span class="num">'+fmtE(s.end)+'</span></div>';
+  h+='<div class="lrow"><span>in today’s euros (2%/yr)</span><span class="num">'+fmtE(s.real)+'</span></div>';
+  h+='<div class="lrow"><span>vs start principal</span><span class="num">'+(d>=0?'+':'−')+fmtE(Math.abs(d))+'</span></div>';
+  h+='<div class="lrow"><span>first-month surplus (yield − spend)</span><span class="num">'+(m1>=0?'+':'−')+fmtE(Math.abs(m1))+'/mo</span></div>';
+  h+='<div class="foot">Runs on the selected mix ('+pct(s.y)+') and the plan-end dial, before any crash-deploy. Real-preservation spend at this mix ≈ '+fmtE(s.keep)+'/mo — under that, the pot grows in REAL terms too, not just on paper.</div>';
+  if(s.end<p.floor)h+='<div class="notep">⚠ This spend runs the pot below your '+fmtE(p.floor)+' floor by '+endLabel(p.months)+' — it exceeds the sustainable draw shown in the hero.</div>';
+  el.innerHTML=h;
 }
 function renderLens(){
   const p=state.plan,a=anchorC(),el=$('#lensT');if(!el)return;
@@ -163,6 +191,7 @@ function updateEngineNumbers(){
   if(ui.blend){const bd=BLENDS.find(x=>x.id===ui.blend);if(bd){const ks=Object.keys(bd.mix);
     document.querySelectorAll('#view-engine .bdet .brow2 .num').forEach((el,i)=>{const k=ks[i];if(!k)return;
       el.textContent=pct(instYield(k))+(p.principal>0?' · '+fmtK(p.principal*bd.mix[k]):'');});}}
+  renderSpend(); /* v1.15: the surplus lens tracks principal/floor/plan-end drags live */
 }
 function bindEngine(){
   $('#prS').oninput=e=>{state.plan.principal=+e.target.value;if(state.plan.floor>state.plan.principal)state.plan.floor=state.plan.principal;save();updateEngineNumbers();};
@@ -177,6 +206,7 @@ function bindEngine(){
   cyi.oninput=e=>{state.plan.customY=+e.target.value;save();updateEngineNumbers();};
   cyi.onchange=e=>{state.plan.customY=custY();e.target.value=state.plan.customY;save();updateEngineNumbers();if(state.plan.blend==='custom')renderMatch();};
   $('#slv').onchange=e=>{state.plan.sleeve=Math.max(0,+e.target.value||0);save();renderLens();};
+  $('#spIn').oninput=e=>{state.plan.spend=Math.max(0,+e.target.value||0);save();renderSpend();}; /* oninput + #spT-only rewrite keeps focus while typing (cyIn pattern) */
 }
 
 /* ---------- MATCH view ---------- */

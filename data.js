@@ -43,9 +43,22 @@
    ib29; card kept). Crossover iBonds (IX29, 4.18 net, IG+BB mix) evaluated and
    REJECTED — breaks the pure-IG principle. Re-verify all yields after the ECB
    decision of 23 Jul 2026 (stamps are Apr/May 2026).
+   v1.14 (2026-07-19): 4th blend 'deploy' — outcome of the crash-dive / powder
+   exchange-rate study (his crypto lens: sell BTC −10% to buy alts −30% = a 3:1 bar.
+   EUR high yield as powder FAILS it: ≈1.5:1 in exactly the big crashes — HY is
+   another altcoin, not BTC; short IG passes). Powder rule deliberately changed ON
+   JOËL'S CALL from crash-PROOF to BOUNDED-LOSS: 7% MMF checking float (≈€25k —
+   bridges mid-2027 departure → Dec 2029 alongside distributions) + 22% iBonds-2029
+   deploy sleeve + 71% iBonds-2031 lock = 3.39 net, +€38/mo over Max yield.
+   Deploy exchange at a 2028 credit-crash trough ≈ 12:1 vs stocks −35 (≈5:1 in a
+   2022-style rate shock — the float + short duration keep even that above the bar).
+   Beats Max yield in ALL rebuilt-sim scenarios incl. 1929 (pull-to-par heals every
+   mark); the price is the deploy-moment haircut (≈€2.9k per €100k raised) and the
+   lost govt crash-rally trade. ib29 pays out ≈€77k cash Jan 2030 — the powder
+   auto-refills for the 2030-31 home window.
    Not financial, tax, legal or immigration advice — verify load-bearing items locally. */
 
-const DATA_STAMP='2026-07-17';
+const DATA_STAMP='2026-07-19';
 const ECB_STAMP={dfr:2.25,asOf:'2026-06-17',estr:2.18,note:'ECB decides again 23 Jul 2026 — hiking cycle; re-stamp snapshots after'};
 const MMF_SPREAD=-0.08;   // MMF-ETF yield ≈ DFR − 0.08 (derivable live)
 const INSURANCE=120;      // IMG Global ~€120/mo — his researched pick, named so he remembers which one won
@@ -143,7 +156,10 @@ const POWDER_RANK=['','pure dry powder','rallies in a crash','mild dip, quick re
    apartment money (≈€234k) without ever breaking the 2031 lock.
    All yields NET of fees — v1.1 blends for history: safety 2.71, target3 2.99, allig 3.08.
    v1.12 (2026-07-18): per-instrument `why` — each slice's earned place, blend-specific
-   (the two-panic-flavours reasoning from the Jul 18 session now travels with the blend). */
+   (the two-panic-flavours reasoning from the Jul 18 session now travels with the blend).
+   v1.14 (2026-07-19): + 'deploy' — the ONE blend that deliberately breaks the
+   crash-proof-powder spine: bounded-loss ib29 sleeve + €25k float instead of the
+   ≈€100k no-loss pot (his call; rationale in the header v1.14 block). */
 const BLENDS=[
   {id:'safety',name:'Max safety',sub:'≈€100k powder (MMF+govt) + core in Schatz rolls & iBonds-2029 — nothing meaningfully red, ever; ≈€245k sellable within days',
     mix:{mmf:.12,govt:.17,schatz:.42,ib29:.29},
@@ -164,7 +180,13 @@ const BLENDS=[
     why:{
       frn:'Powder with a yield kicker. IG floating-rate notes ≈ MMF +30bp, coupons reset quarterly so it floats UP with hikes. Worst dip ever −3.8%, recovered in weeks — second-line powder, not first-line.',
       govt:'Keeps one true crash-rally line in the powder: FRN dips a little in a panic, short govts usually rise — together they cover both panic flavours.',
-      ib31:'Everything else, locked to plan end at the shelf’s top net yield — max extraction, with a printed Jan 2032 payout so every drawdown has a date-certain end.'}}
+      ib31:'Everything else, locked to plan end at the shelf’s top net yield — max extraction, with a printed Jan 2032 payout so every drawdown has a date-certain end.'}},
+  {id:'deploy',name:'Deploy',sub:'BOUNDED-LOSS powder (Jul 2026 rethink): ≈€25k MMF checking float + ≈€77k iBonds-2029 deploy sleeve — worst crash mark ≈ −4–8% today, shrinking every year and healed by the printed Dec 2029 date, after which it IS cash for the 2030-31 window — + ≈€248k locked to plan end. Sell the sleeve at ≈−3–4 to buy a −30% market (≈12:1 exchange): the crash-proof-powder rule traded for ≈+€38/mo over Max yield.',
+    mix:{mmf:.07,ib29:.22,ib31:.71},
+    why:{
+      mmf:'The checking float, not crash powder: ≈€25k that can never print a minus, sized to bridge living costs alongside the distributions until the 2029 rung matures. First euros out of any raise.',
+      ib29:'The bounded-loss deploy sleeve. Short and shrinking duration: crash marks ≈ −4% by 2028, healed by the printed date. Selling at −3–4 to buy stocks at −30 ≈ 12:1 in a credit crash, ≈5:1 even in a 2022-style rate spike — both clear the 3:1 crypto bar (sell BTC −10, buy alts −30). Pays out ≈€77k cash Jan 2030: the powder refills itself for the home window.',
+      ib31:'The plan-end lock, unchanged from Max yield: the shelf’s top net yield, paying out cash ~Jan 2032 exactly at plan end. Deploys come from the float and the 2029 sleeve — this slice never needs to move.'}}
 ];
 
 const BROKERS=[
