@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.17.0';
+const APP_VERSION='1.18.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -90,7 +90,11 @@ function secDiv(n,name,sub){return '<div class="secdiv" id="sd-'+name.toLowerCas
 
 /* ---------- shared bits ---------- */
 function chip(cls,glyph,txt){return '<span class="chip '+cls+'"><b>'+glyph+'</b> '+esc(txt)+'</span>';}
-function stampLine(d){return '<span class="stamp">stamped '+esc(d)+'</span>';}
+/* v1.18 — stamp age: every stamped figure now knows how old it is. Past STALE_DAYS the
+   stamp itself goes amber with a re-verify nudge ("never display a number the app
+   can't vouch for" extended from yields to everything). */
+function stampAge(d){const t=new Date(d+'T00:00:00');return isFinite(t)?Math.floor((Date.now()-t)/864e5):0;}
+function stampLine(d){const a=stampAge(d),old=a>STALE_DAYS;return '<span class="stamp'+(old?' floorwarn':'')+'">stamped '+esc(d)+(old?' · '+a+'d old — re-verify':'')+'</span>';}
 /* small verification mark for figures totalled line-by-line in Joël's own COL ledger (not guide estimates) */
 function vmark(){return '<span class="vmark" title="Hand-costed line-by-line from your COL verification ledger — his real lifestyle, accommodation & protein noted per place (only Chiang Mai is pool+gym; beef where it is his staple, a chicken/fish mix where beef is dear); ex-insurance. Not a guide estimate.">✓ hand-costed</span>';}
 function poolmark(){return '<span class="vmark pool" title="The only base costed with a pool+gym condo — every other place is a regular condo or lean studio.">★ pool+gym</span>';}
@@ -241,6 +245,7 @@ function renderMatch(){
       h+='</div>';}
     if(open){h+='<div class="cbody">'+stampLine(c.stamp);
       h+='<div class="kv"><span>Stay</span>'+esc(c.stay||'—')+'</div>';
+      if(c.res)h+='<div class="kv"><span>Residency trigger — beyond day-count</span>'+esc(c.res)+'</div>';
       if(c.work)h+='<div class="kv"><span>Coaching income</span>'+esc(c.work)+'</div>';
       if(c.col.note)h+='<div class="kv"><span>COL note</span>'+esc(c.col.note)+' · confidence '+esc(c.col.conf)+'</div>';
       if(c.fx)h+='<div class="kv"><span>FX sensitivity</span>'+esc(c.fx)+'</div>';
@@ -277,8 +282,41 @@ function renderMatch(){
 }
 
 /* ---------- PATH view ---------- */
+/* v1.18 — the Agenda: the app's time layer. Dated deadlines sort by date (red past
+   due, amber within 60 days), Prinsjesdag is computed live (3rd Tuesday of September,
+   every year until departure), standing monitors follow. Freshness line at the foot
+   watches the snapshot stamps the same way the ECB drift line watches the rate. */
+function nextPrinsjesdag(){const now=new Date();for(let y=now.getFullYear();;y++){const first=new Date(y,8,1);const off=(2-first.getDay()+7)%7;const p=new Date(y,8,1+off+14);if(p>=now)return p;}}
+function dTo(d){return Math.ceil((d-new Date())/864e5);}
+const MN3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function shortDate(d){return MN3[d.getMonth()]+' '+d.getFullYear();}
+function agendaRow(chipHtml,t,d){return '<div class="brow">'+chipHtml+'<div><b>'+esc(t)+'</b><div class="sub">'+esc(d)+'</div></div></div>';}
+function agendaCard(){
+  const dated=[],standing=[];
+  for(const m of MONITORS){
+    if(m.prinsjesdag)dated.push({due:nextPrinsjesdag(),t:m.t,d:m.d});
+    else if(m.due)dated.push({due:new Date(m.due+'T00:00:00'),t:m.t,d:m.d});
+    else standing.push(m);
+  }
+  dated.sort((a,b)=>a.due-b.due);
+  let h='<div class="card"><div class="lbl">Agenda — dated deadlines &amp; standing monitors</div>';
+  for(const i of dated){
+    const n=dTo(i.due);let c;
+    if(n<0)c=chip('bad','✕','overdue');
+    else if(n<=60)c=chip('warn','!',n+'d');
+    else c=chip('muted','◌',shortDate(i.due));
+    h+=agendaRow(c,i.t,i.d);
+  }
+  for(const m of standing)h+=agendaRow(chip('muted','◌','watch'),m.t,m.d);
+  let oldest=DATA_STAMP;for(const k in INSTRUMENTS){if(INSTRUMENTS[k].stamp<oldest)oldest=INSTRUMENTS[k].stamp;}
+  const stale=stampAge(oldest)>STALE_DAYS||stampAge(DATA_STAMP)>STALE_DAYS;
+  h+='<div class="foot'+(stale?' floorwarn':'')+'">Freshness: data snapshot '+DATA_STAMP+' ('+stampAge(DATA_STAMP)+'d) · oldest instrument stamp '+oldest+' ('+stampAge(oldest)+'d) · ECB stamp '+ECB_STAMP.asOf+' (drift line in Engine watches it live). Stamps go amber past '+STALE_DAYS+' days.</div>';
+  h+='</div>';
+  return h;
+}
 function renderPath(){
   let h=secDiv('03','Path','the linear sequence');
+  h+=agendaCard();
   h+='<div class="foot">Linear plan, plain checkboxes. Dependencies are text on purpose — real decisions are fuzzy; computed unlock logic was rejected for v1.</div>';
   for(const ph of PATH){
     const done=ph.steps.filter(s=>state.steps[s.id]).length;

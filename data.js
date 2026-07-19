@@ -56,6 +56,27 @@
    mark); the price is the deploy-moment haircut (≈€2.9k per €100k raised) and the
    lost govt crash-rally trade. ib29 pays out ≈€77k cash Jan 2030 — the powder
    auto-refills for the 2030-31 home window.
+   v1.18 (2026-07-19): THE TIME LAYER + three strategy gaps closed (his call: "build
+   #2 and #4 now"). (a) MONITORS array + Agenda card at the top of Path — dated
+   deadlines (ECB 23 Jul, the hard NL-deregistration deadline, iBonds maturities) +
+   the recurring Prinsjesdag check (next 3rd-Tue-of-Sep computed live) + standing
+   verify-items (TH decree, TH bank-on-DTV, GE SBS, PH §42(E) opinion, AOW window).
+   Stamp-age flags app-wide: STALE_DAYS (declared v1.2, unused until now) drives
+   amber "re-verify" marks on stamps older than 183 days + a freshness line in the
+   Agenda card. (b) BOOMERANG (art. 2.2 Wet IB, researched Jul 16): new Playbooks
+   card + gate lines in pump/return/tree/x5 — re-settling in NL within 12 months of
+   departure without having lived (and been taxed as resident) in another state =
+   deemed NL-resident the WHOLE time, retroactively. Rule: no sale in months 0–12
+   unless certain of no NL re-settlement before the anniversary. (c) SECONDARY
+   RESIDENCY TESTS: `res` field on VN/JP/KH/CZ/SI/ID — lease/abode/domicile/intent
+   tests that catch BELOW the day count (TH/PH/GE/MY/IN are day-count-only); Path n1
+   discipline widened to day limits AND no dwelling kept AND no vital-interest anchor.
+   (d) EURO-EXIT TRIGGERS Playbooks card: the EUR regime risk no EUR bond can hedge —
+   predefined triggers + a 10–15% gold/CHF/USD response ladder, deliberately NOT
+   armed today (the trigger list is the insurance). (e) nlmotion card upgraded with
+   the enactment-speed analysis (fast-path ceiling ≈3.5 months via the Belastingplan
+   incl. press-release retroactivity, Dec 2025 status = exploration only + punted to
+   the next cabinet, watch formation docs too, NL–PH treaty/TRC blunting).
    Not financial, tax, legal or immigration advice — verify load-bearing items locally. */
 
 const DATA_STAMP='2026-07-19';
@@ -65,6 +86,35 @@ const INSURANCE=120;      // IMG Global ~€120/mo — his researched pick, name
 const HORIZON_MO=60;      // Jan 2028 → Dec 2032 (pivot 2028 = constant, not editable)
 const HORIZON_LABEL='2028 → 2032';
 const STALE_DAYS=183;
+
+/* v1.18 — the Agenda (rendered at the top of Path). Dated items sort by due date and
+   go amber inside 60 days, red past due; `prinsjesdag:true` computes the next 3rd
+   Tuesday of September live (the watch runs EVERY year until actual departure).
+   Undated items = standing monitors: verify-before-acting flags with no calendar
+   date of their own. Resolving a dated item = do the thing, then update/remove the
+   entry in the next build (the app never silently un-flags itself). */
+const MONITORS=[
+  {due:'2026-07-23',t:'ECB decision — re-stamp the yield snapshots',
+    d:'Hiking cycle. After the decision: re-stamp DFR/€STR + the instrument yields (oldest stamps Apr–May 2026) and bump the data snapshot. The Engine drift line warns meanwhile. Path p4.'},
+  {prinsjesdag:true,t:'Prinsjesdag — NL exit-tax / inwonerschapsfictie check',
+    d:'Check the Belastingplan package + the emigrant-exit-tax exploration AND the new cabinet’s formation/tax agenda. If a concrete bill lands, accelerate the exit — the fast path is ≈3.5 months to entry into force (see the Playbooks monitor card). Every September until departure.'},
+  {due:'2027-12-31',t:'Hard deadline — NL deregistration complete before 1 Jan 2028',
+    d:'The pivot constant: vermogensaanwasbelasting treated as fixed for 2028. Target departure mid-2027 leaves ~6 months of slack. Path x5 is the master-shield checklist; the AOW 1-year window opens the day this happens.'},
+  {due:'2030-01-01',t:'iBonds-2029 pays out ≈€77k cash (Priced powder)',
+    d:'The deploy sleeve matures at par — powder auto-refills for the 2030–31 home window. Decide then: re-park (MMF / next rung) or hold as the home tranche.'},
+  {due:'2032-01-01',t:'iBonds-2031 pays out — the plan-end lock matures',
+    d:'Cash lands at par exactly at the Dec 2031 plan end. The Fork decision (stay vs return) should already be made by now.'},
+  {t:'TH remittance decree — monitor, never plan on it',
+    d:'Revived draft (exempt if remitted in the year earned or the next) still awaiting Cabinet + Royal Gazette. Until it is published law, the no-remit leash is permanent.'},
+  {t:'TH bank-on-DTV — THE gate on the onshore route',
+    d:'BBL/KBank/SCB reject DTV accounts since the 2025–26 anti-scam crackdown; no Thai bank = no onshore 0% route. Verify at a branch before committing to TH as anchor. (The offshore Scenario-F route needs no Thai bank.)'},
+  {t:'GE — coaching ≠ consulting for the 1% SBS',
+    d:'Confirm the classification with a local advisor before counting on 1%; “consultancy” is SBS-excluded, fallback 20%. Only bites if GE becomes the anchor.'},
+  {t:'PH lawyer — written §42(E) opinion pending',
+    d:'The sharpened three-part question is in the dossier. The hub-click (guardrail 9) moots the ambiguity meanwhile; the opinion decides how much the continuity stay matters. Path p9.'},
+  {t:'AOW buy-in — the 1-year window opens at departure',
+    d:'Vrijwillige voortzetting must be requested at SVB within 1 year of leaving NL — decide it at Exit, not later. Becomes a dated deadline the day the BRP uitschrijving happens.'}
+];
 
 /* All yld values are NET of TER (fund fee) — YTM/YTW figures published by fund
    providers exclude fees, so net = published yield − TER. Schatz has no wrapper. */
@@ -244,6 +294,7 @@ const COUNTRIES=[
   {cc:'CZ',n:'Czechia',f:'🇨🇿',roles:['anchor','live'],stamp:'2026-07-16',
     col:{f:1200,n:1700,city:'Prague',conf:'high',note:'Brno −15%'},
     stay:'EU — unlimited; report to the Foreign Police within 30 days.',
+    res:'⚠ Stálý byt: an available permanent home with intent to stay = resident from day 1 — the 183-day count is only the second limb. (As anchor that is the feature; passing through, don’t keep a flat at your disposal.)',
     work:'živnost + paušální daň band 1: CZK 9,984/mo (~€400) flat, covering income tax + social + health in one payment, up to ~1.5M CZK revenue. Simplest regime on the list.',
     anchor:{verdict:'the EU slot — 0% on aged lots (a small slice of his stack), ~€400/mo all-in work tax',
       trc:'Days–weeks: permanent home with intent to stay (“stálý byt”) OR 183 days; certificate routine, ~€0.',
@@ -252,15 +303,18 @@ const COUNTRIES=[
       gates:['Per-lot clock RESETS on every sell/rebuy — trading history, not purchase year, decides. Only never-traded lots qualify today; 2026 buys unlock 2029. Koinly lot report = the ground truth.']}},
   {cc:'VN',n:'Vietnam',f:'🇻🇳',roles:['live'],stamp:'2026-07-14',
     col:{f:974,n:1100,city:'Da Nang',conf:'med',verified:true,note:'Hand-costed = line-by-line (his real lifestyle, ex-insurance); regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym) · Comfort = guide estimate (band is tight — Da Nang rent rose in 2026)'},
-    stay:'90-day e-visa, repeatable.'},
+    stay:'90-day e-visa, repeatable.',
+    res:'⚠ Not just days: 183+ days OR a leased dwelling held ≥183 days in the tax year — a long lease ALONE can make you Vietnamese tax-resident below the day count. Keep stays short AND leases short.'},
   {cc:'KH',n:'Cambodia',f:'🇰🇭',roles:['live'],stamp:'2026-07-16',
     col:{f:911,n:1150,city:'Siem Reap',conf:'med',verified:true,note:'Hand-costed = line-by-line for Siem Reap (his real lifestyle, ex-insurance); regular 1BR, NO pool+gym, outer area (Jul 2026) · Comfort = guide estimate (Phnom Penh) · fresh 2026 data, thinnest sourcing of the set'},
     stay:'E-class “ordinary” visa on arrival, then extend 1/3/6/12 months indefinitely — ~$300/yr for the 12-month via agent. Easiest long-stay in SE Asia.',
     work:'Non-residents: Cambodian-source only. RESIDENTS are taxed on WORLDWIDE income — the old “territorial 0%” framing is dead.',
+    res:'⚠ Abode-based, not day-based: a “principal place of abode” makes you resident (→ worldwide 20% CGT since 2026). Hotels/short lets passing through are fine; never keep a KH abode in a sale year.',
     demoted:'DEMOTED as anchor (Jul 16 2026) — the previous card was WRONG. The 20% CGT is LIVE since 1 Jan 2026 for investment assets, goodwill, IP and foreign currency (only the real-estate CGT is deferred to 2027), and residents are taxed on their WORLDWIDE gains. Abode-based residency is the trap: do NOT establish an abode or residency here in a sale year — passing through as a non-resident is fine. Crypto banking remains BANNED onshore (central-bank bar), so there is no local off-ramp either way. Scenario E retired — see the decision-tree playbook.'},
   {cc:'ID',n:'Indonesia',f:'🇮🇩',roles:['live'],stamp:'2026-07-14',
     col:{f:900,n:1400,city:'Canggu',conf:'med',note:'Bali premium; rest of ID much cheaper, nomad infra thin'},
-    stay:'30-day VOA + 30-day extension; longer stays = visa runs or B211A-type paperwork.'},
+    stay:'30-day VOA + 30-day extension; longer stays = visa runs or B211A-type paperwork.',
+    res:'⚠ Not just days: 183+ days OR presence with INTENT to reside (long-term housing, a KITAS permit) — the intent test can catch below the day count. Visa-run tourism is fine; don’t sign a year lease.'},
   {cc:'IN',n:'India',f:'🇮🇳',roles:['live'],stamp:'2026-07-16',
     col:{f:796,n:1100,city:'6 places costed',conf:'med',verified:true,note:'Hand-costed = mean of the 6 hand-costed places below (his real lifestyle, ex-insurance; lean studio, no pool+gym; protein = goat-forward local mix — beef banned). Bimodal range: inland spiritual towns €652–710 = his CHEAPEST tier ever costed; Goa/Kerala beach €858–998 = mid-tier. Comfort = a roomier estimate.'},
     places:[
@@ -280,12 +334,14 @@ const COUNTRIES=[
   {cc:'SI',n:'Slovenia',f:'🇸🇮',roles:['live'],stamp:'2026-07-14',
     col:{f:1450,n:2000,city:'Ljubljana',conf:'med',note:'only country in the red on Hand-costed without work income'},
     stay:'EU — unlimited.',
+    res:'⚠ EU-style home tests: a permanent dwelling or centre of vital interests can attach residency below 183 days — not just a day count.',
     demoted:'Demoted as anchor: 25% tax on crypto→fiat from 1 Jan 2026 (swaps exempt, pre-2026 gains grandfathered). For a mostly-post-2026 gain that’s a ~25% haircut — the old “SI 0%” claim is dead. CZ takes the EU slot.'},
   {cc:'JP',n:'Japan',f:'🇯🇵',roles:['live'],stamp:'2026-07-14',
     col:{f:1472,n:1900,city:'Fukuoka',conf:'med',verified:true,note:'Hand-costed = line-by-line (his real lifestyle, ex-insurance); regular 1LDK, no pool+gym (Japan norm) — beef + cafe meals run 2–3× SE Asia, so his real Fukuoka cost lands ABOVE the old guide numbers · Comfort = a +~30% band, ESTIMATE (guide-normal was below his real cost, so it was raised to keep the band valid) · Tokyo higher again'},
     fx:'HIGH — the euro case is a weak-yen bet; if EUR/JPY strengthens 20%, Hand-costed Fukuoka rises to ~€1,770',
     blocks:'90-day blocks',
     stay:'90 days per entry, HARD CAP — NL is not on the bilateral extension list (AT/DE/IE/LI/MX/CH/UK only). Nomad visa ¥10M/yr, 6mo, non-renewable = out of reach. Pattern: quarterly Fukuoka blocks; immigration scrutinizes serial re-entries.',
+    res:'⚠ Not just days: a jūsho (domicile — centre of life) attaches Japanese residency: a year-round apartment or a life visibly centred in JP can make you resident below any day count. Quarterly blocks in short-term lets are fine; don’t keep a standing JP apartment.',
     note:'Kraken restricted in JP — never an off-ramp jurisdiction. He’s learning Japanese (N4) and will visit regardless.'},
   {cc:'SG',n:'Singapore',f:'🇸🇬',roles:['hub'],stamp:'2026-07-16',hub:{wb:650,wm:1100,note:'cheapest sleep is the problem; food/transport cheap · execution venue for the click — no CGT'}},
   {cc:'HK',n:'Hong Kong',f:'🇭🇰',roles:['hub'],stamp:'2026-07-16',hub:{wb:600,wm:1500,note:'best food value, worst hotel value · execution venue for the click — no CGT'}},
@@ -309,12 +365,12 @@ const PATH=[
     {id:'x2',t:'Park the €350k in the chosen blend at IBKR/Swissquote',dep:'Position BEFORE deregistering — full product access needs a residence.'},
     {id:'x3',t:'Check the iBonds maturity dates line up with the plan',dep:'Dec 2028 tranche → cash Jan 2029 (re-park in MMF); Dec 2030 tranche → cash Jan 2031, right in the apartment window. If return slips past 2032, roll into a later iBonds rung.'},
     {id:'x4',t:'Set up cold-storage estate access',dep:'Someone must be able to reach the coins if something happens abroad — see Playbooks.'},
-    {id:'x5',t:'Deregister from NL — cleanly, and DOCUMENT it',dep:'Before 1 Jan 2028 — vermogensaanwasbelasting treated as fixed (the pivot constant). Guardrail 1, the master shield: BRP uitschrijving + no available Dutch dwelling + NL accounts closed + center of life gone. Keep every piece of paperwork — a sloppy exit is the one failure mode that survives departure.'}]},
+    {id:'x5',t:'Deregister from NL — cleanly, and DOCUMENT it',dep:'Before 1 Jan 2028 — vermogensaanwasbelasting treated as fixed (the pivot constant). Guardrail 1, the master shield: BRP uitschrijving + no available Dutch dwelling + NL accounts closed + center of life gone. Keep every piece of paperwork — a sloppy exit is the one failure mode that survives departure. ⚠ The 12-month boomerang clock starts HERE: re-settling in NL within 12 months of departure = deemed NL-resident the whole time (art. 2.2 — see Playbooks).'}]},
   {id:'nomad',name:'Nomad',when:'2028 → · resident nowhere',steps:[
-    {id:'n1',t:'Stay under day-thresholds everywhere (~183d rule of thumb)',dep:'Guardrail 5: never 182 in India (30% worldwide crypto), never 180 in any worldwide-tax country. PH is SAFE to exceed (territorial at any status); TH only with the no-remit leash; KH no longer safe to exceed (worldwide CGT on residents).'},
+    {id:'n1',t:'Residency discipline — days AND no dwelling AND no anchor',dep:'Guardrail 5, widened (Jul 2026): day limits alone are NOT the whole test — secondary tests (a lease kept at your disposal, an abode, a centre-of-life) catch BELOW the day count in VN/JP/KH/CZ/SI/ID (⚠ lines on those country cards). So: never 182 in India (30% worldwide crypto), never 180 in any worldwide-tax country, AND no dwelling kept available, AND no vital-interest anchor. PH is SAFE to exceed (territorial at any status); TH only with the no-remit leash; day-count-only set: TH/PH/GE/MY/IN.'},
     {id:'n2',t:'Make PH the FIRST stop, rent a real place, set the Kraken address to it — brokers stay as-is',dep:'SUPERSEDES the old after-TRC rule. A real rented PH address (address ≠ TRC): gets NL off the account early — CARF/DAC8 reporting follows the declared address — and avoids re-KYC in the middle of a pump window. Never a fabricated address; stale-but-genuine beats a last-minute change. IBKR/Swissquote keep NL until the TRC exists (“resident nowhere” is grey at brokers; both tolerate the gap).'},
     {id:'n3',t:'Re-confirm the hand-costed COL numbers on the first stays',dep:'The ✓ hand-costed figures (TH €921, VN €974, PH places…) are desk-costed from his real lifestyle — validate on the ground; the ledger in waypoint/research is the living source. (Supersedes the old “TH €800 lived anchor” check.)'},
-    {id:'n4',t:'Monitor the moving parts',dep:'TH bank-on-DTV policy, TH remittance decree, GE coaching-vs-consulting — all flagged on the country cards — plus the NL inwonerschapsfictie/exit-tax motion: recheck every Prinsjesdag (3rd Tue of Sep) until actual departure (see Playbooks).'}]},
+    {id:'n4',t:'Monitor the moving parts',dep:'The Agenda card at the top of this section is the live list: dated deadlines + standing monitors (TH bank-on-DTV, TH decree, GE SBS, PH §42(E), Prinsjesdag). This step = the habit of actually looking at it.'}]},
   {id:'anchor',name:'Anchor',when:'when a base is chosen',steps:[
     {id:'a1',t:'Establish TRC at the anchor',dep:'PH 180d cumulative in the calendar year (the 0% does NOT need it — the TRC is paper/corroboration) · GE 183d · TH 180d + filing · CZ home/183d.'},
     {id:'a2',t:'THEN switch IBKR/Swissquote residency to the anchor',dep:'AFTER the TRC exists, BEFORE any big sale — DAC8/CARF reporting goes to the declared residence. Kraken already points at PH since the first stop (the old “switch Kraken after TRC” rule is superseded — see Nomad).'},
@@ -337,30 +393,44 @@ const PATH=[
 const PLAYBOOKS=[
   {id:'pump',icon:'▲',accent:'ok',title:'Sudden pump — cash out in 1–2 weeks',sub:'the emergency this plan is built around',body:[
     {h:'Before 2028 (still NL-resident)',p:'Fly home and sell as an NL resident — clean, no exotic moves. His own correction: pre-exit, NL IS the emergency plan.'},
-    {h:'Nomad gap (no TRC yet) — the emergency sequence',p:'Fly TOWARD PH via a SG/HK/AE stop → execute the sale DURING the stop (guardrail 9: the hub-click) → land in PH for the presence/continuity story. PH is territorial 0% for aliens at ANY residency status — no 180 days needed. The old line “a hub trip solves logistics, not tax” was WRONG: clicking from a no-CGT jurisdiction also moots the sourcing ambiguity.'},
+    {h:'Nomad gap (no TRC yet) — the emergency sequence',p:'Fly TOWARD PH via a SG/HK/AE stop → execute the sale DURING the stop (guardrail 9: the hub-click) → land in PH for the presence/continuity story. PH is territorial 0% for aliens at ANY residency status — no 180 days needed. The old line “a hub trip solves logistics, not tax” was WRONG: clicking from a no-CGT jurisdiction also moots the sourcing ambiguity. ⚠ Months 0–12 after NL departure: check the boomerang card FIRST — if an NL re-settlement before the 12-month anniversary is at all likely, this sale becomes NL-taxed retroactively.'},
     {h:'After the TRC',p:'Same click discipline: sell via the anchor’s clean route (PH foreign exchange · GE anywhere · TH onshore before 2030 OR Kraken with zero remittance · CZ never-traded lots, small slice) but execute the click from SG/HK/AE anyway — guardrail 9 applies in EVERY scenario. Kraken already points at PH (set at the first stop); IBKR/Swissquote must point at the anchor. Run the Q3 pre-sale checklist first (Path).'}]},
   {id:'tree',icon:'⑂',accent:'ok',title:'Off-ramp decision tree — scenarios A–F',sub:'the one justified branch · from the cash-out dossier, verified Jul 16 2026',body:[
     {h:'The principle',p:'A gain is taxed only if some jurisdiction has a claim at the MOMENT of sale — 0% = engineering a moment where no one does. And in every branch: guardrail 9, execute the actual click physically in SG/HK/AE.'},
-    {h:'Q1 — NL cleanly exited?',p:'NO + pre-2028 → Scenario A: just sell; box 3 is a modest deemed-return wealth tax, tolerable in a true emergency. NO + 2028 or later → do NOT sell as an NL resident (real gains tax) — exit first. YES → NL has no claim; keep the exit documentation.'},
+    {h:'Q1 — NL cleanly exited?',p:'NO + pre-2028 → Scenario A: just sell; box 3 is a modest deemed-return wealth tax, tolerable in a true emergency. NO + 2028 or later → do NOT sell as an NL resident (real gains tax) — exit first. YES → NL has no claim; keep the exit documentation. ⚠ One reach-back: inside months 0–12 of departure, the art. 2.2 boomerang can still reattach NL residency retroactively if you re-settle in NL — see the boomerang card before any early sale.'},
     {h:'Q2 — tax-resident anywhere this year?',p:'NO (roaming) → Scenarios B/D: fly toward PH via a hub stop, sell during the stop, land in PH = 0% at any residency status; guard the hostile thresholds (India 182d, TH 180d). PH resident → Scenario C: sell (hub-click) = 0% — and the hub-click matters MOST here: once PH-domiciled, mobilia sequuntur personam flips AGAINST you and hands BIR a situs argument for a click on PH soil (settled Scenario C carries more doctrinal risk than fly-in Scenario D). TH resident → Scenario F: Kraken → Swissquote, NEVER bring proceeds into TH by any channel = 0% on a permanent no-remit leash. Worldwide-tax country → failure mode: expect local tax, get an adviser.'},
     {h:'Scenario E — Cambodia — RETIRED',p:'✕ Was “sell as KH resident, territorial 0%”. WRONG since 1 Jan 2026: 20% CGT on residents’ WORLDWIDE gains, on abode-based residency. Never establish a KH abode in a sale year; passing through as a non-resident is fine.'},
     {h:'Q3 — always, before pressing sell',p:'Kraken address = PH (not NL)? Provenance dossier ready? Destination = Swissquote, not a remittance-country bank? Swissquote compliance pre-notified? Physically in SG/HK/AE for the click?'},
     {h:'Retired note',p:'“Emergency = fly back to NL and sell” is PRE-EXIT only (Scenario A). Post-exit, returning would re-enter the NL tax net — the emergency route is the hub-click toward PH.'}]},
+  {id:'boom',icon:'⟲',accent:'bad',title:'The 12-month boomerang — art. 2.2 Wet IB',sub:'no sale in months 0–12 if an NL return is possible',body:[
+    {h:'The rule',p:'Leave NL and go back to LIVE in NL within 12 months — without having lived in another state in between — and the law deems you NL-resident THE WHOLE TIME, retroactively. An aborted trip (health, family, burnout) converts a “clean exit” sale into an NL-resident sale after the fact. The clean-exit shield (x5) does not stop this — it is a statutory fiction, not a facts-and-circumstances test.'},
+    {h:'The discipline',p:'No sale in months 0–12 after deregistration unless CERTAIN no NL re-settlement happens before the 12-month anniversary. After that the boomerang is dead — it counts 12 months from DEPARTURE, never backwards from return. A 2-year trip is untouched; only the aborted first year is the trap.'},
+    {h:'The escape hatch',p:'The fiction does not apply if you actually LIVED in another EU/EEA/treaty state and were taxed there as a RESIDENT in between. Pure touring does not give this. A real settled opening stint in PH helps the facts — and a PH TRC (180+ days that calendar year) makes it solid.'},
+    {h:'Forced home early anyway?',p:'Coins unsold + inside month 12 → “sell before re-registering” does NOT work here (the fiction reaches back past the sale date). Either wait out the anniversary abroad before selling, or sell and accept NL tax on that sale. See Forced early return.'}]},
   {id:'crash',icon:'▼',accent:'warn',title:'Crash — deploy the powder, hold the core',sub:'the ≈€100k sleeve exists for exactly this',body:[
     {h:'What holds',p:'MMF: no dent. FRN: −1 to −4% briefly, recovers in weeks. Govt/Schatz: typically RALLY — sell high. iBonds: dip self-heals by the printed maturity date, so do not sell mid-panic unless truly forced. Evergreen IG 1–5y (no longer in any blend): −6/−7% plus a NAV discount if sold into the panic.'},
     {h:'Deploying the ≈€100k',p:'Powder sleeve (MMF/FRN + govt) sells any weekday, cash in 2–4 business days, from anywhere via IBKR. His structure: this is the slice earmarked to buy cheap stocks/BTC at a bottom — the apartment core stays untouched.'},
     {h:'Property crash while abroad',p:'If NL property also craters and he wants the apartment EARLY: iBonds sell same-day too, worst case ≈ −4–6% mid-panic (shrinking yearly). An apartment bought 15–30% off more than covers that haircut.'},
     {h:'Second-line powder — borrow against the core',p:'The iBonds core is marginable collateral at IBKR: for a generational bottom, a margin loan of ≤40% of the core’s value (≈€100k more) can be drawn WITHOUT selling anything — the loan repays itself as rungs mature at par. Strict rules: only AFTER the cash sleeve is spent; deploy on a predefined trigger, not on calling “the bottom” (at ≤40% vs 2y IG, a further −30% leg cannot force a call); pair the draw with a voluntary de-lever line (broker raises bond haircuts → trim and repay on YOUR terms before the liquidation algo does); never draw in the same month as an IBKR residency-country switch. Verify at the time: the ETFs’ marginability + house maintenance + EUR margin rate (floats, ≈benchmark +1.5%, usually ABOVE the bond yield — the drawn tranche carries ≈flat).'},
     {h:'Why margin is 2nd line, not a cash-powder replacement',p:'The cash sleeve is an option he OWNS; a margin line is an option the BROKER writes and can revoke (house haircuts are policy, not contract — and revocation correlates with exactly the moment of use). Borrowing capacity is ADDITIVE to the sleeve, so going all-bonds would only trade the unconditional layer for ≈€90/mo of yield — rejected Jul 2026.'}]},
+  {id:'eurexit',icon:'◎',accent:'warn',title:'Euro-exit triggers — regime insurance',sub:'the one risk EUR bonds cannot hedge · predefined, deliberately NOT armed',body:[
+    {h:'The gap',p:'Every blend is EUR to the bone. A euro REGIME event — redenomination, capital controls, a eurozone break, 1929-scale EUR credit failure — is the one scenario the shelf cannot insure from inside: every hedge denominated in EUR fails with it. The only insurance that survives is outside the currency: gold, CHF, USD. Discussed size: 10–15% of the core.'},
+    {h:'Triggers — predefined, not vibes',p:'(1) Sovereign spread blowout PLUS serious redenomination politics in a big member (IT/FR “parallel currency” talk moving from fringe to government). (2) Capital-control measures anywhere in the euro area (Cyprus 2013 is the precedent). (3) Inflation persistently far above the 2.3% planning assumption with the ECB visibly behind. (4) The stay-in-Asia branch firing — the floor currency should follow the future home, and an NL apartment is priced in euros only as long as NL is the destination.'},
+    {h:'The response ladder',p:'Execute in calm, never mid-panic: shift 10–15% of the core into a physical-backed gold ETC + short CHF/USD sovereign paper — all holdable at IBKR as a nomad, no new accounts needed. The EUR floor logic stays unless the NL-return branch dies. This is a dial with a predefined trigger, exactly like the margin second line.'},
+    {h:'Why not arm it now',p:'Carry cost: a 10–15% slice at gold/CHF carry vs ≈3.4% on the shelf ≈ €40–90/mo — real money for a tail that already has a predefined response. The trigger list IS the insurance until one fires. Revisit if trigger 4 (stay-in-Asia) firms up — that one is a life decision, not a market event.'}]},
   {id:'return',icon:'↩',accent:'warn',title:'Forced early return',body:[
+    {h:'⚠ Inside 12 months of departure?',p:'The art. 2.2 boomerang deems you NL-resident the WHOLE time if you re-settle in NL within 12 months of leaving (see the boomerang card) — any sale made in the gap becomes NL-taxed retroactively, even a hub-click sale. If at all possible: wait out the 12-month anniversary abroad before re-registering — or before selling.'},
     {h:'',p:'Re-register in NL → back in the NL tax net, whatever it is by then. The Engine’s floor is the point: principal intact means the apartment rebuy stays possible at ANY exit time. Broker accounts (IBKR/Swissquote) survive the move back too.'},
-    {h:'Coins still unsold?',p:'Sell BEFORE re-registering, not after — post-2028 an NL resident pays real gains tax on the sale (decision-tree Q1). If the return is foreseeable and the bull has run, the off-ramp (hub-click → Swissquote) comes first, the BRP registration second. Only a genuine emergency justifies inverting that order.'}]},
+    {h:'Coins still unsold?',p:'Past month 12: sell BEFORE re-registering, not after — post-2028 an NL resident pays real gains tax on the sale (decision-tree Q1). If the return is foreseeable and the bull has run, the off-ramp (hub-click → Swissquote) comes first, the BRP registration second. Only a genuine emergency justifies inverting that order.'}]},
   {id:'stay',icon:'⚓',accent:'ok',title:'Relationship / staying long-term',body:[
     {h:'',p:'The anchor becomes home: local tax planning and real integration replace this app’s frame. Work income (coaching) becomes the main lever — the anchor cards’ work lines are the starting point.'}]},
   {id:'aow',icon:'◔',accent:'warn',title:'AOW gap',body:[
     {h:'',p:'Every year not NL-resident ≈ −2% state pension; 2028–2032 ≈ −8 to −10%. Voluntary continuation (vrijwillige voortzetting, SVB) must be requested within 1 year of leaving — it’s an Exit-phase decision, not a later one. Verify current terms with SVB before deregistering.'}]},
-  {id:'nlmotion',icon:'◉',accent:'warn',title:'Monitor — NL emigrant exit tax (inwonerschapsfictie)',body:[
-    {h:'',p:'Tweede Kamer motion (Oct 2024, explore-options stage — nothing enacted) to explore a residency fiction / exit tax for wealthy emigrants. Directly targets this profile. Recheck every Prinsjesdag (3rd Tuesday of September) until actual departure; if it advances, accelerating the exit beats waiting it out.'}]},
+  {id:'nlmotion',icon:'◉',accent:'warn',title:'Monitor — NL emigrant exit tax (inwonerschapsfictie)',sub:'directly targets this profile · Agenda tracks the yearly check',body:[
+    {h:'Status (verified Dec 2025)',p:'Exploration ONLY — the State Secretary’s study found meager revenue (€16–38M/yr) and heavy implementation problems, and the caretaker cabinet explicitly punted the decision to the NEXT cabinet. No bill, no consultation. Origin: Tweede Kamer motion Oct 2024.'},
+    {h:'How fast could it bite?',p:'Fast-path ceiling ≈ 3.5 months: if it ever rides the Belastingplan package — Prinsjesdag (3rd Tue Sep) → in force 1 Jan — and anti-abuse measures can even take effect RETROACTIVELY from the Budget-Day press release (15:15). But a novel trailing tax realistically needs 1.5–3 years from a cabinet “go” (consultation, Raad van State, treaty analysis). The exposure scenario that matters for a mid-2027 exit: a concrete bill on Prinsjesdag 2026 in force Jan 2027 — currently unlikely given the Dec 2025 findings, but exactly what the watch is for.'},
+    {h:'What to watch',p:'Every Prinsjesdag until departure (the Agenda in Path computes the next one) AND the new cabinet’s formation/tax agenda — a coalition deal is where a “go” would first appear, months before any Budget Day.'},
+    {h:'If a bill lands',p:'Accelerate the exit before entry into force — grandfathering of already-departed emigrants is likely but NOT guaranteed. Treaty blunting: a German-style trailing tax mainly works against NON-treaty states; NL–PH has a treaty, so PH treaty-residency (TRC) would blunt it — one more reason the 180-day continuity/TRC play is cheap insurance.'}]},
   {id:'addr',icon:'✉',accent:'ok',title:'What the exchange address does — and doesn’t',body:[
     {h:'Does',p:'Decides WHERE Kraken’s CARF/DAC8 report goes. That is all it steers.'},
     {h:'Doesn’t',p:'It is not a tax claim: notification ≠ taxation, and address ≠ TRC. A report landing in PH about a territorial-0% gain is a non-event. His follow-up (“doesn’t the PH address hand BIR a ‘he represented residence’ exhibit?”): the PH self-cert is a TRUE statement that at most shifts him between alien categories that are ALL territorial — the only theoretical route it matters is the mobilia domicile long-shot, itself mooted by the hub-click. A three-long-shot parlay.'},
