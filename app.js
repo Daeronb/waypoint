@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.19.0';
+const APP_VERSION='1.19.1';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -96,8 +96,8 @@ function chip(cls,glyph,txt){return '<span class="chip '+cls+'"><b>'+glyph+'</b>
 function stampAge(d){const t=new Date(d+'T00:00:00');return isFinite(t)?Math.floor((Date.now()-t)/864e5):0;}
 function stampLine(d){const a=stampAge(d),old=a>STALE_DAYS;return '<span class="stamp'+(old?' floorwarn':'')+'">stamped '+esc(d)+(old?' · '+a+'d old — re-verify':'')+'</span>';}
 /* small verification mark for figures totalled line-by-line in Joël's own COL ledger (not guide estimates) */
-function vmark(){return '<span class="vmark" title="Hand-costed line-by-line from your COL verification ledger — his real lifestyle, accommodation & protein noted per place (only Chiang Mai is pool+gym; beef where it is his staple, a chicken/fish mix where beef is dear); ex-insurance. Not a guide estimate.">✓ hand-costed</span>';}
-function poolmark(){return '<span class="vmark pool" title="The only base costed with a pool+gym condo — every other place is a regular condo or lean studio.">★ pool+gym</span>';}
+function vmark(){return '<span class="vmark" title="Hand-costed line-by-line from your COL verification ledger — his real lifestyle, accommodation & protein noted per place (only Chiang Mai + Cebu are pool+gym; beef where it is his staple, a chicken/fish mix where beef is dear); ex-insurance. Not a guide estimate.">✓ hand-costed</span>';}
+function poolmark(){return '<span class="vmark pool" title="Costed with a pool+gym condo (Chiang Mai + Cebu) — every other place is a regular condo or lean studio.">★ pool+gym</span>';}
 function mixmark(){return '<span class="vmark mix" title="Beef is not the main protein here — costed as a local meat/fish mix instead: goat-forward in India (beef is banned), chicken-forward on the Thai islands (imported beef is dear).">◆ beef not main</span>';}
 
 /* ---------- ENGINE view ---------- */
@@ -224,7 +224,7 @@ function renderMatch(){
   h+='<input type="number" id="spIn" class="numin" inputmode="numeric" min="0" step="10" value="'+p.spend+'">';
   h+='<div id="spT"></div></div>';
   h+='<div class="lbl sect">Live-through — can the Engine fund it?</div>';
-  h+='<div class="foot">'+vmark()+' = totalled line-by-line from your own COL ledger (his real lifestyle, ex-insurance; accommodation & protein noted per place). '+poolmark()+' = the one pool+gym base (Chiang Mai only). '+mixmark()+' = beef is not the staple there (chicken/fish mix). The ✓ mark shows where the Hand-costed number is a real ledger total; unmarked countries are still guide-calibrated (guide ×0.7) even under this tab. Comfort is the looser, roomier band.</div>';
+  h+='<div class="foot">'+vmark()+' = totalled line-by-line from your own COL ledger (his real lifestyle, ex-insurance; accommodation & protein noted per place). '+poolmark()+' = pool+gym base (Chiang Mai + Cebu). '+mixmark()+' = beef is not the staple there (chicken/fish mix). The ✓ mark shows where the Hand-costed number is a real ledger total; unmarked countries are still guide-calibrated (guide ×0.7) even under this tab. Comfort is the looser, roomier band.</div>';
   const lives=COUNTRIES.filter(c=>c.roles.includes('live'));
   const rows=lives.map(c=>({c,req:reqFor(c),v:verdict(en.w,reqFor(c))}));
   rows.sort((a,b)=>b.v.m-a.v.m);

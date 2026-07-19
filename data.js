@@ -86,6 +86,12 @@
    New Hand-costed ex-ins: Da Nang 884 (VN), Cebu 958 + Valencia 799 (PH mean
    879→869), Penang 1005 (MY), Assagao 958 (IN mean 796→789), Fukuoka 1355 (JP; fx
    +20% line 1770→1630). Ledger rows carry the Reality-check/Revised/Adjusted trail.
+   v1.19.1 (2026-07-19): POOL+GYM CONSISTENCY SWEEP after Joël's own edit (Cebu's
+   repriced €280 INCLUDES pool+gym): Cebu gets pool:true (★ badge) + sub 'pool+gym
+   1BR condo'; Chiang Mai note, Da Nang/Penang notes, app.js vmark/poolmark tooltips
+   + foot legend reworded from "only Chiang Mai" to Chiang Mai + Cebu; ledger Cebu
+   rent basis/reality-check + Rollup A25 legend aligned. Accommodation convention is
+   now: Chiang Mai + Cebu = pool+gym; everywhere else regular condo / lean studio.
    Not financial, tax, legal or immigration advice — verify load-bearing items locally. */
 
 const DATA_STAMP='2026-07-19';
@@ -264,7 +270,7 @@ const COUNTRIES=[
   {cc:'PH',n:'Philippines',f:'🇵🇭',roles:['anchor','live'],stamp:'2026-07-19',primary:true,
     col:{f:869,n:1250,city:'3 places costed',conf:'med',verified:true,note:'Hand-costed = mean of the three hand-costed places listed below (his real lifestyle, ex-insurance); Comfort = guide estimate. Manila higher, provinces lower.'},
     places:[
-      {name:'Cebu',sub:'regular 1BR condo',f:958,conf:'med',verified:true,note:'Regular 1BR condo, WITH pool+gym (Jul 2026 — Chiang Mai + Cebu keep pool+gym). Mainland beef supply, ~15min out. Rent repriced Jul 2026 from Airbnb monthly rates: ~€280 even Dec–Jan high season (was €370); 6-mo/yearly contracts likely lower. Priciest PH place.'},
+      {name:'Cebu',sub:'pool+gym 1BR condo',f:958,conf:'med',verified:true,pool:true,note:'Regular 1BR condo, WITH pool+gym (Jul 2026 — Chiang Mai + Cebu keep pool+gym). Mainland beef supply, ~15min out. Rent repriced Jul 2026 from Airbnb monthly rates: ~€280 even Dec–Jan high season (was €370); 6-mo/yearly contracts likely lower. Priciest PH place.'},
       {name:'Siquijor',sub:'lean beach island',f:850,conf:'med',verified:true,note:'Home wifi weak → Eden/Starlink coworking (~$45/wk) doubles as workspace (biggest line); no pool/gym; beef stocked on Dumaguete ferry runs.'},
       {name:'Valencia / Dumaguete',sub:'lean, mainland-priced',f:799,conf:'med',verified:true,note:'Cheapest PH place — real supermarkets, mainland beef ~€7/kg, no coworking premium, BI office in town for visa extensions. Rent repriced UP Jul 2026: Airbnb monthly ~€320 Dec–Jan high season (the €260 lean estimate was too optimistic); contracts likely lower.'}],
     stay:'30 days free, then famously extendable — up to ~36 months without leaving. SRRV (age 40+, ~$15–25k refundable deposit, $1.5k once + $360/yr) is optional convenience, not required.',
@@ -287,7 +293,7 @@ const COUNTRIES=[
   {cc:'TH',n:'Thailand',f:'🇹🇭',roles:['anchor','live'],stamp:'2026-07-16',
     col:{f:921,n:1400,city:'Chiang Mai',conf:'med',verified:true,note:'Hand-costed = line-by-line (his real lifestyle, ex-insurance) — supersedes the old €800 lived anchor · Comfort = guide estimate · Bangkok +15–20% · re-confirm on next stay'},
     places:[
-      {name:'Chiang Mai',sub:'his anchor city',f:921,verified:true,pool:true,note:'The representative cheap-TH base (his lived anchor, now hand-costed). ★ The ONLY pool+gym base in the whole plan — every other place is a regular condo or lean studio. The two islands below are pricier lifestyle alternatives.'},
+      {name:'Chiang Mai',sub:'his anchor city',f:921,verified:true,pool:true,note:'The representative cheap-TH base (his lived anchor, now hand-costed). ★ One of only two pool+gym bases (with Cebu since Jul 2026) — every other place is a regular condo or lean studio. The two islands below are pricier lifestyle alternatives.'},
       {name:'Koh Phangan',sub:'wellness island + coworking',f:1214,verified:true,beefMix:true,note:'+32% over Chiang Mai. Island rent (Srithanu/Haad Yuan wellness hub tightens supply), higher elec, + coworking (beacHub/Inner Space). ◆ BEEF NOT THE MAIN FOCUS: protein = chicken-forward mix (0% beef / 80% chicken / 20% fish) — imported island beef ~€12/kg not worth it (dropped the line ~€83/mo). Srithanu is itself a yoga/coaching hub.'},
       {name:'Koh Lanta',sub:'quiet beach island',f:1130,verified:true,beefMix:true,note:'+23% over Chiang Mai. Cheaper & quieter than Phangan; KoHub (~6.5k THB/mo) doubles as the reliable internet. ◆ BEEF NOT THE MAIN FOCUS: chicken-forward mix (0/80/20) — imported island beef ~€13/kg not worth it (dropped the line ~€94/mo).'}],
     stay:'DTV: 5-year multi-entry, 180 days/entry + 180-day extension, ~10k THB fee, show ~€13k funds. LTR out of reach ($80k/yr income bar).',
@@ -311,7 +317,7 @@ const COUNTRIES=[
       off:'0% on lots held 3+ years, capped 40M CZK/yr (~€1.6M); disposals <100k CZK/yr not even reported. ⚠ NOT HIS FALLBACK (demoted Jul 16 2026): the exemption is PER-LOT and every sell/rebuy resets the clock — the LINK stack was actively traded, so the provably-uninterrupted 3y slice is likely SMALL. Same flaw that killed the Germany idea (1-year hold). Holding-period regimes don’t fit this lot history; source-based regimes (PH, TH, GE) do. The Koinly report will quantify the clean slice — informational only, not an anchor strategy.',
       gates:['Per-lot clock RESETS on every sell/rebuy — trading history, not purchase year, decides. Only never-traded lots qualify today; 2026 buys unlock 2029. Koinly lot report = the ground truth.']}},
   {cc:'VN',n:'Vietnam',f:'🇻🇳',roles:['live'],stamp:'2026-07-19',
-    col:{f:884,n:1100,city:'Da Nang',conf:'med',verified:true,note:'Hand-costed = line-by-line (his real lifestyle, ex-insurance); regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym) · rent repriced Jul 2026 from Airbnb monthly rates: ~€270 even Dec–Jan high season (was €360); contracts likely lower · Comfort = guide estimate'},
+    col:{f:884,n:1100,city:'Da Nang',conf:'med',verified:true,note:'Hand-costed = line-by-line (his real lifestyle, ex-insurance); regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai + Cebu have pool+gym) · rent repriced Jul 2026 from Airbnb monthly rates: ~€270 even Dec–Jan high season (was €360); contracts likely lower · Comfort = guide estimate'},
     stay:'90-day e-visa, repeatable.',
     res:'⚠ Not just days: 183+ days OR a leased dwelling held ≥183 days in the tax year — a long lease ALONE can make you Vietnamese tax-resident below the day count. Keep stays short AND leases short.'},
   {cc:'KH',n:'Cambodia',f:'🇰🇭',roles:['live'],stamp:'2026-07-16',
@@ -337,7 +343,7 @@ const COUNTRIES=[
     work:'Work performed while IN India = India-source, progressive PIT — but as a sub-182-day non-resident only India-day income is in scope. Perform/bill offshore where possible.',
     avoid:'⚠ RESIDENCY = HARD-AVOID — a sub-180-day EXPERIENCE only, never an anchor. 182+ days in an Indian FY (Apr–Mar) → resident → crypto taxed 30% + cess WORLDWIDE (§115BBH), exactly what the off-ramp exists to avoid. The 60-day + 365-days-over-prior-4-years limb ALSO catches foreigners: a repeat yearly visitor whose 4-year total hits 365 is caught at just 60 days. Rule: never >181 days/FY; if visiting yearly, cap the long-run average ~90 days/yr.'},
   {cc:'MY',n:'Malaysia',f:'🇲🇾',roles:['live'],stamp:'2026-07-19',
-    col:{f:1005,n:1300,city:'Penang',conf:'med',verified:true,note:'Hand-costed = line-by-line for Penang (his real lifestyle, ex-insurance); regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai keeps pool+gym) · rent repriced UP Jul 2026: Airbnb monthly ~€360, pricier than the €330 estimate · Comfort = guide estimate (KL) · best infrastructure-per-euro in SE Asia'},
+    col:{f:1005,n:1300,city:'Penang',conf:'med',verified:true,note:'Hand-costed = line-by-line for Penang (his real lifestyle, ex-insurance); regular 1BR condo, NO pool+gym (Jul 2026 — only Chiang Mai + Cebu have pool+gym) · rent repriced UP Jul 2026: Airbnb monthly ~€360, pricier than the €330 estimate · Comfort = guide estimate (KL) · best infrastructure-per-euro in SE Asia'},
     stay:'90 days visa-free.',
     demoted:'Demoted as anchor: MM2H Silver = $150k deposit + MANDATORY RM600k property purchase (kills keep-principal-liquid); DE Rantau non-tech bar $60k/yr. Tax outcome was fine (no CGT non-trading, FSI exempt to 2036) — the visa economics are broken.'},
   {cc:'SI',n:'Slovenia',f:'🇸🇮',roles:['live'],stamp:'2026-07-14',
