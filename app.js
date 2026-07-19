@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.20.0';
+const APP_VERSION='1.21.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */

@@ -92,6 +92,19 @@
    + foot legend reworded from "only Chiang Mai" to Chiang Mai + Cebu; ledger Cebu
    rent basis/reality-check + Rollup A25 legend aligned. Accommodation convention is
    now: Chiang Mai + Cebu = pool+gym; everywhere else regular condo / lean studio.
+   v1.21 (2026-07-19): TH VERIFICATION SWEEP from research-9 + its fact-check pass
+   (research-9-verification.md, ~30 sources). NEW: TH-as-home Playbooks card (live in
+   TH, PH anchor-of-record; ~€33/mo ≈3.5% living tax + PND 90; three golden rules;
+   sale-year sub-180 lever). CORRECTED: the "exempt ≠ unreported / filing >120k THB"
+   claim on the TH offshore route was WRONG — unremitted foreign income never goes on
+   a Thai return (no disclosure regime; crypto outside CRS until CARF 2028, routed by
+   declared address → PH), so Scenario F files NOTHING (TH card off:, Path o2, tree
+   Q2). UPDATED: relaxation decree = shelved by Dec 2025 House dissolution → Feb 2026
+   election (monitor + gate; if enacted, living tax → €0); worldwide-income draft =
+   dormant not live; card/ATM-as-remittance calibrated (conservative reading, RD
+   never confirmed, posture unchanged); NEW gate + monitor line: Thai SEC blocks
+   unlicensed offshore exchanges — verify Kraken reachability from inside TH; TRC
+   line fixed (TRC feeds brokers; Kraken stays on PH).
    Not financial, tax, legal or immigration advice — verify load-bearing items locally. */
 
 const DATA_STAMP='2026-07-19';
@@ -120,9 +133,9 @@ const MONITORS=[
   {due:'2032-01-01',t:'iBonds-2031 pays out — the plan-end lock matures',
     d:'Cash lands at par exactly at the Dec 2031 plan end. The Fork decision (stay vs return) should already be made by now.'},
   {t:'TH remittance decree — monitor, never plan on it',
-    d:'Revived draft (exempt if remitted in the year earned or the next) still awaiting Cabinet + Royal Gazette. Until it is published law, the no-remit leash is permanent.'},
+    d:'Draft (exempt if remitted in the year earned or the next) SHELVED by the Dec 2025 House dissolution + Feb 2026 election — watch the new government. Until published law the no-remit leash is permanent; if enacted it also zeroes the ~3.5% tax on living remittances. Same check: the DORMANT Sep 2024 worldwide-income draft (never reached parliament) — a revival would make TH-resident SALE years dangerous. Re-verify both before committing to TH residency and again before any sale.'},
   {t:'TH bank-on-DTV — THE gate on the onshore route',
-    d:'BBL/KBank/SCB reject DTV accounts since the 2025–26 anti-scam crackdown; no Thai bank = no onshore 0% route. Verify at a branch before committing to TH as anchor. (The offshore Scenario-F route needs no Thai bank.)'},
+    d:'BBL/KBank/SCB reject DTV accounts since the 2025–26 anti-scam crackdown; no Thai bank = no onshore 0% route. Verify at a branch before committing to TH as anchor. (The offshore Scenario-F route needs no Thai bank.) Related access check: the Thai SEC also blocks unlicensed offshore exchanges (Bybit/OKX since 2025) — verify Kraken reachability from inside TH.'},
   {t:'GE — coaching ≠ consulting for the 1% SBS',
     d:'Confirm the classification with a local advisor before counting on 1%; “consultancy” is SBS-excluded, fallback 20%. Only bites if GE becomes the anchor.'},
   {t:'PH lawyer — written §42(E) opinion pending',
@@ -290,7 +303,7 @@ const COUNTRIES=[
       coach:'1% SBS if classification lands; else 20%.',
       off:'0% — 2019 MoF ruling: individual crypto gains = foreign-source under the territorial system. Unchanged 2026. Kraken supported.',
       gates:['Verify coaching ≠ consulting for SBS with a local advisor before counting on the 1%']}},
-  {cc:'TH',n:'Thailand',f:'🇹🇭',roles:['anchor','live'],stamp:'2026-07-16',
+  {cc:'TH',n:'Thailand',f:'🇹🇭',roles:['anchor','live'],stamp:'2026-07-19',
     col:{f:921,n:1400,city:'Chiang Mai',conf:'med',verified:true,note:'Hand-costed = line-by-line (his real lifestyle, ex-insurance) — supersedes the old €800 lived anchor · Comfort = guide estimate · Bangkok +15–20% · re-confirm on next stay'},
     places:[
       {name:'Chiang Mai',sub:'his anchor city',f:921,verified:true,pool:true,note:'The representative cheap-TH base (his lived anchor, now hand-costed). ★ One of only two pool+gym bases (with Cebu since Jul 2026) — every other place is a regular condo or lean studio. The two islands below are pricier lifestyle alternatives.'},
@@ -298,14 +311,16 @@ const COUNTRIES=[
       {name:'Koh Lanta',sub:'quiet beach island',f:1130,verified:true,beefMix:true,note:'+23% over Chiang Mai. Cheaper & quieter than Phangan; KoHub (~6.5k THB/mo) doubles as the reliable internet. ◆ BEEF NOT THE MAIN FOCUS: chicken-forward mix (0/80/20) — imported island beef ~€13/kg not worth it (dropped the line ~€94/mo).'}],
     stay:'DTV: 5-year multi-entry, 180 days/entry + 180-day extension, ~10k THB fee, show ~€13k funds. LTR out of reach ($80k/yr income bar).',
     work:'By the book: work performed while IN Thailand = Thai-source, 5–35% PIT regardless of remittance (DTV permits it immigration-wise, tax law doesn’t exempt it). Enforcement on nomads currently thin — the app shows the honest number.',
-    anchor:{verdict:'the backup anchor — 0% two ways, each conditional (bank gate / no-remit leash)',
-      trc:'180+ days in the calendar year + TIN + file first — the RO.22 certificate lags residence by months. Fine if sequenced: declare TH residence at the exchange before the sale, certificate follows.',
+    anchor:{verdict:'the backup anchor — 0% two ways, each conditional (bank gate / no-remit leash) · and the endorsed HOME (TH-as-home playbook)',
+      trc:'180+ days in the calendar year + TIN + file first — the RO.22 certificate lags residence by months. Fine if sequenced: the TRC feeds the BROKERS (IBKR/Swissquote); Kraken stays parked on PH, the anchor-of-record (TH-as-home playbook).',
       coach:'5–35% by the book on TH-performed work.',
-      off:'TWO 0% routes. Onshore: sell via Thai SEC-licensed exchanges (Min.Reg. 399), 1 Jan 2025 – 31 Dec 2029 — but bank-gated (see gate) and time-boxed. Offshore (Scenario F, the converged route): a Kraken sale is FOREIGN-source income on the remittance basis — assessable only when brought INTO TH, so Kraken → Swissquote + never remit = 0% even as a full 180+ day Thai resident, no Thai bank needed. Filing still required above 120k THB — exempt ≠ unreported. Guardrail 9 still applies: click from SG/HK/AE.',
+      off:'TWO 0% routes. Onshore: sell via Thai SEC-licensed exchanges (Min.Reg. 399), 1 Jan 2025 – 31 Dec 2029 — but bank-gated (see gate) and time-boxed. Offshore (Scenario F, the converged route): a Kraken sale is FOREIGN-source income on the remittance basis — assessable only when brought INTO TH, so Kraken → Swissquote + never remit = 0% even as a full 180+ day Thai resident, no Thai bank needed — and NOTHING to file on it (verified Jul 2026: unremitted foreign income never goes on a Thai return; keep never-remitted proof in the drawer instead). Cleanest anyway: keep the SALE YEAR under 180 TH days (TH-as-home playbook). Guardrail 9 still applies: click from SG/HK/AE.',
       gates:['THE gate: Thai banks (BBL/KBank/SCB) reject new accounts on DTV since the 2025–26 anti-scam crackdown — no Thai bank, no THB cash-out. Verify on the ground before committing.',
         'Window closes 31 Dec 2029 — the entire off-ramp must finish before.',
-        'Remittance is WIDER than wires: ATM withdrawals + card spend inside TH from the proceeds account COUNT. Amount-based (only what comes in is assessable), but income-first ordering on commingled money — keep proceeds in a dedicated non-commingled account and spend in TH from separate clean money. The leash is PERMANENT: remitting years later is still assessable if earned while TH-resident.',
-        'Remittance relaxation = revived DRAFT decree (exempt if remitted in year earned or the next) — monitor, don’t plan on it.']}},
+        'Remittance is WIDER than wires: ATM withdrawals + card spend inside TH from the proceeds account COUNT (conservative reading — the RD has never explicitly confirmed the card/ATM point and enforcement is thin so far, but CRS visibility rises; posture stays strict for the proceeds). Amount-based (only what comes in is assessable), but income-first ordering on commingled money — keep proceeds in a dedicated non-commingled account and spend in TH from separate clean money. The leash is PERMANENT: remitting years later is still assessable if earned while TH-resident.',
+        'Living there 180+ days = remittance tax on the LIVING money too: ≈€33/mo (~3.5%) at his ~€950/mo budget + a PND 90 return every March (threshold 60k THB) — small but not zero-admin. TH-as-home playbook has the math.',
+        'Remittance relaxation = SHELVED draft (exempt if remitted in year earned or the next; House dissolved Dec 2025 → Feb 2026 election, awaiting the new government) — monitor, never plan the €500k on it. If enacted it would also zero the ~3.5% on living remittances.',
+        'Thai SEC blocks unlicensed offshore exchanges since Apr 2025 (Bybit/OKX/CoinEx/XT) — verify Kraken stays reachable from inside TH before settling; sale actions happen from hubs regardless.']}},
   {cc:'CZ',n:'Czechia',f:'🇨🇿',roles:['anchor','live'],stamp:'2026-07-16',
     col:{f:1200,n:1700,city:'Prague',conf:'high',note:'Brno −15%'},
     stay:'EU — unlimited; report to the Foreign Police within 30 days.',
@@ -395,8 +410,8 @@ const PATH=[
   {id:'offramp',name:'Off-ramp',when:'the bull-run window',steps:[
     {id:'oq',t:'Run the Q3 pre-sale checklist',dep:'Before pressing anything: Kraken address = PH (not NL)? Provenance dossier current? Destination = Swissquote, never a remittance-country bank? Swissquote compliance pre-notified about the incoming wire? No hostile residency tripped this year?'},
     {id:'o0',t:'Fly to a hub and execute the sale physically in SG/HK/AE',dep:'Guardrail 9 — the hub-click, in EVERY scenario: even if “sold within” attached to the click location, local CGT is 0 → the PH §42(E) ambiguity becomes stakes-free. If roaming with no TRC: fly TOWARD PH via the hub, sell during the stop, land in PH (Scenario D). Cost: one layover.'},
-    {id:'o1',t:'Sell via the anchor’s clean route',dep:'PH: foreign exchange (Kraken) → Swissquote, click from the hub. GE: anywhere (foreign-source). TH: ONSHORE licensed exchange only, before 31 Dec 2029 — or Kraken abroad with ZERO remittance. CZ: never-traded 3y+ lots only — a small slice of the stack.'},
-    {id:'o2',t:'File the return even when exempt',dep:'Exempt ≠ unreported (TH filing duty >120k THB; CZ <100k CZK/yr excepted).'},
+    {id:'o1',t:'Sell via the anchor’s clean route',dep:'PH: foreign exchange (Kraken) → Swissquote, click from the hub. GE: anywhere (foreign-source). TH: ONSHORE licensed exchange only, before 31 Dec 2029 — or Kraken abroad with ZERO remittance (cleanest: that sale year under 180 TH days — TH-as-home playbook). CZ: never-traded 3y+ lots only — a small slice of the stack.'},
+    {id:'o2',t:'File where a duty exists — and know where none does',dep:'TH onshore-399 sale: keep records + file. CZ: file (exempt lots <100k CZK/yr excepted). But the TH OFFSHORE route is the opposite (verified Jul 2026): never-remitted foreign income does not go on a Thai return at all — nothing to file, keep proof-it-never-entered-TH in the drawer. PH: no return for a foreigner’s foreign-source gains either.'},
     {id:'o3',t:'Sweep proceeds into the safe blend',dep:'Back to the Engine — the sleeve becomes principal.'}]},
   {id:'fork',name:'Fork',when:'≈2032 · the only real branch',steps:[
     {id:'f1',t:'Decide: stay at the anchor or return to NL',dep:''},
@@ -413,7 +428,7 @@ const PLAYBOOKS=[
   {id:'tree',icon:'⑂',accent:'ok',title:'Off-ramp decision tree — scenarios A–F',sub:'the one justified branch · from the cash-out dossier, verified Jul 16 2026',body:[
     {h:'The principle',p:'A gain is taxed only if some jurisdiction has a claim at the MOMENT of sale — 0% = engineering a moment where no one does. And in every branch: guardrail 9, execute the actual click physically in SG/HK/AE.'},
     {h:'Q1 — NL cleanly exited?',p:'NO + pre-2028 → Scenario A: just sell; box 3 is a modest deemed-return wealth tax, tolerable in a true emergency. NO + 2028 or later → do NOT sell as an NL resident (real gains tax) — exit first. YES → NL has no claim; keep the exit documentation. ⚠ One reach-back: inside months 0–12 of departure, the art. 2.2 boomerang can still reattach NL residency retroactively if you re-settle in NL — see the boomerang card before any early sale.'},
-    {h:'Q2 — tax-resident anywhere this year?',p:'NO (roaming) → Scenarios B/D: fly toward PH via a hub stop, sell during the stop, land in PH = 0% at any residency status; guard the hostile thresholds (India 182d, TH 180d). PH resident → Scenario C: sell (hub-click) = 0% — and the hub-click matters MOST here: once PH-domiciled, mobilia sequuntur personam flips AGAINST you and hands BIR a situs argument for a click on PH soil (settled Scenario C carries more doctrinal risk than fly-in Scenario D). TH resident → Scenario F: Kraken → Swissquote, NEVER bring proceeds into TH by any channel = 0% on a permanent no-remit leash. Worldwide-tax country → failure mode: expect local tax, get an adviser.'},
+    {h:'Q2 — tax-resident anywhere this year?',p:'NO (roaming) → Scenarios B/D: fly toward PH via a hub stop, sell during the stop, land in PH = 0% at any residency status; guard the hostile thresholds (India 182d, TH 180d). PH resident → Scenario C: sell (hub-click) = 0% — and the hub-click matters MOST here: once PH-domiciled, mobilia sequuntur personam flips AGAINST you and hands BIR a situs argument for a click on PH soil (settled Scenario C carries more doctrinal risk than fly-in Scenario D). TH resident → Scenario F: Kraken → Swissquote, NEVER bring proceeds into TH by any channel = 0% on a permanent no-remit leash — and nothing to file in TH (unremitted foreign income is not reportable; crypto sits outside CRS until CARF 2028, which routes by declared address → PH). Cleanest: keep the sale year under 180 TH days (TH-as-home playbook). Worldwide-tax country → failure mode: expect local tax, get an adviser.'},
     {h:'Scenario E — Cambodia — RETIRED',p:'✕ Was “sell as KH resident, territorial 0%”. WRONG since 1 Jan 2026: 20% CGT on residents’ WORLDWIDE gains, on abode-based residency. Never establish a KH abode in a sale year; passing through as a non-resident is fine.'},
     {h:'Q3 — always, before pressing sell',p:'Kraken address = PH (not NL)? Provenance dossier ready? Destination = Swissquote, not a remittance-country bank? Swissquote compliance pre-notified? Physically in SG/HK/AE for the click?'},
     {h:'Retired note',p:'“Emergency = fly back to NL and sell” is PRE-EXIT only (Scenario A). Post-exit, returning would re-enter the NL tax net — the emergency route is the hub-click toward PH.'}]},
@@ -438,7 +453,13 @@ const PLAYBOOKS=[
     {h:'',p:'Re-register in NL → back in the NL tax net, whatever it is by then. The Engine’s floor is the point: principal intact means the apartment rebuy stays possible at ANY exit time. Broker accounts (IBKR/Swissquote) survive the move back too.'},
     {h:'Coins still unsold?',p:'Past month 12: sell BEFORE re-registering, not after — post-2028 an NL resident pays real gains tax on the sale (decision-tree Q1). If the return is foreseeable and the bull has run, the off-ramp (hub-click → Swissquote) comes first, the BRP registration second. Only a genuine emergency justifies inverting that order.'}]},
   {id:'stay',icon:'⚓',accent:'ok',title:'Relationship / staying long-term',body:[
-    {h:'',p:'The anchor becomes home: local tax planning and real integration replace this app’s frame. Work income (coaching) becomes the main lever — the anchor cards’ work lines are the starting point.'}]},
+    {h:'',p:'The anchor becomes home: local tax planning and real integration replace this app’s frame. Work income (coaching) becomes the main lever — the anchor cards’ work lines are the starting point. For the Thailand version of this branch, see the TH-as-home card below.'}]},
+  {id:'thhome',icon:'⌂',accent:'ok',title:'Thailand as home — the sale-year lever',sub:'live in TH, PH stays anchor-of-record · research-9, verified Jul 19 2026',body:[
+    {h:'The variant',p:'He is more drawn to Thailand than the Philippines as the place to LIVE. That fits the plan without weakening it: PH first (Kraken → real PH address), roam, then settle in TH and become a Thai tax resident. PH was always the anchor-of-record + emergency off-ramp — never a required home. Keep the PH footprint genuinely warm: Kraken parked there, an occasional real rental, ties not lapsed.'},
+    {h:'The price of TH residency',p:'Remittance tax on the LIVING money only: ~€950/mo ≈ 438k THB/yr remitted → ≈€33/mo (~3.5%; first ~210k THB effectively free — 60k allowance + zero band; no expense deduction on yield) + a PND 90 return every March. Grandfathering does not help him (assets funded post-2024 by the 2027 home sale). Airbnb-from-offshore and foreign-card angles are gray and save ~€300/yr at best — just wear the 3.5%.'},
+    {h:'The three golden rules',p:'(1) ALWAYS hub-click from SG/HK/AE — never click sell sitting in TH (the source-reclassification theory is weak and unprecedented for a one-off sale, but the hub-click zeroes it for free). (2) NEVER remit the proceeds into TH by any channel — wire, ATM or card — permanently. (3) Keep the SALE YEAR under 180 TH days — then TH has no claim at all and Kraken-on-PH stays truthful. Live in TH heavily every other year.'},
+    {h:'If a pump forces a 180+ year — still 0%',p:'Hub-click keeps the gain foreign-source, never-remit keeps it non-assessable, and NOTHING is filed in TH — unremitted foreign income is not reportable (no disclosure regime), and no report reaches the Thai RD today (crypto is outside CRS until CARF 2028, which routes by declared address → PH). Keep contemporaneous proof the proceeds never entered TH. The real wrinkle: Kraken-says-PH against a documented 180+ Thai year — exactly why rule 3 is the clean path.'},
+    {h:'The moving target — re-check before residency AND before any sale',p:'(a) The shelved relaxation decree — if the new government enacts it, the living tax drops to ~€0. (b) The dormant worldwide-income draft (Sep 2024, never a bill) — a revival would make TH-resident sale years dangerous. (c) SEC exchange-blocking — is Kraken still reachable from inside TH? Bonus either way: years of documented TH life STRENGTHEN the NL defense — a real centre of life beats “resident nowhere”.'}]},
   {id:'aow',icon:'◔',accent:'warn',title:'AOW gap',body:[
     {h:'',p:'Every year not NL-resident ≈ −2% state pension; 2028–2032 ≈ −8 to −10%. Voluntary continuation (vrijwillige voortzetting, SVB) must be requested within 1 year of leaving — it’s an Exit-phase decision, not a later one. Verify current terms with SVB before deregistering.'}]},
   {id:'nlmotion',icon:'◉',accent:'warn',title:'Monitor — NL emigrant exit tax (inwonerschapsfictie)',sub:'directly targets this profile · Agenda tracks the yearly check',body:[
