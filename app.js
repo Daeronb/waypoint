@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.15.0';
+const APP_VERSION='1.16.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -66,24 +66,25 @@ function verdict(budget,req){
 }
 function anchorC(){return COUNTRIES.find(c=>c.cc===state.plan.anchor)||COUNTRIES[0];}
 const SAFETY_NET=300000;  // the NL apartment safety net, in today’s money
+const INFL=2.3;           // %/yr inflation for ALL today's-money math (floor check + surplus lens). His call Jul 19 2026: 2.3 conservative, was 2.0 — one constant, one truth
 function floorCheck(floor,months){
   if(floor<=0)return{real:0,below:false,txt:'Dials at zero — set the start principal and floor to see the inflation check.'};
   const yrs=(18+months)/12; /* mid-2026 (today’s money) → Jan 2028 is 18 mo, then the plan horizon */
-  const real=floor/Math.pow(1.02,yrs);
+  const real=floor/Math.pow(1+INFL/100,yrs);
   const below=real<SAFETY_NET;
-  return{real,below,txt:'Ends '+endLabel(months)+' at '+fmtE(floor)+' — floor held by construction. At 2%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
+  return{real,below,txt:'Ends '+endLabel(months)+' at '+fmtE(floor)+' — floor held by construction. At '+INFL+'%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
 }
-/* v1.15: SURPLUS LENS — type the real all-in monthly spend; if it undercuts the mix yield
-   the pot GROWS. Same declining-balance recurrence as monthlyBudget, run forward
-   (end = P·g − S·(g−1)/i over the plan months); the today's-euros figure uses the exact
-   floorCheck convention (2%/yr, 18 mo from mid-2026 to the Jan-2028 pivot + the horizon).
-   keep = the real-preservation spend: principal·(yield − 2%)/12 — spend under THAT and
-   the pot grows in real terms too, not just nominally. */
+/* v1.15 SURPLUS LENS (v1.16: lives in MATCH, INFL const) — type the real all-in monthly
+   spend; if it undercuts the mix yield the pot GROWS. Same declining-balance recurrence
+   as monthlyBudget, run forward (end = P·g − S·(g−1)/i over the plan months); the
+   today's-euros figure uses the exact floorCheck convention (INFL %/yr, 18 mo from
+   mid-2026 to the Jan-2028 pivot + the horizon). keep = the real-preservation spend:
+   principal·(yield − INFL)/12 — spend under THAT and the pot grows in real terms too. */
 function surplusProj(S){
   const p=state.plan,y=currentYield(),i=y/100/12,n=p.months;
   const g=Math.pow(1+i,n);
   const end=i>0?p.principal*g-S*(g-1)/i:p.principal-S*n;
-  return{y,end,real:end/Math.pow(1.02,(18+n)/12),keep:Math.max(0,p.principal*(y-2)/100/12)};
+  return{y,end,real:end/Math.pow(1+INFL/100,(18+n)/12),keep:Math.max(0,p.principal*(y-INFL)/100/12)};
 }
 function secDiv(n,name,sub){return '<div class="secdiv" id="sd-'+name.toLowerCase()+'"><span class="secn">'+n+'</span><b>'+name+'</b><span class="secsub">'+esc(sub)+'</span></div>';}
 
@@ -137,9 +138,6 @@ function renderEngine(){
   h+='<span class="picksub">What-if dial — type any net yield and this row shows the sustainable monthly. Select it and the hero + Match run on it; the four mixes above stay untouched.</span></span></label>';
   h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
   h+='<div class="foot">The first three mixes keep ≈€100k of crash-proof dry powder — a DUAL-DESTINATION pot: crash-deploy into cheap assets, or the first tranche of an early home purchase (Modular is built around this). Deploy is the deliberate exception: a bounded-loss iBonds-2029 sleeve + €25k float instead (small known haircut, healed by a printed date). Core on fixed maturity dates, yields NET of fund fees. Max-safety → Deploy gap ≈ €190/mo — the floor dial can absorb that on its own. The iBonds core is also marginable — a second €100k of crisis firepower without selling (see Playbooks → Crash).</div></div>';
-  h+='<div class="card"><div class="lbl">Actual spend — a lens, not a branch</div>';
-  h+='<input type="number" id="spIn" class="numin" inputmode="numeric" min="0" step="10" value="'+p.spend+'">';
-  h+='<div id="spT"></div></div>';
   h+='<div class="card"><div class="lbl">Crypto sleeve — a lens, not a branch</div>';
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';
   h+='<div id="lensT"></div></div>';
@@ -149,19 +147,19 @@ function renderEngine(){
   h+='<div class="foot">Load-bearing: most NL/EU brokers close accounts on deregistration. Open IBKR + Swissquote while still NL-resident — see Path.</div></div>';
   h+='<div class="foot disc">Snapshot '+DATA_STAMP+' · sources in the four research docs · not financial advice — verify before acting.</div>';
   $('#view-engine').innerHTML=h;
-  bindEngine();renderLens();renderSpend();
+  bindEngine();renderLens();
 }
 function renderSpend(){
   const p=state.plan,el=$('#spT');if(!el)return;
-  if(!(p.spend>0)){el.innerHTML='<div class="foot">Type your real all-in monthly spend (COL + €120 insurance + visa amortisation). Spend under the mix yield and the pot GROWS — this shows where it lands by plan end, nominal and in today’s euros. The hero above stays the sustainable MAXIMUM; this lens runs the other direction.</div>';return;}
+  if(!(p.spend>0)){el.innerHTML='<div class="foot">Type your real all-in monthly spend (COL + €120 insurance + visa amortisation). Spend under the mix yield and the pot GROWS — this shows where it lands by plan end, nominal and in today’s euros. The budget above stays the sustainable MAXIMUM; this lens runs the other direction.</div>';return;}
   if(!(p.principal>0)){el.innerHTML='<div class="foot">Set the start-principal dial first — this lens projects it forward at your typed spend.</div>';return;}
   const s=surplusProj(p.spend),d=s.end-p.principal,m1=p.principal*s.y/100/12-p.spend;
   let h='<div class="lrow"><span>pot at '+endLabel(p.months)+'</span><span class="num">'+fmtE(s.end)+'</span></div>';
-  h+='<div class="lrow"><span>in today’s euros (2%/yr)</span><span class="num">'+fmtE(s.real)+'</span></div>';
+  h+='<div class="lrow"><span>in today’s euros ('+INFL+'%/yr)</span><span class="num">'+fmtE(s.real)+'</span></div>';
   h+='<div class="lrow"><span>vs start principal</span><span class="num">'+(d>=0?'+':'−')+fmtE(Math.abs(d))+'</span></div>';
   h+='<div class="lrow"><span>first-month surplus (yield − spend)</span><span class="num">'+(m1>=0?'+':'−')+fmtE(Math.abs(m1))+'/mo</span></div>';
   h+='<div class="foot">Runs on the selected mix ('+pct(s.y)+') and the plan-end dial, before any crash-deploy. Real-preservation spend at this mix ≈ '+fmtE(s.keep)+'/mo — under that, the pot grows in REAL terms too, not just on paper.</div>';
-  if(s.end<p.floor)h+='<div class="notep">⚠ This spend runs the pot below your '+fmtE(p.floor)+' floor by '+endLabel(p.months)+' — it exceeds the sustainable draw shown in the hero.</div>';
+  if(s.end<p.floor)h+='<div class="notep">⚠ This spend runs the pot below your '+fmtE(p.floor)+' floor by '+endLabel(p.months)+' — it exceeds the sustainable draw shown in Engine.</div>';
   el.innerHTML=h;
 }
 function renderLens(){
@@ -191,7 +189,6 @@ function updateEngineNumbers(){
   if(ui.blend){const bd=BLENDS.find(x=>x.id===ui.blend);if(bd){const ks=Object.keys(bd.mix);
     document.querySelectorAll('#view-engine .bdet .brow2 .num').forEach((el,i)=>{const k=ks[i];if(!k)return;
       el.textContent=pct(instYield(k))+(p.principal>0?' · '+fmtK(p.principal*bd.mix[k]):'');});}}
-  renderSpend(); /* v1.15: the surplus lens tracks principal/floor/plan-end drags live */
 }
 function bindEngine(){
   $('#prS').oninput=e=>{state.plan.principal=+e.target.value;if(state.plan.floor>state.plan.principal)state.plan.floor=state.plan.principal;save();updateEngineNumbers();};
@@ -206,7 +203,6 @@ function bindEngine(){
   cyi.oninput=e=>{state.plan.customY=+e.target.value;save();updateEngineNumbers();};
   cyi.onchange=e=>{state.plan.customY=custY();e.target.value=state.plan.customY;save();updateEngineNumbers();if(state.plan.blend==='custom')renderMatch();};
   $('#slv').onchange=e=>{state.plan.sleeve=Math.max(0,+e.target.value||0);save();renderLens();};
-  $('#spIn').oninput=e=>{state.plan.spend=Math.max(0,+e.target.value||0);save();renderSpend();}; /* oninput + #spT-only rewrite keeps focus while typing (cyIn pattern) */
 }
 
 /* ---------- MATCH view ---------- */
@@ -219,6 +215,10 @@ function renderMatch(){
   h+='<div class="card"><div class="matchhead"><div><div class="lbl">Budget from Engine</div><div class="heron sm num">'+fmtE(en.w)+'<span class="permo">/mo</span></div></div>';
   h+='<div class="colswitch"><button data-m="f" class="'+(p.colMode==='f'?'on':'')+'">Hand-costed</button><button data-m="n" class="'+(p.colMode==='n'?'on':'')+'">Comfort</button></div></div>';
   h+='<div class="foot"><b>Hand-costed</b> = your real line-by-line cost from the COL ledger (lean lifestyle, ex-insurance) — not tourist guides. <b>Comfort</b> = a looser, roomier band on top. Every row = COL + €'+INSURANCE+' IMG Global insurance. Visa costs + flights come on top.</div></div>';
+  /* v1.16: the surplus lens lives HERE (his placement call) — between the budget and the live-through list */
+  h+='<div class="card"><div class="lbl">Actual spend — a lens, not a branch</div>';
+  h+='<input type="number" id="spIn" class="numin" inputmode="numeric" min="0" step="10" value="'+p.spend+'">';
+  h+='<div id="spT"></div></div>';
   h+='<div class="lbl sect">Live-through — can the Engine fund it?</div>';
   h+='<div class="foot">'+vmark()+' = totalled line-by-line from your own COL ledger (his real lifestyle, ex-insurance; accommodation & protein noted per place). '+poolmark()+' = the one pool+gym base (Chiang Mai only). '+mixmark()+' = beef is not the staple there (chicken/fish mix). The ✓ mark shows where the Hand-costed number is a real ledger total; unmarked countries are still guide-calibrated (guide ×0.7) even under this tab. Comfort is the looser, roomier band.</div>';
   const lives=COUNTRIES.filter(c=>c.roles.includes('live'));
@@ -272,6 +272,8 @@ function renderMatch(){
   document.querySelectorAll('.colswitch button').forEach(b=>b.onclick=()=>{state.plan.colMode=b.dataset.m;save();renderMatch();});
   document.querySelectorAll('#view-match .cc .chead').forEach(hd=>hd.onclick=()=>{const cc=hd.parentElement.dataset.cc;ui.cc=(ui.cc===cc?null:cc);renderMatch();});
   document.querySelectorAll('input[name=anchor]').forEach(r=>r.onchange=e=>{state.plan.anchor=e.target.value;save();renderMatch();toast('Anchor set: '+e.target.value+' — Engine lens + Path follow');});
+  $('#spIn').oninput=e=>{state.plan.spend=Math.max(0,+e.target.value||0);save();renderSpend();}; /* oninput + #spT-only rewrite keeps focus while typing (cyIn pattern) */
+  renderSpend();
 }
 
 /* ---------- PATH view ---------- */
