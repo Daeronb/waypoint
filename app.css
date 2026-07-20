@@ -108,6 +108,11 @@ input[type=range]{width:100%;accent-color:var(--sec)}
 .colswitch{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .colswitch button{background:none;border:none;padding:7px 14px;font:inherit;font-size:.8rem;color:var(--sec);cursor:pointer}
 .colswitch button.on{background:var(--ink);color:var(--paper)}
+/* v1.28: master insurance toggle row — sits under the budget head in the Match card */
+.instog{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.instog-lbl{font-size:.85rem;color:var(--sec)}
+.instog-lbl b{color:var(--ink)}
+.insoff{font-size:.62rem;letter-spacing:.04em;color:var(--sec);background:rgba(109,98,80,.11);border:1px solid var(--line);border-radius:4px;padding:0 5px;vertical-align:middle;white-space:nowrap}
 .brow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.85rem}
 .brow:last-of-type{border-bottom:none}
 /* hub rows: keep flag+name on one line, aligned column so the weekly figures line up */

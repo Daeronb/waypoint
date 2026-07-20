@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.26.0';
+const APP_VERSION='1.28.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -11,7 +11,7 @@ const pct=v=>v.toFixed(2)+'%';
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._h);toast._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 /* ---------- state ---------- */
-function defaults(){return{plan:{principal:0,floor:0,months:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0,customY:3,spend:0},steps:{},ecb:null};} /* v1.15: spend = his typed actual monthly all-in spend for the surplus lens (0 = lens shows its prompt) */ /* v1.11: customY = the what-if net yield behind the 4th 'Custom yield' row (plan.blend may be 'custom'). v1.9: default months = 48 = Dec 2031 (his pick). v1.5: months = plan horizon (Jan 2028 → end), third dial; earlier off-ramp+return = shorter horizon = higher monthly draw for the same floor. v1.4: fresh devices start at 0/0/0 (his call). v1.2: default anchor = PH; saved plans keep their own picks */
+function defaults(){return{plan:{principal:0,floor:0,months:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0,customY:3,spend:0,insOn:true},steps:{},ecb:null};} /* v1.28: insOn = master €120 insurance toggle, on by default (matches prior behaviour) */ /* v1.15: spend = his typed actual monthly all-in spend for the surplus lens (0 = lens shows its prompt) */ /* v1.11: customY = the what-if net yield behind the 4th 'Custom yield' row (plan.blend may be 'custom'). v1.9: default months = 48 = Dec 2031 (his pick). v1.5: months = plan horizon (Jan 2028 → end), third dial; earlier off-ramp+return = shorter horizon = higher monthly draw for the same floor. v1.4: fresh devices start at 0/0/0 (his call). v1.2: default anchor = PH; saved plans keep their own picks */
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(!s)return defaults();const d=defaults();s.plan=Object.assign(d.plan,s.plan||{});s.steps=s.steps||{};return s;}catch(e){return defaults();}}
 function save(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}}
 let state=(typeof localStorage!=='undefined')?load():defaults();
@@ -212,14 +212,19 @@ function bindEngine(){
 
 /* ---------- MATCH view ---------- */
 const ui={cc:null,book:null,blend:null}; /* blend = which mix breakdown is open (v1.12; v1.13 removed inst — instrument cards retired, breakdowns carry the shelf) */
-function reqFor(c){return(state.plan.colMode==='f'?c.col.f:c.col.n)+INSURANCE;}
+function visaOf(c){return c.visa||0;} /* v1.27: per-country amortised visa €/mo (blended convention, from research-11 / ledger Visa tab), folded into every COL total */
+function insOnState(){return state.plan.insOn!==false;} /* v1.28: master insurance switch */
+function insAmt(){return insOnState()?INSURANCE:0;} /* v1.28: €120 IMG Global insurance, one master toggle for every location at once */
+function reqFor(c){return(state.plan.colMode==='f'?c.col.f:c.col.n)+visaOf(c)+insAmt();}
 function renderMatch(){
-  const p=state.plan,en=engineNumbers();
+  const p=state.plan,en=engineNumbers(),insOn=insOnState();
   let h='';
   h+=secDiv('02','Match','where the budget lands');
   h+='<div class="card"><div class="matchhead"><div><div class="lbl">Budget from Engine</div><div class="heron sm num">'+fmtE(en.w)+'<span class="permo">/mo</span></div></div>';
   h+='<div class="colswitch"><button data-m="f" class="'+(p.colMode==='f'?'on':'')+'">Hand-costed</button><button data-m="n" class="'+(p.colMode==='n'?'on':'')+'">Comfort</button></div></div>';
-  h+='<div class="foot"><b>Hand-costed</b> = your real line-by-line cost from the COL ledger (lean lifestyle, ex-insurance) — not tourist guides. <b>Comfort</b> = a looser, roomier band on top. Every row = COL + €'+INSURANCE+' IMG Global insurance. Visa costs + flights come on top.</div></div>';
+  /* v1.28: master insurance toggle — one switch adds/removes the €120/mo IMG Global line across EVERY location at once */
+  h+='<div class="instog"><span class="instog-lbl">Health insurance <b>€'+INSURANCE+'/mo</b> <span class="sub">IMG Global · same everywhere</span></span><div class="colswitch"><button data-ins="on" class="'+(insOn?'on':'')+'">Included</button><button data-ins="off" class="'+(!insOn?'on':'')+'">Off</button></div></div>';
+  h+='<div class="foot"><b>Hand-costed</b> = your real line-by-line cost from the COL ledger (lean lifestyle, ex-insurance) — not tourist guides. <b>Comfort</b> = a looser, roomier band on top. '+(insOn?'Every row = COL + €'+INSURANCE+' IMG Global insurance, with each country’s amortised visa cost (cheapest legal route) folded into the COL figure':'<b>Insurance is toggled off</b> — every row = COL only, with each country’s amortised visa cost (cheapest legal route) folded in; flip it back to <b>Included</b> to add the €'+INSURANCE+'/mo everywhere')+' — expand a card for the per-country amount + max stay, or the ledger Visa tab for line-by-line. Flights come on top.</div></div>';
   /* v1.16: the surplus lens lives HERE (his placement call) — between the budget and the live-through list */
   h+='<div class="card"><div class="lbl">Actual spend — a lens, not a branch</div>';
   h+='<input type="number" id="spIn" class="numin" inputmode="numeric" min="0" step="10" value="'+p.spend+'">';
@@ -230,7 +235,7 @@ function renderMatch(){
   const rows=lives.map(c=>({c,req:reqFor(c),v:verdict(en.w,reqFor(c))}));
   rows.sort((a,b)=>b.v.m-a.v.m);
   for(const r of rows){
-    const c=r.c,open=ui.cc===c.cc,col=state.plan.colMode==='f'?c.col.f:c.col.n;
+    const c=r.c,open=ui.cc===c.cc,col=(state.plan.colMode==='f'?c.col.f:c.col.n)+visaOf(c);
     let tags='';
     if(c.blocks)tags+='<span class="tag">'+esc(c.blocks)+'</span>';
     if(c.fx)tags+='<span class="tag warn">FX HIGH</span>';
@@ -238,14 +243,16 @@ function renderMatch(){
     if(c.demoted)tags+='<span class="tag bad">demoted anchor</span>';
     if(c.avoid)tags+='<span class="tag bad">residency: hard-avoid</span>';
     h+='<div class="card cc'+(open?' open':'')+'" data-cc="'+c.cc+'"><div class="chead"><div><b>'+c.f+' '+esc(c.n)+'</b> <span class="sub">'+esc(c.col.city)+'</span>'+(c.col.verified?'':' '+estmark())+tags;
-    h+='<div class="sub num">'+fmtE(col)+' + '+fmtE(INSURANCE)+' insurance = <span class="tot">'+fmtE(r.req)+'</span></div></div>';
+    h+='<div class="sub num">'+(insOn?fmtE(col)+' + '+fmtE(INSURANCE)+' insurance = ':'')+'<span class="tot">'+fmtE(r.req)+'</span>'+(insOn?'':' <span class="insoff">insurance off</span>')+'</div></div>';
     h+='<span class="chip '+r.v.cls+'"><b>'+r.v.glyph+'</b> '+r.v.word+' '+(r.v.m>=0?'+':'−')+fmtE(Math.abs(r.v.m))+'</span></div>';
     if(c.places){h+='<div class="places"><div class="placelbl">Places costed'+(state.plan.colMode==='n'?' · real figures (hand-costed basis)':'')+'</div>';
-      for(const pl of c.places){const preq=pl.f+INSURANCE,pv=verdict(en.w,preq);
-        h+='<div class="placerow"><span class="chip '+pv.cls+' pmini"><b>'+pv.glyph+'</b></span><div class="pinfo"><b>'+esc(pl.name)+'</b> <span class="sub">'+esc(pl.sub||'')+'</span>'+(pl.verified?'':' '+estmark())+(pl.pool?' '+poolmark():'')+(pl.beefMix?' '+mixmark():'')+'<div class="sub num">'+fmtE(pl.f)+' + '+fmtE(INSURANCE)+' = <span class="tot">'+fmtE(preq)+'</span> · '+pv.word+' '+(pv.m>=0?'+':'−')+fmtE(Math.abs(pv.m))+'</div>'+(pl.note?'<div class="pnote sub">'+esc(pl.note)+'</div>':'')+'</div></div>';}
+      for(const pl of c.places){const preq=pl.f+visaOf(c)+insAmt(),pv=verdict(en.w,preq);
+        h+='<div class="placerow"><span class="chip '+pv.cls+' pmini"><b>'+pv.glyph+'</b></span><div class="pinfo"><b>'+esc(pl.name)+'</b> <span class="sub">'+esc(pl.sub||'')+'</span>'+(pl.verified?'':' '+estmark())+(pl.pool?' '+poolmark():'')+(pl.beefMix?' '+mixmark():'')+'<div class="sub num">'+(insOn?fmtE(pl.f+visaOf(c))+' + '+fmtE(INSURANCE)+' = ':'')+'<span class="tot">'+fmtE(preq)+'</span> · '+pv.word+' '+(pv.m>=0?'+':'−')+fmtE(Math.abs(pv.m))+'</div>'+(pl.note?'<div class="pnote sub">'+esc(pl.note)+'</div>':'')+'</div></div>';}
       h+='</div>';}
     if(open){h+='<div class="cbody">'+stampLine(c.stamp);
       h+='<div class="kv"><span>Stay</span>'+esc(c.stay||'—')+'</div>';
+      if(c.maxstay)h+='<div class="kv"><span>Max realistic stay</span>'+esc(c.maxstay)+'</div>';
+      h+='<div class="kv"><span>Visa (in the total)</span>'+(visaOf(c)?'≈'+fmtE(visaOf(c))+'/mo amortised (cheapest legal route) — folded into the COL figure above':'€0 — EU freedom of movement / long visa-free stay')+'</div>';
       if(c.res)h+='<div class="kv"><span>Residency trigger — beyond day-count</span>'+esc(c.res)+'</div>';
       if(c.work)h+='<div class="kv"><span>Coaching income</span>'+esc(c.work)+'</div>';
       if(c.col.note)h+='<div class="kv"><span>COL note</span>'+esc(c.col.note)+' · confidence '+esc(c.col.conf)+'</div>';
@@ -275,7 +282,8 @@ function renderMatch(){
   h+='<div class="foot">Guardrail 9 — the hub-click: execute EVERY sale physically from SG/HK/AE. Local CGT is 0 even if the sale were deemed locally sourced, which moots the PH “sold within” question. A 1–2 week trip = €500–1,500 + flights — a rounding error on the event that triggers it. Never a place to live.</div></div>';
   h+='<div class="foot disc">Snapshot '+DATA_STAMP+' · not tax or immigration advice.</div>';
   $('#view-match').innerHTML=h;
-  document.querySelectorAll('.colswitch button').forEach(b=>b.onclick=()=>{state.plan.colMode=b.dataset.m;save();renderMatch();});
+  document.querySelectorAll('.colswitch button[data-m]').forEach(b=>b.onclick=()=>{state.plan.colMode=b.dataset.m;save();renderMatch();});
+  document.querySelectorAll('.colswitch button[data-ins]').forEach(b=>b.onclick=()=>{state.plan.insOn=(b.dataset.ins==='on');save();renderMatch();toast('Insurance '+(state.plan.insOn?'included (+€'+INSURANCE+'/mo everywhere)':'off — totals show COL + visa only'));});
   document.querySelectorAll('#view-match .cc .chead').forEach(hd=>hd.onclick=()=>{const cc=hd.parentElement.dataset.cc;ui.cc=(ui.cc===cc?null:cc);renderMatch();});
   document.querySelectorAll('input[name=anchor]').forEach(r=>r.onchange=e=>{state.plan.anchor=e.target.value;save();renderMatch();toast('Anchor set: '+e.target.value+' — Engine lens + Path follow');});
   $('#spIn').oninput=e=>{state.plan.spend=Math.max(0,+e.target.value||0);save();renderSpend();}; /* oninput + #spT-only rewrite keeps focus while typing (cyIn pattern) */
