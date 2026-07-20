@@ -124,6 +124,7 @@ input[type=range]{width:100%;accent-color:var(--sec)}
   background:var(--okbg);border:1px solid var(--okbd);border-radius:4px;padding:0 5px;vertical-align:middle;white-space:nowrap}
 .vmark.pool{color:#2f6fd0;background:rgba(47,111,208,.12);border-color:rgba(47,111,208,.38)}
 .vmark.mix{color:#c07a1a;background:rgba(192,122,26,.12);border-color:rgba(192,122,26,.4)}
+.vmark.est{color:var(--warn);background:var(--warnbg);border-color:var(--warnbd)}
 
 /* places-within-a-country (PH: Cebu / Siquijor / Valencia) */
 .places{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
