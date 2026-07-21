@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.28.0';
+const APP_VERSION='1.30.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -56,7 +56,7 @@ function engineNumbers(){
   const ym=p.principal*y/100/12;
   return{y,w,yieldMo:ym,draw:Math.max(0,w-ym)};
 }
-/* months since Jan 2028 → calendar label (6 → Jun 2028, 36 → Dec 2030, 60 → Dec 2032) */
+/* months since Jan 2028 → calendar label (6 → Jun 2028, 36 → Dec 2030, 48 → Dec 2031 [default], 60 → Dec 2032, 156 → Dec 2040 [max]) */
 function endLabel(mo){const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return MN[(mo-1)%12]+' '+(2028+Math.floor((mo-1)/12));}
 function verdict(budget,req){
   const m=budget-req;
@@ -76,15 +76,20 @@ function floorCheck(floor,months){
 }
 /* v1.15 SURPLUS LENS (v1.16: lives in MATCH, INFL const) — type the real all-in monthly
    spend; if it undercuts the mix yield the pot GROWS. Same declining-balance recurrence
-   as monthlyBudget, run forward (end = P·g − S·(g−1)/i over the plan months); the
-   today's-euros figure uses the exact floorCheck convention (INFL %/yr, 18 mo from
-   mid-2026 to the Jan-2028 pivot + the horizon). keep = the real-preservation spend:
-   principal·(yield − INFL)/12 — spend under THAT and the pot grows in real terms too. */
+   as monthlyBudget, run forward (end = P·g − S·(g−1)/i over the plan months).
+   v1.29 BUGFIX: deflate over the SAME horizon the pot compounded — n months, NOT 18+n.
+   The pot grows only over the n plan months (Jan-2028 → plan end); deflating over 18+n
+   charged 18 extra months of inflation with no matching yield, so a near-zero spend at a
+   yield ABOVE inflation still showed a real value below the true real gain. Now growth and
+   deflation share the n-month window: real = end / (1+INFL)^(n/12). floorCheck keeps 18+n
+   on purpose — it translates a STATIC plan-end floor to today's purchasing power, a
+   different question. keep = the real-preservation spend: principal·(yield − INFL)/12 —
+   spend under THAT and the pot grows in real terms too. */
 function surplusProj(S){
   const p=state.plan,y=currentYield(),i=y/100/12,n=p.months;
   const g=Math.pow(1+i,n);
   const end=i>0?p.principal*g-S*(g-1)/i:p.principal-S*n;
-  return{y,end,real:end/Math.pow(1+INFL/100,(18+n)/12),keep:Math.max(0,p.principal*(y-INFL)/100/12)};
+  return{y,end,real:end/Math.pow(1+INFL/100,n/12),keep:Math.max(0,p.principal*(y-INFL)/100/12)};
 }
 function secDiv(n,name,sub){return '<div class="secdiv" id="sd-'+name.toLowerCase()+'"><span class="secn">'+n+'</span><b>'+name+'</b><span class="secsub">'+esc(sub)+'</span></div>';}
 
@@ -110,11 +115,11 @@ function renderEngine(){
   h+='<div class="hero"><div class="heron" id="heroW">'+fmtE(en.w)+'</div><div class="herosub">per month · sustainable to <span id="heroFloor">'+fmtE(p.floor)+'</span> · 2028 → <span id="heroEnd">'+endLabel(p.months)+'</span></div>';
   h+='<div class="herobk" id="heroBk">≈ '+fmtE(en.yieldMo)+' yield + '+fmtE(en.draw)+' draw-down · computed on the declining balance</div></div>';
   h+='<div class="card"><div class="lbl">The three dials</div>';
-  h+='<div class="slrow"><div class="slhead"><span>Start principal</span><span class="num" id="prV">'+fmtE(p.principal)+'</span></div><input type="range" id="prS" min="0" max="600000" step="5000" value="'+p.principal+'"></div>';
+  h+='<div class="slrow"><div class="slhead"><span>Start principal</span><span class="num" id="prV">'+fmtE(p.principal)+'</span></div><input type="range" id="prS" min="0" max="800000" step="5000" value="'+p.principal+'"></div>';
   h+='<div class="slrow"><div class="slhead"><span>Acceptable floor at plan end</span><span class="num" id="flV">'+fmtE(p.floor)+'</span></div><input type="range" id="flS" min="0" max="'+p.principal+'" step="5000" value="'+Math.min(p.floor,p.principal)+'"></div>';
-  h+='<div class="slrow"><div class="slhead"><span>Plan end — off-ramp &amp; possible return</span><span class="num" id="tmV">'+endLabel(p.months)+' · '+p.months+' mo</span></div><input type="range" id="tmS" min="6" max="60" step="6" value="'+p.months+'"></div>';
+  h+='<div class="slrow"><div class="slhead"><span>Plan end — off-ramp &amp; possible return</span><span class="num" id="tmV">'+endLabel(p.months)+' · '+p.months+' mo</span></div><input type="range" id="tmS" min="6" max="156" step="6" value="'+p.months+'"></div>';
   h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chk2032">'+fc.txt+'</div>';
-  h+='<div class="foot">A shorter plan spreads the same principal→floor drawdown over fewer months — sell &amp; return earlier and the monthly budget rises. Dec 2032 = the baseline fork.</div></div>';
+  h+='<div class="foot">A shorter plan spreads the same principal→floor drawdown over fewer months — sell &amp; return earlier and the monthly budget rises. Default sits at Dec 2031; drag the dial anywhere from 2028 out to 2040 to test shorter exits or a longer runway.</div></div>';
   h+='<div class="card"><div class="lbl">Instrument mix</div>';
   for(const b of BLENDS){
     const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,p.months),open=ui.blend===b.id;
@@ -200,7 +205,7 @@ function bindEngine(){
   $('#prS').onchange=()=>renderMatch();
   $('#flS').oninput=e=>{state.plan.floor=Math.min(+e.target.value,state.plan.principal);save();updateEngineNumbers();};
   $('#flS').onchange=()=>renderMatch();
-  $('#tmS').oninput=e=>{state.plan.months=Math.min(60,Math.max(6,+e.target.value||60));save();updateEngineNumbers();};
+  $('#tmS').oninput=e=>{state.plan.months=Math.min(156,Math.max(6,+e.target.value||48));save();updateEngineNumbers();};
   $('#tmS').onchange=()=>renderMatch();
   document.querySelectorAll('input[name=blend]').forEach(r=>r.onchange=e=>{state.plan.blend=e.target.value;save();renderEngine();renderMatch();});
   document.querySelectorAll('#view-engine .btgl').forEach(bt=>bt.onclick=e=>{e.preventDefault();e.stopPropagation();ui.blend=(ui.blend===bt.dataset.bd?null:bt.dataset.bd);renderEngine();});
