@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.31.0';
+const APP_VERSION='1.32.0';
 const LS='waypoint:v1';
 
 /* ---------- helpers ---------- */
@@ -11,8 +11,16 @@ const pct=v=>v.toFixed(2)+'%';
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._h);toast._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 /* ---------- state ---------- */
-function defaults(){return{plan:{principal:0,floor:0,months:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0,customY:3,spend:0,insOn:true},steps:{},ecb:null};} /* v1.28: insOn = master €120 insurance toggle, on by default (matches prior behaviour) */ /* v1.15: spend = his typed actual monthly all-in spend for the surplus lens (0 = lens shows its prompt) */ /* v1.11: customY = the what-if net yield behind the 4th 'Custom yield' row (plan.blend may be 'custom'). v1.9: default months = 48 = Dec 2031 (his pick). v1.5: months = plan horizon (Jan 2028 → end), third dial; earlier off-ramp+return = shorter horizon = higher monthly draw for the same floor. v1.4: fresh devices start at 0/0/0 (his call). v1.2: default anchor = PH; saved plans keep their own picks */
-function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(!s)return defaults();const d=defaults();s.plan=Object.assign(d.plan,s.plan||{});s.steps=s.steps||{};return s;}catch(e){return defaults();}}
+function defaults(){return{plan:{principal:0,floor:0,start:0,end:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0,customY:3,spend:0,insOn:true},steps:{},ecb:null};} /* v1.32: TWO plan dials — start & end (month indices, endLabel convention: index 1 = Jan 2028). Default start 0 = Dec 2027, end 48 = Dec 2031 → horizon 48 mo, IDENTICAL to the old single 'months:48' dial (old n=months was really Dec-2027→end). Earliest start = -6 = Jun 2027. Horizon n = end − start drives every calc; floorCheck deflates the plan-end floor and depends on END only. */ /* v1.28: insOn = master €120 insurance toggle, on by default (matches prior behaviour) */ /* v1.15: spend = his typed actual monthly all-in spend for the surplus lens (0 = lens shows its prompt) */ /* v1.11: customY = the what-if net yield behind the 4th 'Custom yield' row (plan.blend may be 'custom'). v1.4: fresh devices start at 0/0/… (his call). v1.2: default anchor = PH; saved plans keep their own picks */
+function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(!s)return defaults();const d=defaults();const sp=s.plan||{};
+  /* v1.32 migration — MUST run on the RAW saved plan, before merging defaults (defaults now always
+     carry end:48, which would mask the legacy field). A plan saved before the start dial carries
+     `months` (the old end index) but no `start`/`end`: map end = months, start stays 0 (Dec 2027),
+     so the horizon is unchanged. Then drop the dead field. */
+  if(typeof sp.months==='number'&&typeof sp.end!=='number'){sp.end=sp.months;if(typeof sp.start!=='number')sp.start=0;}
+  delete sp.months;
+  s.plan=Object.assign(d.plan,sp);
+  s.steps=s.steps||{};return s;}catch(e){return defaults();}}
 function save(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}}
 let state=(typeof localStorage!=='undefined')?load():defaults();
 
@@ -50,14 +58,19 @@ function currentBlend(){return BLENDS.find(b=>b.id===state.plan.blend)||BLENDS[1
 /* v1.11: the 4th row — his own what-if net yield. Clamped 0–12; when plan.blend==='custom' the whole app runs on it. */
 function custY(){const v=+state.plan.customY;return isFinite(v)?Math.min(12,Math.max(0,Math.round(v*100)/100)):0;}
 function currentYield(){return state.plan.blend==='custom'?custY():blendYield(currentBlend().mix);}
+/* v1.32: the plan horizon in months = end − start. Both are month indices on the
+   endLabel scale (index 1 = Jan 2028). Clamped to ≥6 so no calc ever sees n≤0. */
+function horizon(p){return Math.max(6,p.end-p.start);}
 function engineNumbers(){
   const p=state.plan,y=currentYield();
-  const w=monthlyBudget(p.principal,p.floor,y,p.months);
+  const w=monthlyBudget(p.principal,p.floor,y,horizon(p));
   const ym=p.principal*y/100/12;
   return{y,w,yieldMo:ym,draw:Math.max(0,w-ym)};
 }
-/* months since Jan 2028 → calendar label (6 → Jun 2028, 36 → Dec 2030, 48 → Dec 2031 [default], 60 → Dec 2032, 156 → Dec 2040 [max]) */
-function endLabel(mo){const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return MN[(mo-1)%12]+' '+(2028+Math.floor((mo-1)/12));}
+/* month index → calendar label (index 1 = Jan 2028; 6 → Jun 2028, 48 → Dec 2031 [default end],
+   156 → Dec 2040 [max end], 0 → Dec 2027 [default start], -6 → Jun 2027 [earliest start]).
+   v1.32: negative-safe (floored division + wrapped modulo) so start indices below Jan 2028 label correctly. */
+function endLabel(mo){const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const idx=mo-1;return MN[((idx%12)+12)%12]+' '+(2028+Math.floor(idx/12));}
 function verdict(budget,req){
   const m=budget-req;
   if(m>=0)return{cls:'ok',glyph:'✓',word:'funded',m};
@@ -67,12 +80,16 @@ function verdict(budget,req){
 function anchorC(){return COUNTRIES.find(c=>c.cc===state.plan.anchor)||COUNTRIES[0];}
 const SAFETY_NET=300000;  // the NL apartment safety net, in today’s money
 const INFL=2.3;           // %/yr inflation for ALL today's-money math (floor check + surplus lens). His call Jul 19 2026: 2.3 conservative, was 2.0 — one constant, one truth
-function floorCheck(floor,months){
+/* v1.32: the floor is a fixed amount at the plan-END date, so its today's-money value depends
+   on END only (never on start). Param `end` = the end month index; deflation horizon from today
+   to that date = 18 + end months (mid-2026 → Dec-2027/index-0 ≈ 18 mo, then +end to the end date).
+   Moving the START dial changes the monthly budget, not this check — economically correct. */
+function floorCheck(floor,end){
   if(floor<=0)return{real:0,below:false,txt:'Dials at zero — set the start principal and floor to see the inflation check.'};
-  const yrs=(18+months)/12; /* mid-2026 (today’s money) → Jan 2028 is 18 mo, then the plan horizon */
+  const yrs=(18+end)/12; /* mid-2026 (today’s money) → the plan-end date */
   const real=floor/Math.pow(1+INFL/100,yrs);
   const below=real<SAFETY_NET;
-  return{real,below,txt:'Ends '+endLabel(months)+' at '+fmtE(floor)+' — floor held by construction. At '+INFL+'%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
+  return{real,below,txt:'Ends '+endLabel(end)+' at '+fmtE(floor)+' — floor held by construction. At '+INFL+'%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
 }
 /* v1.15 SURPLUS LENS (v1.16: lives in MATCH, INFL const) — type the real all-in monthly
    spend; if it undercuts the mix yield the pot GROWS. Same declining-balance recurrence
@@ -86,7 +103,7 @@ function floorCheck(floor,months){
    different question. keep = the real-preservation spend: principal·(yield − INFL)/12 —
    spend under THAT and the pot grows in real terms too. */
 function surplusProj(S){
-  const p=state.plan,y=currentYield(),i=y/100/12,n=p.months;
+  const p=state.plan,y=currentYield(),i=y/100/12,n=horizon(p); /* v1.32: horizon = end−start; pot compounds over the plan months and (v1.29) deflates over the SAME window */
   const g=Math.pow(1+i,n);
   const end=i>0?p.principal*g-S*(g-1)/i:p.principal-S*n;
   return{y,end,real:end/Math.pow(1+INFL/100,n/12),keep:Math.max(0,p.principal*(y-INFL)/100/12)};
@@ -109,20 +126,21 @@ function estmark(){return '<span class="vmark est" title="Guide estimate — NOT
 /* ---------- ENGINE view ---------- */
 function renderEngine(){
   const p=state.plan,en=engineNumbers(),di=driftInfo(),bl=currentBlend();
-  const fc=floorCheck(p.floor,p.months);
+  const fc=floorCheck(p.floor,p.end),n=horizon(p);
   let h='';
   h+=secDiv('01','Engine','what the principal yields');
-  h+='<div class="hero"><div class="heron" id="heroW">'+fmtE(en.w)+'</div><div class="herosub">per month · sustainable to <span id="heroFloor">'+fmtE(p.floor)+'</span> · 2028 → <span id="heroEnd">'+endLabel(p.months)+'</span></div>';
+  h+='<div class="hero"><div class="heron" id="heroW">'+fmtE(en.w)+'</div><div class="herosub">per month · sustainable to <span id="heroFloor">'+fmtE(p.floor)+'</span> · <span id="heroSpan">'+endLabel(p.start)+' → '+endLabel(p.end)+'</span></div>';
   h+='<div class="herobk" id="heroBk">≈ '+fmtE(en.yieldMo)+' yield + '+fmtE(en.draw)+' draw-down · computed on the declining balance</div></div>';
-  h+='<div class="card"><div class="lbl">The three dials</div>';
+  h+='<div class="card"><div class="lbl">The four dials</div>';
   h+='<div class="slrow"><div class="slhead"><span>Start principal</span><span class="num" id="prV">'+fmtE(p.principal)+'</span></div><input type="range" id="prS" min="0" max="800000" step="5000" value="'+p.principal+'"></div>';
   h+='<div class="slrow"><div class="slhead"><span>Acceptable floor at plan end</span><span class="num" id="flV">'+fmtE(p.floor)+'</span></div><input type="range" id="flS" min="0" max="'+p.principal+'" step="5000" value="'+Math.min(p.floor,p.principal)+'"></div>';
-  h+='<div class="slrow"><div class="slhead"><span>Plan end — off-ramp &amp; possible return</span><span class="num" id="tmV">'+endLabel(p.months)+' · '+p.months+' mo</span></div><input type="range" id="tmS" min="6" max="156" step="6" value="'+p.months+'"></div>';
+  h+='<div class="slrow"><div class="slhead"><span>Plan start — when the drawdown begins</span><span class="num" id="stV">'+endLabel(p.start)+'</span></div><input type="range" id="stS" min="-6" max="'+(p.end-6)+'" step="6" value="'+p.start+'"></div>';
+  h+='<div class="slrow"><div class="slhead"><span>Plan end — off-ramp &amp; possible return</span><span class="num" id="tmV">'+endLabel(p.end)+' · '+n+' mo</span></div><input type="range" id="tmS" min="6" max="156" step="6" value="'+p.end+'"></div>';
   h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chk2032">'+fc.txt+'</div>';
-  h+='<div class="foot">A shorter plan spreads the same principal→floor drawdown over fewer months — sell &amp; return earlier and the monthly budget rises. Default sits at Dec 2031; drag the dial anywhere from 2028 out to 2040 to test shorter exits or a longer runway.</div></div>';
+  h+='<div class="foot">The budget spreads the principal→floor drawdown over the plan window (start → end). Pull the start earlier or the end later to lengthen the runway and the monthly budget drops; a shorter window raises it. Defaults sit at Dec 2027 → Dec 2031 (48 months); the start dial reaches back to Jun 2027, the end dial out to Dec 2040.</div></div>';
   h+='<div class="card"><div class="lbl">Instrument mix</div>';
   for(const b of BLENDS){
-    const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,p.months),open=ui.blend===b.id;
+    const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,n),open=ui.blend===b.id;
     const comp=Object.keys(b.mix).map(k=>Math.round(b.mix[k]*100)+'% '+esc(INSTRUMENTS[k].name)).join(' · ');
     h+='<label class="pick'+(b.id===p.blend?' on':'')+'"><input type="radio" name="blend" value="'+b.id+'"'+(b.id===p.blend?' checked':'')+'>';
     h+='<span class="pickbody"><span class="pickhead"><b>'+esc(b.name)+'</b><span class="num">'+pct(y)+' · '+fmtE(w)+'/mo</span></span>';
@@ -142,7 +160,7 @@ function renderEngine(){
     h+='<button type="button" class="btgl" data-bd="'+b.id+'">'+(open?'▾ hide the why':'▸ why this mix — every instrument’s place')+'</button>';
     h+='</span></label>';
   }
-  const cy=custY(),cw=monthlyBudget(p.principal,p.floor,cy,p.months);
+  const cy=custY(),cw=monthlyBudget(p.principal,p.floor,cy,n);
   h+='<label class="pick'+(p.blend==='custom'?' on':'')+'"><input type="radio" name="blend" value="custom"'+(p.blend==='custom'?' checked':'')+'>';
   h+='<span class="pickbody"><span class="pickhead"><b>Custom yield</b><span class="num cywrap"><input type="number" id="cyIn" class="cyin" inputmode="decimal" min="0" max="12" step="0.01" value="'+cy+'">% · <span id="cyW">'+fmtE(cw)+'/mo</span></span></span>';
   h+='<span class="picksub">What-if dial — type any net yield and this row shows the sustainable monthly. Select it and the hero + Match run on it; the four mixes above stay untouched.</span></span></label>';
@@ -164,12 +182,12 @@ function renderSpend(){
   if(!(p.spend>0)){el.innerHTML='<div class="foot">Type your real all-in monthly spend (COL + €120 insurance + visa amortisation). Spend under the mix yield and the pot GROWS — this shows where it lands by plan end, nominal and in today’s euros. The budget above stays the sustainable MAXIMUM; this lens runs the other direction.</div>';return;}
   if(!(p.principal>0)){el.innerHTML='<div class="foot">Set the start-principal dial first — this lens projects it forward at your typed spend.</div>';return;}
   const s=surplusProj(p.spend),d=s.end-p.principal,m1=p.principal*s.y/100/12-p.spend;
-  let h='<div class="lrow"><span>pot at '+endLabel(p.months)+'</span><span class="num">'+fmtE(s.end)+'</span></div>';
+  let h='<div class="lrow"><span>pot at '+endLabel(p.end)+'</span><span class="num">'+fmtE(s.end)+'</span></div>';
   h+='<div class="lrow"><span>in today’s euros ('+INFL+'%/yr)</span><span class="num">'+fmtE(s.real)+'</span></div>';
   h+='<div class="lrow"><span>vs start principal</span><span class="num">'+(d>=0?'+':'−')+fmtE(Math.abs(d))+'</span></div>';
   h+='<div class="lrow"><span>first-month surplus (yield − spend)</span><span class="num">'+(m1>=0?'+':'−')+fmtE(Math.abs(m1))+'/mo</span></div>';
   h+='<div class="foot">Runs on the selected mix ('+pct(s.y)+') and the plan-end dial, before any crash-deploy. Real-preservation spend at this mix ≈ '+fmtE(s.keep)+'/mo — under that, the pot grows in REAL terms too, not just on paper.</div>';
-  if(s.end<p.floor)h+='<div class="notep">⚠ This spend runs the pot below your '+fmtE(p.floor)+' floor by '+endLabel(p.months)+' — it exceeds the sustainable draw shown in Engine.</div>';
+  if(s.end<p.floor)h+='<div class="notep">⚠ This spend runs the pot below your '+fmtE(p.floor)+' floor by '+endLabel(p.end)+' — it exceeds the sustainable draw shown in Engine.</div>';
   el.innerHTML=h;
 }
 function renderLens(){
@@ -182,18 +200,21 @@ function renderLens(){
   el.innerHTML=rows+'<div class="foot">'+note+' Outcomes are a lens on the numbers — the plan does not branch on them.</div>'+gate;
 }
 function updateEngineNumbers(){
-  const p=state.plan,en=engineNumbers();
+  const p=state.plan,en=engineNumbers(),n=horizon(p);
   $('#heroW').textContent=fmtE(en.w);$('#heroFloor').textContent=fmtE(p.floor);
   $('#heroBk').textContent='≈ '+fmtE(en.yieldMo)+' yield + '+fmtE(en.draw)+' draw-down · computed on the declining balance';
   $('#prV').textContent=fmtE(p.principal);$('#flV').textContent=fmtE(p.floor);
-  $('#tmV').textContent=endLabel(p.months)+' · '+p.months+' mo';$('#heroEnd').textContent=endLabel(p.months);
-  const fc=floorCheck(p.floor,p.months),ck=$('#chk2032');ck.textContent=fc.txt;ck.classList.toggle('floorwarn',fc.below);
+  $('#stV').textContent=endLabel(p.start);
+  $('#tmV').textContent=endLabel(p.end)+' · '+n+' mo';$('#heroSpan').textContent=endLabel(p.start)+' → '+endLabel(p.end);
+  const fc=floorCheck(p.floor,p.end),ck=$('#chk2032');ck.textContent=fc.txt;ck.classList.toggle('floorwarn',fc.below);
   const fl=$('#flS');fl.max=p.principal;if(+fl.value>p.principal)fl.value=p.principal;
+  /* v1.32: keep the start dial below the end dial — its max tracks end−6 (mirrors the floor≤principal guard) */
+  const st=$('#stS');if(st){st.max=p.end-6;if(+st.value>p.end-6)st.value=p.end-6;}
   document.querySelectorAll('#view-engine .pick').forEach(pk=>{
     const id=pk.querySelector('input').value;
-    if(id==='custom'){$('#cyW').textContent=fmtE(monthlyBudget(p.principal,p.floor,custY(),p.months))+'/mo';return;}
+    if(id==='custom'){$('#cyW').textContent=fmtE(monthlyBudget(p.principal,p.floor,custY(),n))+'/mo';return;}
     const b=BLENDS.find(x=>x.id===id);
-    const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,p.months);
+    const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,n);
     pk.querySelector('.pickhead .num').textContent=pct(y)+' · '+fmtE(w)+'/mo';
   });
   if(ui.blend){const bd=BLENDS.find(x=>x.id===ui.blend);if(bd){const ks=Object.keys(bd.mix);
@@ -205,7 +226,11 @@ function bindEngine(){
   $('#prS').onchange=()=>renderMatch();
   $('#flS').oninput=e=>{state.plan.floor=Math.min(+e.target.value,state.plan.principal);save();updateEngineNumbers();};
   $('#flS').onchange=()=>renderMatch();
-  $('#tmS').oninput=e=>{state.plan.months=Math.min(156,Math.max(6,+e.target.value||48));save();updateEngineNumbers();};
+  /* v1.32: plan START dial — month index, earliest -6 (Jun 2027), kept ≤ end−6 so the horizon stays ≥6 mo */
+  $('#stS').oninput=e=>{const v=Math.max(-6,Math.min(state.plan.end-6,+e.target.value||0));state.plan.start=v;save();updateEngineNumbers();};
+  $('#stS').onchange=()=>renderMatch();
+  /* plan END dial — if the end is dragged at/under the start, pull the start down with it (keep ≥6 mo, floor at Jun 2027) */
+  $('#tmS').oninput=e=>{const v=Math.min(156,Math.max(6,+e.target.value||48));state.plan.end=v;if(state.plan.start>v-6)state.plan.start=Math.max(-6,v-6);save();updateEngineNumbers();};
   $('#tmS').onchange=()=>renderMatch();
   document.querySelectorAll('input[name=blend]').forEach(r=>r.onchange=e=>{state.plan.blend=e.target.value;save();renderEngine();renderMatch();});
   document.querySelectorAll('#view-engine .btgl').forEach(bt=>bt.onclick=e=>{e.preventDefault();e.stopPropagation();ui.blend=(ui.blend===bt.dataset.bd?null:bt.dataset.bd);renderEngine();});
