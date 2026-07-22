@@ -1,6 +1,7 @@
 'use strict';
-const APP_VERSION='1.32.0';
+const APP_VERSION='1.33.0';
 const LS='waypoint:v1';
+const INFL_DEFAULT=2.3; /* %/yr — the seed for both inflation rates (was the single const INFL). His call Jul 19 2026: 2.3 conservative, was 2.0. Declared here (before defaults()/state init) so the plan can seed inflEng+inflSpend from it. */
 
 /* ---------- helpers ---------- */
 const $=s=>document.querySelector(s);
@@ -11,7 +12,7 @@ const pct=v=>v.toFixed(2)+'%';
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._h);toast._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 /* ---------- state ---------- */
-function defaults(){return{plan:{principal:0,floor:0,start:0,end:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0,customY:3,spend:0,insOn:true},steps:{},ecb:null};} /* v1.32: TWO plan dials — start & end (month indices, endLabel convention: index 1 = Jan 2028). Default start 0 = Dec 2027, end 48 = Dec 2031 → horizon 48 mo, IDENTICAL to the old single 'months:48' dial (old n=months was really Dec-2027→end). Earliest start = -6 = Jun 2027. Horizon n = end − start drives every calc; floorCheck deflates the plan-end floor and depends on END only. */ /* v1.28: insOn = master €120 insurance toggle, on by default (matches prior behaviour) */ /* v1.15: spend = his typed actual monthly all-in spend for the surplus lens (0 = lens shows its prompt) */ /* v1.11: customY = the what-if net yield behind the 4th 'Custom yield' row (plan.blend may be 'custom'). v1.4: fresh devices start at 0/0/… (his call). v1.2: default anchor = PH; saved plans keep their own picks */
+function defaults(){return{plan:{principal:0,floor:0,start:0,end:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0,customY:3,spend:0,insOn:true,inflEng:INFL_DEFAULT,inflSpend:INFL_DEFAULT},steps:{},ecb:null};} /* v1.33: inflEng + inflSpend = TWO independent inflation rates (%/yr), both default 2.3 = the old single INFL, so existing plans are byte-identical. inflEng drives the Engine floor check; inflSpend drives the Actual-spend lens (today's-euros line + real-preservation spend). His ask Jul 22 2026: let the engine calc and the actual-spend calc run on different inflation. */ /* v1.32: TWO plan dials — start & end (month indices, endLabel convention: index 1 = Jan 2028). Default start 0 = Dec 2027, end 48 = Dec 2031 → horizon 48 mo, IDENTICAL to the old single 'months:48' dial (old n=months was really Dec-2027→end). Earliest start = -6 = Jun 2027. Horizon n = end − start drives every calc; floorCheck deflates the plan-end floor and depends on END only. */ /* v1.28: insOn = master €120 insurance toggle, on by default (matches prior behaviour) */ /* v1.15: spend = his typed actual monthly all-in spend for the surplus lens (0 = lens shows its prompt) */ /* v1.11: customY = the what-if net yield behind the 4th 'Custom yield' row (plan.blend may be 'custom'). v1.4: fresh devices start at 0/0/… (his call). v1.2: default anchor = PH; saved plans keep their own picks */
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(!s)return defaults();const d=defaults();const sp=s.plan||{};
   /* v1.32 migration — MUST run on the RAW saved plan, before merging defaults (defaults now always
      carry end:48, which would mask the legacy field). A plan saved before the start dial carries
@@ -79,17 +80,23 @@ function verdict(budget,req){
 }
 function anchorC(){return COUNTRIES.find(c=>c.cc===state.plan.anchor)||COUNTRIES[0];}
 const SAFETY_NET=300000;  // the NL apartment safety net, in today’s money
-const INFL=2.3;           // %/yr inflation for ALL today's-money math (floor check + surplus lens). His call Jul 19 2026: 2.3 conservative, was 2.0 — one constant, one truth
+/* v1.33: TWO independent inflation rates (were the single const INFL=2.3). Both clamp 0–20 %/yr and
+   fall back to INFL_DEFAULT if a saved value is junk. inflEng() drives the Engine floor check;
+   inflSpend() drives the Actual-spend lens. His ask Jul 22 2026: engine + actual-spend on different rates. */
+function inflEng(){const v=+state.plan.inflEng;return isFinite(v)?Math.min(20,Math.max(0,Math.round(v*100)/100)):INFL_DEFAULT;}
+function inflSpend(){const v=+state.plan.inflSpend;return isFinite(v)?Math.min(20,Math.max(0,Math.round(v*100)/100)):INFL_DEFAULT;}
 /* v1.32: the floor is a fixed amount at the plan-END date, so its today's-money value depends
    on END only (never on start). Param `end` = the end month index; deflation horizon from today
    to that date = 18 + end months (mid-2026 → Dec-2027/index-0 ≈ 18 mo, then +end to the end date).
-   Moving the START dial changes the monthly budget, not this check — economically correct. */
+   Moving the START dial changes the monthly budget, not this check — economically correct.
+   v1.33: deflation rate = inflEng() (was the shared INFL). */
 function floorCheck(floor,end){
-  if(floor<=0)return{real:0,below:false,txt:'Dials at zero — set the start principal and floor to see the inflation check.'};
+  const infl=inflEng();
+  if(floor<=0)return{real:0,below:false,infl,txt:'Dials at zero — set the start principal and floor to see the inflation check.'};
   const yrs=(18+end)/12; /* mid-2026 (today’s money) → the plan-end date */
-  const real=floor/Math.pow(1+INFL/100,yrs);
+  const real=floor/Math.pow(1+infl/100,yrs);
   const below=real<SAFETY_NET;
-  return{real,below,txt:'Ends '+endLabel(end)+' at '+fmtE(floor)+' — floor held by construction. At '+INFL+'%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
+  return{real,below,infl,txt:'Ends '+endLabel(end)+' at '+fmtE(floor)+' — floor held by construction. At '+infl+'%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
 }
 /* v1.15 SURPLUS LENS (v1.16: lives in MATCH, INFL const) — type the real all-in monthly
    spend; if it undercuts the mix yield the pot GROWS. Same declining-balance recurrence
@@ -98,15 +105,16 @@ function floorCheck(floor,end){
    The pot grows only over the n plan months (Jan-2028 → plan end); deflating over 18+n
    charged 18 extra months of inflation with no matching yield, so a near-zero spend at a
    yield ABOVE inflation still showed a real value below the true real gain. Now growth and
-   deflation share the n-month window: real = end / (1+INFL)^(n/12). floorCheck keeps 18+n
+   deflation share the n-month window: real = end / (1+infl)^(n/12). floorCheck keeps 18+n
    on purpose — it translates a STATIC plan-end floor to today's purchasing power, a
-   different question. keep = the real-preservation spend: principal·(yield − INFL)/12 —
-   spend under THAT and the pot grows in real terms too. */
+   different question. keep = the real-preservation spend: principal·(yield − infl)/12 —
+   spend under THAT and the pot grows in real terms too.
+   v1.33: this lens runs on inflSpend() — its OWN inflation rate, independent of the Engine floor check. */
 function surplusProj(S){
-  const p=state.plan,y=currentYield(),i=y/100/12,n=horizon(p); /* v1.32: horizon = end−start; pot compounds over the plan months and (v1.29) deflates over the SAME window */
+  const p=state.plan,y=currentYield(),i=y/100/12,n=horizon(p),infl=inflSpend(); /* v1.32: horizon = end−start; pot compounds over the plan months and (v1.29) deflates over the SAME window. v1.33: infl = the actual-spend rate */
   const g=Math.pow(1+i,n);
   const end=i>0?p.principal*g-S*(g-1)/i:p.principal-S*n;
-  return{y,end,real:end/Math.pow(1+INFL/100,n/12),keep:Math.max(0,p.principal*(y-INFL)/100/12)};
+  return{y,end,infl,real:end/Math.pow(1+infl/100,n/12),keep:Math.max(0,p.principal*(y-infl)/100/12)};
 }
 function secDiv(n,name,sub){return '<div class="secdiv" id="sd-'+name.toLowerCase()+'"><span class="secn">'+n+'</span><b>'+name+'</b><span class="secsub">'+esc(sub)+'</span></div>';}
 
@@ -137,6 +145,8 @@ function renderEngine(){
   h+='<div class="slrow"><div class="slhead"><span>Plan start — when the drawdown begins</span><span class="num" id="stV">'+endLabel(p.start)+'</span></div><input type="range" id="stS" min="-6" max="'+(p.end-6)+'" step="6" value="'+p.start+'"></div>';
   h+='<div class="slrow"><div class="slhead"><span>Plan end — off-ramp &amp; possible return</span><span class="num" id="tmV">'+endLabel(p.end)+' · '+n+' mo</span></div><input type="range" id="tmS" min="6" max="156" step="6" value="'+p.end+'"></div>';
   h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chk2032">'+fc.txt+'</div>';
+  /* v1.33: inflation dial for the floor check — independent of the actual-spend lens rate (in Match) */
+  h+='<div class="instog"><span class="instog-lbl">Inflation — floor check <span class="sub">deflates the plan-end floor to today’s money</span></span><span class="cywrap"><input type="number" id="inEng" class="cyin" inputmode="decimal" min="0" max="20" step="0.1" value="'+inflEng()+'">%/yr</span></div>';
   h+='<div class="foot">The budget spreads the principal→floor drawdown over the plan window (start → end). Pull the start earlier or the end later to lengthen the runway and the monthly budget drops; a shorter window raises it. Defaults sit at Dec 2027 → Dec 2031 (48 months); the start dial reaches back to Jun 2027, the end dial out to Dec 2040.</div></div>';
   h+='<div class="card"><div class="lbl">Instrument mix</div>';
   for(const b of BLENDS){
@@ -183,7 +193,7 @@ function renderSpend(){
   if(!(p.principal>0)){el.innerHTML='<div class="foot">Set the start-principal dial first — this lens projects it forward at your typed spend.</div>';return;}
   const s=surplusProj(p.spend),d=s.end-p.principal,m1=p.principal*s.y/100/12-p.spend;
   let h='<div class="lrow"><span>pot at '+endLabel(p.end)+'</span><span class="num">'+fmtE(s.end)+'</span></div>';
-  h+='<div class="lrow"><span>in today’s euros ('+INFL+'%/yr)</span><span class="num">'+fmtE(s.real)+'</span></div>';
+  h+='<div class="lrow"><span>in today’s euros ('+s.infl+'%/yr)</span><span class="num">'+fmtE(s.real)+'</span></div>';
   h+='<div class="lrow"><span>vs start principal</span><span class="num">'+(d>=0?'+':'−')+fmtE(Math.abs(d))+'</span></div>';
   h+='<div class="lrow"><span>first-month surplus (yield − spend)</span><span class="num">'+(m1>=0?'+':'−')+fmtE(Math.abs(m1))+'/mo</span></div>';
   h+='<div class="foot">Runs on the selected mix ('+pct(s.y)+') and the plan-end dial, before any crash-deploy. Real-preservation spend at this mix ≈ '+fmtE(s.keep)+'/mo — under that, the pot grows in REAL terms too, not just on paper.</div>';
@@ -237,6 +247,9 @@ function bindEngine(){
   const cyi=$('#cyIn');
   cyi.oninput=e=>{state.plan.customY=+e.target.value;save();updateEngineNumbers();};
   cyi.onchange=e=>{state.plan.customY=custY();e.target.value=state.plan.customY;save();updateEngineNumbers();if(state.plan.blend==='custom')renderMatch();};
+  /* v1.33: floor-check inflation dial — live-updates the floor check only (does NOT touch the budget or Match) */
+  const ie=$('#inEng');if(ie){ie.oninput=e=>{state.plan.inflEng=+e.target.value;save();updateEngineNumbers();};
+    ie.onchange=e=>{state.plan.inflEng=inflEng();e.target.value=state.plan.inflEng;save();updateEngineNumbers();};}
   $('#slv').onchange=e=>{state.plan.sleeve=Math.max(0,+e.target.value||0);save();renderLens();};
 }
 
@@ -258,6 +271,8 @@ function renderMatch(){
   /* v1.16: the surplus lens lives HERE (his placement call) — between the budget and the live-through list */
   h+='<div class="card"><div class="lbl">Actual spend — a lens, not a branch</div>';
   h+='<input type="number" id="spIn" class="numin" inputmode="numeric" min="0" step="10" value="'+p.spend+'">';
+  /* v1.33: this lens has its OWN inflation rate, separate from the Engine floor check */
+  h+='<div class="instog"><span class="instog-lbl">Inflation — this lens <span class="sub">today’s-euros line + real-preservation spend</span></span><span class="cywrap"><input type="number" id="inSpend" class="cyin" inputmode="decimal" min="0" max="20" step="0.1" value="'+inflSpend()+'">%/yr</span></div>';
   h+='<div id="spT"></div></div>';
   h+='<div class="lbl sect">Live-through — can the Engine fund it?</div>';
   h+='<div class="foot">'+estmark()+' = still a guide estimate (guide ×0.7), NOT yet hand-costed — every place WITHOUT this mark is totalled line-by-line from your own COL ledger (real lifestyle, ex-insurance; accommodation & protein noted per place). '+poolmark()+' = pool+gym base (Chiang Mai + Cebu). '+mixmark()+' = beef is not the staple there (chicken/fish mix). Comfort is the looser, roomier band.</div>';
@@ -317,6 +332,9 @@ function renderMatch(){
   document.querySelectorAll('#view-match .cc .chead').forEach(hd=>hd.onclick=()=>{const cc=hd.parentElement.dataset.cc;ui.cc=(ui.cc===cc?null:cc);renderMatch();});
   document.querySelectorAll('input[name=anchor]').forEach(r=>r.onchange=e=>{state.plan.anchor=e.target.value;save();renderMatch();toast('Anchor set: '+e.target.value+' — Engine lens + Path follow');});
   $('#spIn').oninput=e=>{state.plan.spend=Math.max(0,+e.target.value||0);save();renderSpend();}; /* oninput + #spT-only rewrite keeps focus while typing (cyIn pattern) */
+  /* v1.33: actual-spend inflation dial — lives OUTSIDE #spT so renderSpend() (which rewrites only #spT) keeps focus while typing */
+  const isp=$('#inSpend');if(isp){isp.oninput=e=>{state.plan.inflSpend=+e.target.value;save();renderSpend();};
+    isp.onchange=e=>{state.plan.inflSpend=inflSpend();e.target.value=state.plan.inflSpend;save();renderSpend();};}
   renderSpend();
 }
 
