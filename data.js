@@ -117,6 +117,26 @@
    + PH 36mo (no runs); ID hard 180d; JP 90d-blocks-only; IN limit is 182d/FY tax not immigration;
    TH tourist runs curbed Nov-2025 → DTV. Ledger SYNCED (Visa tab + Rollup reference rows; canonical
    ALL-IN untouched). Not an app anchor/COL change beyond the additive visa line.
+   v1.35 (2026-07-25): PH SCRUTINY CHECK — a “the Philippines is tightening on Western
+   foreigners” claim was verified against current sources and is largely inapplicable to this
+   plan (no PH bank, nothing claimed from the BIR, §23 territorial unchanged, and PH actually
+   EXITED the FATF grey list in Feb 2025). Two real items folded in: Path n5 = the ACR I-Card
+   past 59 days + the BI Annual Report every 1 Jan – 1 Mar (the only recurring PH obligation,
+   previously missing everywhere), and a standing Agenda monitor for the 2027 FATF
+   reassessment — dated nowhere because FATF publishes no date, and it is a verify-before-
+   acting flag on the correspondent-banking rail (Kraken → Swissquote), not on the 0%.
+   Also noted, not folded: PH has committed to CARF (first exchanges 2028) and joined the
+   MAC convention in May 2025, but has still NOT adopted CRS — blocked by the 1955 Bank
+   Secrecy Law. Crypto reporting arrives before bank reporting.
+   v1.36 (2026-07-25): LAWYER-RECALIBRATION CATCH-UP — the app was the last place still
+   saying “get the PH lawyer’s written §42(E) opinion” as a live to-do. The 19 Jul 2026
+   recalibration (hub-click moots §42(E); territorial treatment of an alien’s foreign-source
+   crypto is settled law; NL is the only authority with a real claim) downgraded the PH
+   lawyer to CONTINGENCY-ONLY and promoted the DUTCH/cross-border adviser to the one paid
+   hour worth buying. Path p9 rewritten around the Dutch session (PH opinion kept as the
+   named contingency: hub stop impossible, or the settled-in-PH continuity route going
+   serious). The Agenda monitor is retitled from a pending deliverable to a standing
+   conditional flag. Step id p9 unchanged so existing checkmarks survive.
    Not financial, tax, legal or immigration advice — verify load-bearing items locally. */
 
 const DATA_STAMP='2026-07-19';
@@ -150,8 +170,10 @@ const MONITORS=[
     d:'BBL/KBank/SCB reject DTV accounts since the 2025–26 anti-scam crackdown; no Thai bank = no onshore 0% route. Verify at a branch before committing to TH as anchor. (The offshore Scenario-F route needs no Thai bank.) Related access check: the Thai SEC also blocks unlicensed offshore exchanges (Bybit/OKX since 2025) — verify Kraken reachability from inside TH.'},
   {t:'GE — coaching ≠ consulting for the 1% SBS',
     d:'Confirm the classification with a local advisor before counting on 1%; “consultancy” is SBS-excluded, fallback 20%. Only bites if GE becomes the anchor.'},
-  {t:'PH lawyer — written §42(E) opinion pending',
-    d:'The sharpened three-part question is in the dossier. The hub-click (guardrail 9) moots the ambiguity meanwhile; the opinion decides how much the continuity stay matters. Path p9.'},
+  {t:'PH §42(E) sourcing — contingency-only, mooted by the hub-click',
+    d:'A standing flag, not a to-do (recalibrated Jul 2026). §42(E) (“purchased without and sold within”) is the one genuinely open PH question, and guardrail 9 makes it stakes-free: execute the click in SG/HK/AE and every sourcing theory lands at 0% CGT anyway. It re-opens ONLY if a real scenario makes the hub stop impossible, or if the settled-in-PH continuity route becomes serious — then buy the written PH opinion (the sharpened three-part question is drafted, dossier 04). The consult that actually de-risks is DUTCH/cross-border, not Filipino — Path p9.'},
+  {t:'FATF 2027 reassessment — the PH banking-rail watch',
+    d:'PH LEFT the grey list in Feb 2025, but AMLC still rates the country high-risk and the BSP governor said publicly (Feb 2026) there is a real risk of returning — the reassessment lands in 2027, the departure year. Nothing here touches the 0%: NIRC §23 territorial treatment of aliens is statute, unchanged, and no bill exists. What a re-listing WOULD hit is correspondent banking — the Kraken → Swissquote SWIFT wire and Swissquote compliance questions on a PH-address account. Check the standing before leaning on the PH address for the off-ramp. There is no PH bank anywhere in the plan, so the exposure stops there.'},
   {t:'AOW buy-in — the 1-year window opens at departure',
     d:'Vrijwillige voortzetting must be requested at SVB within 1 year of leaving NL — decide it at Exit, not later. Becomes a dated deadline the day the BRP uitschrijving happens.'}
 ];
@@ -411,7 +433,7 @@ const PATH=[
     {id:'p6',t:'Line up IMG Global insurance (~€120/mo)',dep:'His researched winner — already inside every burn number in Match.'},
     {id:'p7',t:'Skip term deposits — iBonds replaced them',dep:'Research-5: fixed-maturity iBonds ETFs beat Raisin deposits on yield, liquidity AND residency. Nothing residence-tied should hold the €350k.'},
     {id:'p8',t:'Assemble the source-of-funds dossier',dep:'Guardrail 7. Binance + Kraken exports, Etherscan paper-wallet trail, box-3 reconciliation, Koinly report → one PDF for Swissquote compliance BEFORE the ~€500k wire (pre-notify; freeze ≠ forfeiture, but a ready dossier keeps it smooth). Lives in Personal apps/offramp-dossier.'},
-    {id:'p9',t:'Get the PH lawyer’s written §42(E) opinion + one cross-border pressure-test',dep:'Guardrail 8. The sharpened three-part question is in the dossier (04). Hub-click (guardrail 9) moots the ambiguity meanwhile — the opinion decides how much the continuity stay matters. One cross-border adviser session pressure-tests the whole itinerary before relying on it.'},
+    {id:'p9',t:'Book ONE Dutch / cross-border adviser session to pressure-test the NL exit + the itinerary',dep:'Guardrail 8, RECALIBRATED Jul 2026. NL is the only authority with both a real claim and real teeth, so how the Belastingdienst would weigh the exit is a DUTCH question — a PH lawyer is the wrong expert for it and can only say what a PH document certifies. Book this near departure, once the itinerary is concrete. ⚠ The PH lawyer is now CONTINGENCY-ONLY: an alien’s foreign-source crypto being untaxed is settled territorial law (no paid opinion needed), and the one open PH question — §42(E) sourcing — is mooted by the hub-click (guardrail 9). Buy the PH opinion only if the hub stop becomes impossible in a live scenario, or if the settled-in-PH continuity route becomes serious.'},
     {id:'p10',t:'Line up a replacement credit card before the ING account closes',dep:'The ING credit card dies with the ING account (Exit x5 / Guardrail 1 closes ALL NL accounts for the clean break — so the belastingdienst can’t argue a retained base of living). Research a cheap card not tied to NL residency that survives emigration — doubles as a non-iDEAL rail if he ever pays the Mijndak renewal himself. Research to-do (project agenda).'}]},
   {id:'exit',name:'Exit',when:'2027 · before the 2028 pivot',steps:[
     {id:'x1',t:'Sell apartment + company (≈ €350k)',dep:'Selling the apartment is ALSO the tax shield: no available Dutch dwelling = the decisive clean-exit factor (decision-tree Q1).'},
@@ -423,7 +445,8 @@ const PATH=[
     {id:'n1',t:'Residency discipline — days AND no dwelling AND no anchor',dep:'Guardrail 5, widened (Jul 2026): day limits alone are NOT the whole test — secondary tests (a lease kept at your disposal, an abode, a centre-of-life) catch BELOW the day count in VN/JP/KH/CZ/SI/ID (⚠ lines on those country cards). So: never 182 in India (30% worldwide crypto), never 180 in any worldwide-tax country, AND no dwelling kept available, AND no vital-interest anchor. PH is SAFE to exceed (territorial at any status); TH only with the no-remit leash; day-count-only set: TH/PH/GE/MY/IN.'},
     {id:'n2',t:'Make PH the FIRST stop, rent a real place, set the Kraken address to it — brokers stay as-is',dep:'SUPERSEDES the old after-TRC rule. A real rented PH address (address ≠ TRC): gets NL off the account early — CARF/DAC8 reporting follows the declared address — and avoids re-KYC in the middle of a pump window. Never a fabricated address; stale-but-genuine beats a last-minute change. IBKR/Swissquote keep NL until the TRC exists (“resident nowhere” is grey at brokers; both tolerate the gap).'},
     {id:'n3',t:'Re-confirm the hand-costed COL numbers on the first stays',dep:'The ✓ hand-costed figures (TH €921, VN €884, PH places…) are desk-costed from his real lifestyle (rents repriced Jul 2026 from Airbnb monthly rates) — validate on the ground; the ledger in waypoint/research is the living source. (Supersedes the old “TH €800 lived anchor” check.)'},
-    {id:'n4',t:'Monitor the moving parts',dep:'The Agenda card at the top of this section is the live list: dated deadlines + standing monitors (TH bank-on-DTV, TH decree, GE SBS, PH §42(E), Prinsjesdag). This step = the habit of actually looking at it.'}]},
+    {id:'n4',t:'Monitor the moving parts',dep:'The Agenda card at the top of this section is the live list: dated deadlines + standing monitors (TH bank-on-DTV, TH decree, GE SBS, PH §42(E), Prinsjesdag). This step = the habit of actually looking at it.'},
+    {id:'n5',t:'Any PH stay past 59 days: get the ACR I-Card — then file the BI Annual Report every 1 Jan – 1 Mar',dep:'Immigration admin, not tax — and the only RECURRING PH obligation in the whole plan. From the second tourist extension (past 59 days) the ACR I-Card is mandatory, and a first issue needs an in-person biometrics appointment. Every ACR I-Card holder then files the Annual Report at a BI office between 1 January and 1 March each year: small fee, penalties for missing it. Bites in the continuity/anchor stays and any multi-year PH base — NOT in a fly-in-sell-fly-out off-ramp trip. The 36-month continuous-extension ceiling is unaffected, and none of it touches the territorial 0%.'}]},
   {id:'anchor',name:'Anchor',when:'when a base is chosen',steps:[
     {id:'a1',t:'Establish TRC at the anchor',dep:'PH 180d cumulative in the calendar year (the 0% does NOT need it — the TRC is paper/corroboration) · GE 183d · TH 180d + filing · CZ home/183d.'},
     {id:'a2',t:'THEN switch IBKR/Swissquote residency to the anchor',dep:'AFTER the TRC exists, BEFORE any big sale — DAC8/CARF reporting goes to the declared residence. Kraken already points at PH since the first stop (the old “switch Kraken after TRC” rule is superseded — see Nomad).'},
