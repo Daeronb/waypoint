@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.36.0';
+const APP_VERSION='1.38.0';
 const LS='waypoint:v1';
 const INFL_DEFAULT=2.3; /* %/yr — the seed for both inflation rates (was the single const INFL). His call Jul 19 2026: 2.3 conservative, was 2.0. Declared here (before defaults()/state init) so the plan can seed inflEng+inflSpend from it. */
 
@@ -85,6 +85,16 @@ const SAFETY_NET=300000;  // the NL apartment safety net, in today’s money
    inflSpend() drives the Actual-spend lens. His ask Jul 22 2026: engine + actual-spend on different rates. */
 function inflEng(){const v=+state.plan.inflEng;return isFinite(v)?Math.min(20,Math.max(0,Math.round(v*100)/100)):INFL_DEFAULT;}
 function inflSpend(){const v=+state.plan.inflSpend;return isFinite(v)?Math.min(20,Math.max(0,Math.round(v*100)/100)):INFL_DEFAULT;}
+/* v1.38 — THE SINGLE DEFLATION HORIZON. Every “in today’s money / today’s euros” figure in the
+   app deflates from the PLAN-END date back to TODAY, and they all get that horizon from HERE.
+   18 mo = mid-2026 (today) → Dec-2027 (end index 0), then + the end index. Depends on END only:
+   moving the START dial changes how long the pot compounds, never what “today” means.
+   ⚠ SUPERSEDES the v1.29 rule that the surplus lens should deflate over its own n-month window.
+   That made the lens quote PLAN-START euros under a “today’s euros” label, so the Engine floor
+   check and the Actual-spend lens silently answered in two different currencies-of-the-day
+   (v1.32’s start dial widened the gap to n vs 18+end — 54 vs 66 months at start Jun-2027,
+   ≈ €8.9k on a €350k pot at 3%). Both call this now, so they can never drift apart again. */
+function realYrs(end){return (18+end)/12;}
 /* v1.32: the floor is a fixed amount at the plan-END date, so its today's-money value depends
    on END only (never on start). Param `end` = the end month index; deflation horizon from today
    to that date = 18 + end months (mid-2026 → Dec-2027/index-0 ≈ 18 mo, then +end to the end date).
@@ -93,7 +103,7 @@ function inflSpend(){const v=+state.plan.inflSpend;return isFinite(v)?Math.min(2
 function floorCheck(floor,end){
   const infl=inflEng();
   if(floor<=0)return{real:0,below:false,infl,txt:'Dials at zero — set the start principal and floor to see the inflation check.'};
-  const yrs=(18+end)/12; /* mid-2026 (today’s money) → the plan-end date */
+  const yrs=realYrs(end); /* v1.38: the shared today→plan-end horizon */
   const real=floor/Math.pow(1+infl/100,yrs);
   const below=real<SAFETY_NET;
   return{real,below,infl,txt:'Ends '+endLabel(end)+' at '+fmtE(floor)+' — floor held by construction. At '+infl+'%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
@@ -101,20 +111,28 @@ function floorCheck(floor,end){
 /* v1.15 SURPLUS LENS (v1.16: lives in MATCH, INFL const) — type the real all-in monthly
    spend; if it undercuts the mix yield the pot GROWS. Same declining-balance recurrence
    as monthlyBudget, run forward (end = P·g − S·(g−1)/i over the plan months).
-   v1.29 BUGFIX: deflate over the SAME horizon the pot compounded — n months, NOT 18+n.
-   The pot grows only over the n plan months (Jan-2028 → plan end); deflating over 18+n
-   charged 18 extra months of inflation with no matching yield, so a near-zero spend at a
-   yield ABOVE inflation still showed a real value below the true real gain. Now growth and
-   deflation share the n-month window: real = end / (1+infl)^(n/12). floorCheck keeps 18+n
-   on purpose — it translates a STATIC plan-end floor to today's purchasing power, a
-   different question. keep = the real-preservation spend: principal·(yield − infl)/12 —
-   spend under THAT and the pot grows in real terms too.
+   ⚠ v1.38 REVERSES v1.29. v1.29 made this lens deflate over its own n-month compounding
+   window so that "growth and deflation share the window". Internally tidy, but it silently
+   changed WHICH DATE the real number is expressed in: plan-start euros, under a label that
+   says today's euros — while the Engine floor check kept quoting genuine today's euros. The
+   two headline real numbers therefore disagreed by the start offset (Joël, Jul 25 2026:
+   €306.4k here vs €297.5k there on identical dials). The label is the contract, so both now
+   deflate to TODAY via realYrs(p.end). Consequence to expect and NOT re-file as a bug: with
+   a yield only slightly above inflation the real end value can sit BELOW the nominal
+   principal, because the pot earns nothing over the months between today and the plan start
+   — that is a true statement about purchasing power, and the floor check has always said it.
+   keep = the real-preservation spend: principal·(yield − infl)/12 — spend under THAT and the
+   pot grows in real terms too.
    v1.33: this lens runs on inflSpend() — its OWN inflation rate, independent of the Engine floor check. */
 function surplusProj(S){
   const p=state.plan,y=currentYield(),i=y/100/12,n=horizon(p),infl=inflSpend(); /* v1.32: horizon = end−start; pot compounds over the plan months and (v1.29) deflates over the SAME window. v1.33: infl = the actual-spend rate */
   const g=Math.pow(1+i,n);
   const end=i>0?p.principal*g-S*(g-1)/i:p.principal-S*n;
-  return{y,end,infl,real:end/Math.pow(1+infl/100,n/12),keep:Math.max(0,p.principal*(y-infl)/100/12)};
+  /* v1.38 BUGFIX: real is deflated over realYrs(p.end) — today → plan end — NOT over n.
+     n is how long the pot COMPOUNDS (start → end); it is not how far the end value sits from
+     today. Using n anchored this line to the plan-START date while the label said today’s
+     euros, so it disagreed with the Engine floor check by exactly the start offset. */
+  return{y,end,infl,real:end/Math.pow(1+infl/100,realYrs(p.end)),keep:Math.max(0,p.principal*(y-infl)/100/12)};
 }
 function secDiv(n,name,sub){return '<div class="secdiv" id="sd-'+name.toLowerCase()+'"><span class="secn">'+n+'</span><b>'+name+'</b><span class="secsub">'+esc(sub)+'</span></div>';}
 
