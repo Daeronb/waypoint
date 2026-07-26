@@ -143,8 +143,11 @@ const DATA_STAMP='2026-07-19';
 const ECB_STAMP={dfr:2.25,asOf:'2026-06-17',estr:2.18,note:'ECB decides again 23 Jul 2026 — hiking cycle; re-stamp snapshots after'};
 const MMF_SPREAD=-0.08;   // MMF-ETF yield ≈ DFR − 0.08 (derivable live)
 const INSURANCE=120;      // IMG Global ~€120/mo — his researched pick, named so he remembers which one won
-const HORIZON_MO=60;      // Jan 2028 → Dec 2032 (pivot 2028 = constant, not editable)
-const HORIZON_LABEL='2028 → 2032';
+/* v1.40: HORIZON_MO (60) and HORIZON_LABEL ('2028 → 2032') REMOVED — dead constants,
+   referenced nowhere since the v1.32 start/end dials replaced the old fixed window. They still
+   claimed Jan-2028 → Dec-2032 while the app's own defaults read Dec-2027 → Dec-2031, so the next
+   editor to trust them would have been misled. The plan span comes from state.plan.start/end
+   via endLabel() — there is no second source of truth for it. */
 const STALE_DAYS=183;
 
 /* v1.18 — the Agenda (rendered at the top of Path). Dated items sort by due date and

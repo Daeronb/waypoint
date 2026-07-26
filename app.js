@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.38.0';
+const APP_VERSION='1.40.0';
 const LS='waypoint:v1';
 const INFL_DEFAULT=2.3; /* %/yr — the seed for both inflation rates (was the single const INFL). His call Jul 19 2026: 2.3 conservative, was 2.0. Declared here (before defaults()/state init) so the plan can seed inflEng+inflSpend from it. */
 
@@ -71,7 +71,11 @@ function engineNumbers(){
 /* month index → calendar label (index 1 = Jan 2028; 6 → Jun 2028, 48 → Dec 2031 [default end],
    156 → Dec 2040 [max end], 0 → Dec 2027 [default start], -6 → Jun 2027 [earliest start]).
    v1.32: negative-safe (floored division + wrapped modulo) so start indices below Jan 2028 label correctly. */
-function endLabel(mo){const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const idx=mo-1;return MN[((idx%12)+12)%12]+' '+(2028+Math.floor(idx/12));}
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function endLabel(mo){const idx=mo-1;return MONTHS[((idx%12)+12)%12]+' '+(2028+Math.floor(idx/12));}
+/* v1.39: the live wall-clock month, shown next to the inflation dial so the reference date of
+   every today's-money figure is visible instead of implied. */
+function nowLabel(){const n=new Date();return MONTHS[n.getMonth()]+' '+n.getFullYear();}
 function verdict(budget,req){
   const m=budget-req;
   if(m>=0)return{cls:'ok',glyph:'✓',word:'funded',m};
@@ -79,7 +83,13 @@ function verdict(budget,req){
   return{cls:'bad',glyph:'✕',word:'short',m};
 }
 function anchorC(){return COUNTRIES.find(c=>c.cc===state.plan.anchor)||COUNTRIES[0];}
-const SAFETY_NET=300000;  // the NL apartment safety net, in today’s money
+/* The NL apartment safety net, in TODAY’S money. Deliberately a frozen figure, NOT a
+   computing constant: floorCheck deflates the plan-end floor back to today and compares it
+   here, so both sides are already in the same (today’s) euros — auto-inflating this would
+   double-count. What it DOES need is a periodic human re-read: it is a 2026 asking price for
+   the kind of place he would rebuy, so it drifts with the Dutch market, not with CPI.
+   v1.40 review cadence: re-check it whenever the yield snapshots get re-stamped. */
+const SAFETY_NET=300000;
 /* v1.33: TWO independent inflation rates (were the single const INFL=2.3). Both clamp 0–20 %/yr and
    fall back to INFL_DEFAULT if a saved value is junk. inflEng() drives the Engine floor check;
    inflSpend() drives the Actual-spend lens. His ask Jul 22 2026: engine + actual-spend on different rates. */
@@ -87,17 +97,33 @@ function inflEng(){const v=+state.plan.inflEng;return isFinite(v)?Math.min(20,Ma
 function inflSpend(){const v=+state.plan.inflSpend;return isFinite(v)?Math.min(20,Math.max(0,Math.round(v*100)/100)):INFL_DEFAULT;}
 /* v1.38 — THE SINGLE DEFLATION HORIZON. Every “in today’s money / today’s euros” figure in the
    app deflates from the PLAN-END date back to TODAY, and they all get that horizon from HERE.
-   18 mo = mid-2026 (today) → Dec-2027 (end index 0), then + the end index. Depends on END only:
-   moving the START dial changes how long the pot compounds, never what “today” means.
+   Depends on END only: moving the START dial changes how long the pot compounds, never what
+   “today” means.
    ⚠ SUPERSEDES the v1.29 rule that the surplus lens should deflate over its own n-month window.
    That made the lens quote PLAN-START euros under a “today’s euros” label, so the Engine floor
    check and the Actual-spend lens silently answered in two different currencies-of-the-day
    (v1.32’s start dial widened the gap to n vs 18+end — 54 vs 66 months at start Jun-2027,
-   ≈ €8.9k on a €350k pot at 3%). Both call this now, so they can never drift apart again. */
-function realYrs(end){return (18+end)/12;}
+   ≈ €8.9k on a €350k pot at 3%). Both call this now, so they can never drift apart again.
+
+   v1.39 — “TODAY” IS NOW COMPUTED, NOT BAKED IN. This used to read (18+end)/12, where 18 was
+   the months from mid-2026 to Dec-2027. That was only true in mid-2026: it overstated the
+   horizon by one month for every month that passed, so by the mid-2027 departure it would have
+   been charging ~12 months of inflation that had ALREADY HAPPENED, quietly understating every
+   real figure. ANCHOR = Dec 2027 = end index 0 (the endLabel convention). monthsToAnchor()
+   counts real calendar months from the current month to that anchor and goes NEGATIVE once
+   today passes Dec-2027 — correct, because the distance to a FIXED plan-end date shrinks as
+   time runs. Clamped to a sane band so a badly-set device clock degrades instead of printing
+   nonsense; at the band edge it lands on the historical 18. */
+const REF_ANCHOR_Y=2027, REF_ANCHOR_M=11; /* Date-style month index: 11 = December */
+function monthsToAnchor(d){
+  const n=(d instanceof Date&&!isNaN(d.getTime()))?d:new Date();
+  const m=(REF_ANCHOR_Y-n.getFullYear())*12+(REF_ANCHOR_M-n.getMonth());
+  return isFinite(m)?Math.min(18,Math.max(-240,m)):18; /* 18 = the mid-2026 value this replaced */
+}
+function realYrs(end){return (monthsToAnchor()+end)/12;}
 /* v1.32: the floor is a fixed amount at the plan-END date, so its today's-money value depends
    on END only (never on start). Param `end` = the end month index; deflation horizon from today
-   to that date = 18 + end months (mid-2026 → Dec-2027/index-0 ≈ 18 mo, then +end to the end date).
+   to that date = realYrs(end): live months from this month to Dec-2027/index-0, then + end.
    Moving the START dial changes the monthly budget, not this check — economically correct.
    v1.33: deflation rate = inflEng() (was the shared INFL). */
 function floorCheck(floor,end){
@@ -162,9 +188,11 @@ function renderEngine(){
   h+='<div class="slrow"><div class="slhead"><span>Acceptable floor at plan end</span><span class="num" id="flV">'+fmtE(p.floor)+'</span></div><input type="range" id="flS" min="0" max="'+p.principal+'" step="5000" value="'+Math.min(p.floor,p.principal)+'"></div>';
   h+='<div class="slrow"><div class="slhead"><span>Plan start — when the drawdown begins</span><span class="num" id="stV">'+endLabel(p.start)+'</span></div><input type="range" id="stS" min="-6" max="'+(p.end-6)+'" step="6" value="'+p.start+'"></div>';
   h+='<div class="slrow"><div class="slhead"><span>Plan end — off-ramp &amp; possible return</span><span class="num" id="tmV">'+endLabel(p.end)+' · '+n+' mo</span></div><input type="range" id="tmS" min="6" max="156" step="6" value="'+p.end+'"></div>';
-  h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chk2032">'+fc.txt+'</div>';
+  /* v1.40: id was #chk2032 — a year baked into an element name back when the plan ended in
+     2032. Renamed to #chkFloor; the id is referenced only here and in updateEngineNumbers. */
+  h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chkFloor">'+fc.txt+'</div>';
   /* v1.33: inflation dial for the floor check — independent of the actual-spend lens rate (in Match) */
-  h+='<div class="instog"><span class="instog-lbl">Inflation — floor check <span class="sub">deflates the plan-end floor to today’s money</span></span><span class="cywrap"><input type="number" id="inEng" class="cyin" inputmode="decimal" min="0" max="20" step="0.1" value="'+inflEng()+'">%/yr</span></div>';
+  h+='<div class="instog"><span class="instog-lbl">Inflation — floor check <span class="sub">deflates the plan-end floor to today’s money · today = '+nowLabel()+'</span></span><span class="cywrap"><input type="number" id="inEng" class="cyin" inputmode="decimal" min="0" max="20" step="0.1" value="'+inflEng()+'">%/yr</span></div>';
   h+='<div class="foot">The budget spreads the principal→floor drawdown over the plan window (start → end). Pull the start earlier or the end later to lengthen the runway and the monthly budget drops; a shorter window raises it. Defaults sit at Dec 2027 → Dec 2031 (48 months); the start dial reaches back to Jun 2027, the end dial out to Dec 2040.</div></div>';
   h+='<div class="card"><div class="lbl">Instrument mix</div>';
   for(const b of BLENDS){
@@ -234,7 +262,7 @@ function updateEngineNumbers(){
   $('#prV').textContent=fmtE(p.principal);$('#flV').textContent=fmtE(p.floor);
   $('#stV').textContent=endLabel(p.start);
   $('#tmV').textContent=endLabel(p.end)+' · '+n+' mo';$('#heroSpan').textContent=endLabel(p.start)+' → '+endLabel(p.end);
-  const fc=floorCheck(p.floor,p.end),ck=$('#chk2032');ck.textContent=fc.txt;ck.classList.toggle('floorwarn',fc.below);
+  const fc=floorCheck(p.floor,p.end),ck=$('#chkFloor');ck.textContent=fc.txt;ck.classList.toggle('floorwarn',fc.below);
   const fl=$('#flS');fl.max=p.principal;if(+fl.value>p.principal)fl.value=p.principal;
   /* v1.32: keep the start dial below the end dial — its max tracks end−6 (mirrors the floor≤principal guard) */
   const st=$('#stS');if(st){st.max=p.end-6;if(+st.value>p.end-6)st.value=p.end-6;}
