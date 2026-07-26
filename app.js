@@ -1,7 +1,9 @@
 'use strict';
-const APP_VERSION='1.40.0';
+const APP_VERSION='1.42.0';
 const LS='waypoint:v1';
 const INFL_DEFAULT=2.3; /* %/yr — the seed for both inflation rates (was the single const INFL). His call Jul 19 2026: 2.3 conservative, was 2.0. Declared here (before defaults()/state init) so the plan can seed inflEng+inflSpend from it. */
+const HOME_DEFAULT=250000;    /* v1.41: the home target in TODAY'S euros (his number Jul 26 2026). Declared HERE, not next to homeToday(), because defaults() runs at load — const TDZ, same trap as INFL_DEFAULT in v1.33. */
+const INFL_HOME_DEFAULT=3.0;  /* v1.41: %/yr for the home target — deliberately ABOVE INFL_DEFAULT (2.3); Dutch house prices have run above CPI, and that divergence is the whole reason this rate is separate. */
 
 /* ---------- helpers ---------- */
 const $=s=>document.querySelector(s);
@@ -12,7 +14,7 @@ const pct=v=>v.toFixed(2)+'%';
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._h);toast._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 /* ---------- state ---------- */
-function defaults(){return{plan:{principal:0,floor:0,start:0,end:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0,customY:3,spend:0,insOn:true,inflEng:INFL_DEFAULT,inflSpend:INFL_DEFAULT},steps:{},ecb:null};} /* v1.33: inflEng + inflSpend = TWO independent inflation rates (%/yr), both default 2.3 = the old single INFL, so existing plans are byte-identical. inflEng drives the Engine floor check; inflSpend drives the Actual-spend lens (today's-euros line + real-preservation spend). His ask Jul 22 2026: let the engine calc and the actual-spend calc run on different inflation. */ /* v1.32: TWO plan dials — start & end (month indices, endLabel convention: index 1 = Jan 2028). Default start 0 = Dec 2027, end 48 = Dec 2031 → horizon 48 mo, IDENTICAL to the old single 'months:48' dial (old n=months was really Dec-2027→end). Earliest start = -6 = Jun 2027. Horizon n = end − start drives every calc; floorCheck deflates the plan-end floor and depends on END only. */ /* v1.28: insOn = master €120 insurance toggle, on by default (matches prior behaviour) */ /* v1.15: spend = his typed actual monthly all-in spend for the surplus lens (0 = lens shows its prompt) */ /* v1.11: customY = the what-if net yield behind the 4th 'Custom yield' row (plan.blend may be 'custom'). v1.4: fresh devices start at 0/0/… (his call). v1.2: default anchor = PH; saved plans keep their own picks */
+function defaults(){return{plan:{principal:0,floor:0,start:0,end:48,blend:'target3',colMode:'f',anchor:'PH',sleeve:0,customY:3,spend:0,insOn:true,inflEng:INFL_DEFAULT,inflSpend:INFL_DEFAULT,home:HOME_DEFAULT,inflHome:INFL_HOME_DEFAULT},steps:{},ecb:null};} /* v1.33: inflEng + inflSpend = TWO independent inflation rates (%/yr), both default 2.3 = the old single INFL, so existing plans are byte-identical. inflEng drives the Engine floor check; inflSpend drives the Actual-spend lens (today's-euros line + real-preservation spend). His ask Jul 22 2026: let the engine calc and the actual-spend calc run on different inflation. */ /* v1.32: TWO plan dials — start & end (month indices, endLabel convention: index 1 = Jan 2028). Default start 0 = Dec 2027, end 48 = Dec 2031 → horizon 48 mo, IDENTICAL to the old single 'months:48' dial (old n=months was really Dec-2027→end). Earliest start = -6 = Jun 2027. Horizon n = end − start drives every calc; floorCheck deflates the plan-end floor and depends on END only. */ /* v1.28: insOn = master €120 insurance toggle, on by default (matches prior behaviour) */ /* v1.15: spend = his typed actual monthly all-in spend for the surplus lens (0 = lens shows its prompt) */ /* v1.11: customY = the what-if net yield behind the 4th 'Custom yield' row (plan.blend may be 'custom'). v1.4: fresh devices start at 0/0/… (his call). v1.2: default anchor = PH; saved plans keep their own picks */
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(!s)return defaults();const d=defaults();const sp=s.plan||{};
   /* v1.32 migration — MUST run on the RAW saved plan, before merging defaults (defaults now always
      carry end:48, which would mask the legacy field). A plan saved before the start dial carries
@@ -83,13 +85,21 @@ function verdict(budget,req){
   return{cls:'bad',glyph:'✕',word:'short',m};
 }
 function anchorC(){return COUNTRIES.find(c=>c.cc===state.plan.anchor)||COUNTRIES[0];}
-/* The NL apartment safety net, in TODAY’S money. Deliberately a frozen figure, NOT a
-   computing constant: floorCheck deflates the plan-end floor back to today and compares it
-   here, so both sides are already in the same (today’s) euros — auto-inflating this would
-   double-count. What it DOES need is a periodic human re-read: it is a 2026 asking price for
-   the kind of place he would rebuy, so it drifts with the Dutch market, not with CPI.
-   v1.40 review cadence: re-check it whenever the yield snapshots get re-stamped. */
-const SAFETY_NET=300000;
+/* v1.41 — THE HOME TARGET, replacing the frozen SAFETY_NET=300000 constant.
+   His numbers (Jul 26 2026): "about 250k would be fine, but that is in today's euros".
+   The planning question is NOT "what is my floor worth today" — it is "what will the house
+   COST by then". So the target is entered in TODAY'S euros and grown FORWARD to the plan-end
+   date, then compared to the plan-end floor: nominal vs nominal, same date, no deflator on
+   either side. When inflHome == inflEng this is arithmetically identical to the old
+   deflate-the-floor comparison — the whole point is that they are ALLOWED TO DIFFER, because
+   Dutch house prices have historically outrun the consumer basket, and that gap is exactly
+   the risk he is trying to see. Hence its own rate, defaulting ABOVE INFL_DEFAULT. */
+/* (HOME_DEFAULT / INFL_HOME_DEFAULT are declared at the TOP with INFL_DEFAULT — const TDZ:
+   defaults() runs at load, long before this line. Same trap as v1.33.) */
+function homeToday(){const v=+state.plan.home;return isFinite(v)&&v>=0?Math.round(v):HOME_DEFAULT;}
+function inflHome(){const v=+state.plan.inflHome;return isFinite(v)?Math.min(20,Math.max(0,Math.round(v*100)/100)):INFL_HOME_DEFAULT;}
+/* the target grown forward over the SAME horizon everything else uses (v1.38/v1.39) */
+function homeAt(end){return homeToday()*Math.pow(1+inflHome()/100,realYrs(end));}
 /* v1.33: TWO independent inflation rates (were the single const INFL=2.3). Both clamp 0–20 %/yr and
    fall back to INFL_DEFAULT if a saved value is junk. inflEng() drives the Engine floor check;
    inflSpend() drives the Actual-spend lens. His ask Jul 22 2026: engine + actual-spend on different rates. */
@@ -128,11 +138,14 @@ function realYrs(end){return (monthsToAnchor()+end)/12;}
    v1.33: deflation rate = inflEng() (was the shared INFL). */
 function floorCheck(floor,end){
   const infl=inflEng();
-  if(floor<=0)return{real:0,below:false,infl,txt:'Dials at zero — set the start principal and floor to see the inflation check.'};
+  if(floor<=0)return{real:0,target:0,gap:0,below:false,infl,txt:'Dials at zero — set the start principal and floor to see the inflation check.'};
   const yrs=realYrs(end); /* v1.38: the shared today→plan-end horizon */
   const real=floor/Math.pow(1+infl/100,yrs);
-  const below=real<SAFETY_NET;
-  return{real,below,infl,txt:'Ends '+endLabel(end)+' at '+fmtE(floor)+' — floor held by construction. At '+infl+'%/yr inflation ≈ '+fmtE(real)+' in today’s money — '+(below?'⚠ below':'still above')+' the '+fmtE(SAFETY_NET)+' NL apartment safety net.'};
+  /* v1.41: the home target grown FORWARD to the same date, at its OWN rate. below = the floor
+     does not cover the house by then. Both sides nominal, both at plan end — no deflator. */
+  const target=homeAt(end),gap=floor-target,below=gap<0;
+  return{real,target,gap,below,infl,
+    txt:'Ends '+endLabel(end)+' at '+fmtE(floor)+', held by construction (≈ '+fmtE(real)+' in today’s money at '+infl+'%/yr). A '+fmtE(homeToday())+' home today ≈ '+fmtE(target)+' by then at '+inflHome()+'%/yr — '+(below?'⚠ short by '+fmtE(-gap):'clears it by '+fmtE(gap))+'.'};
 }
 /* v1.15 SURPLUS LENS (v1.16: lives in MATCH, INFL const) — type the real all-in monthly
    spend; if it undercuts the mix yield the pot GROWS. Same declining-balance recurrence
@@ -193,6 +206,10 @@ function renderEngine(){
   h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chkFloor">'+fc.txt+'</div>';
   /* v1.33: inflation dial for the floor check — independent of the actual-spend lens rate (in Match) */
   h+='<div class="instog"><span class="instog-lbl">Inflation — floor check <span class="sub">deflates the plan-end floor to today’s money · today = '+nowLabel()+'</span></span><span class="cywrap"><input type="number" id="inEng" class="cyin" inputmode="decimal" min="0" max="20" step="0.1" value="'+inflEng()+'">%/yr</span></div>';
+  /* v1.41: the home target — entered in TODAY’S euros, grown forward at its own rate. Two rows,
+     one control each, mirroring the inflation-dial pattern. */
+  h+='<div class="instog"><span class="instog-lbl">Home target <span class="sub">what the place would cost TODAY — grown forward to '+endLabel(p.end)+'</span></span><span class="cywrap">€<input type="number" id="hmIn" class="cyin" style="width:6.2em" inputmode="numeric" min="0" step="5000" value="'+homeToday()+'"></span></div>';
+  h+='<div class="instog"><span class="instog-lbl">Inflation — housing <span class="sub">its own rate: Dutch house prices have run above CPI</span></span><span class="cywrap"><input type="number" id="inHome" class="cyin" inputmode="decimal" min="0" max="20" step="0.1" value="'+inflHome()+'">%/yr</span></div>';
   h+='<div class="foot">The budget spreads the principal→floor drawdown over the plan window (start → end). Pull the start earlier or the end later to lengthen the runway and the monthly budget drops; a shorter window raises it. Defaults sit at Dec 2027 → Dec 2031 (48 months); the start dial reaches back to Jun 2027, the end dial out to Dec 2040.</div></div>';
   h+='<div class="card"><div class="lbl">Instrument mix</div>';
   for(const b of BLENDS){
@@ -296,6 +313,12 @@ function bindEngine(){
   /* v1.33: floor-check inflation dial — live-updates the floor check only (does NOT touch the budget or Match) */
   const ie=$('#inEng');if(ie){ie.oninput=e=>{state.plan.inflEng=+e.target.value;save();updateEngineNumbers();};
     ie.onchange=e=>{state.plan.inflEng=inflEng();e.target.value=state.plan.inflEng;save();updateEngineNumbers();};}
+  /* v1.41: home target + housing rate. oninput only rewrites #chkFloor (updateEngineNumbers
+     never touches these inputs), so typing keeps focus — same reason #inSpend sits outside #spT. */
+  const hm=$('#hmIn');if(hm){hm.oninput=e=>{state.plan.home=+e.target.value;save();updateEngineNumbers();};
+    hm.onchange=e=>{state.plan.home=homeToday();e.target.value=state.plan.home;save();updateEngineNumbers();};}
+  const ih=$('#inHome');if(ih){ih.oninput=e=>{state.plan.inflHome=+e.target.value;save();updateEngineNumbers();};
+    ih.onchange=e=>{state.plan.inflHome=inflHome();e.target.value=state.plan.inflHome;save();updateEngineNumbers();};}
   $('#slv').onchange=e=>{state.plan.sleeve=Math.max(0,+e.target.value||0);save();renderLens();};
 }
 
