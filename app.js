@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.43.0';
+const APP_VERSION='1.44.0';
 const LS='waypoint:v1';
 const INFL_DEFAULT=2.3; /* %/yr — the seed for both inflation rates (was the single const INFL). His call Jul 19 2026: 2.3 conservative, was 2.0. Declared here (before defaults()/state init) so the plan can seed inflEng+inflSpend from it. */
 const HOME_DEFAULT=250000;    /* v1.41: the home target in TODAY'S euros (his number Jul 26 2026). Declared HERE, not next to homeToday(), because defaults() runs at load — const TDZ, same trap as INFL_DEFAULT in v1.33. */
@@ -420,7 +420,21 @@ function renderMatch(){
    due, amber within 60 days), Prinsjesdag is computed live (3rd Tuesday of September,
    every year until departure), standing monitors follow. Freshness line at the foot
    watches the snapshot stamps the same way the ECB drift line watches the rate. */
-function nextPrinsjesdag(){const now=new Date();for(let y=now.getFullYear();;y++){const first=new Date(y,8,1);const off=(2-first.getDay()+7)%7;const p=new Date(y,8,1+off+14);if(p>=now)return p;}}
+/* v1.44: same start-of-day fix — Prinsjesdag used to drop off the agenda at midnight on
+   Prinsjesdag itself, the one morning it matters most. `now` injectable for testing. */
+function nextPrinsjesdag(now){const n=startOfDay(now||new Date());for(let y=n.getFullYear();;y++){const first=new Date(y,8,1);const off=(2-first.getDay()+7)%7;const p=new Date(y,8,1+off+14);if(p>=n)return p;}}
+/* v1.44 — A RECURRING dated monitor carries a LIST of published dates and shows the
+   next one still ahead. The ECB row was recurring but held ONE hardcoded date, so the
+   morning after a decision it went permanently red and had to be rolled by hand — that,
+   not "ageing", was the real cause of backlog #24. Same spirit as nextPrinsjesdag(),
+   except these dates are PUBLISHED rather than computable, so the list is finite: when
+   it runs out the row falls back to the LAST date and goes overdue, which is the honest
+   signal that the calendar needs restocking. The app still never silently un-flags itself.
+   `now` is injectable so the rollover can be tested at any point on the calendar. */
+function startOfDay(d){const x=new Date(d);x.setHours(0,0,0,0);return x;}
+function nextDue(list,now){const n=startOfDay(now||new Date());
+  for(const s of list){const d=new Date(s+'T00:00:00');if(d>=n)return{due:d,exhausted:false};}
+  return{due:new Date(list[list.length-1]+'T00:00:00'),exhausted:true};}
 function dTo(d){return Math.ceil((d-new Date())/864e5);}
 const MN3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function shortDate(d){return MN3[d.getMonth()]+' '+d.getFullYear();}
@@ -429,6 +443,8 @@ function agendaCard(){
   const dated=[],standing=[];
   for(const m of MONITORS){
     if(m.prinsjesdag)dated.push({due:nextPrinsjesdag(),t:m.t,d:m.d});
+    else if(m.dues){const r=nextDue(m.dues);dated.push({due:r.due,t:m.t,
+      d:m.d+(r.exhausted?' ⚠ The published date list has run out — restock it from the source calendar.':'')});}
     else if(m.due)dated.push({due:new Date(m.due+'T00:00:00'),t:m.t,d:m.d});
     else standing.push(m);
   }
