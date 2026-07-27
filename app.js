@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.42.0';
+const APP_VERSION='1.43.0';
 const LS='waypoint:v1';
 const INFL_DEFAULT=2.3; /* %/yr — the seed for both inflation rates (was the single const INFL). His call Jul 19 2026: 2.3 conservative, was 2.0. Declared here (before defaults()/state init) so the plan can seed inflEng+inflSpend from it. */
 const HOME_DEFAULT=250000;    /* v1.41: the home target in TODAY'S euros (his number Jul 26 2026). Declared HERE, not next to homeToday(), because defaults() runs at load — const TDZ, same trap as INFL_DEFAULT in v1.33. */
@@ -138,14 +138,22 @@ function realYrs(end){return (monthsToAnchor()+end)/12;}
    v1.33: deflation rate = inflEng() (was the shared INFL). */
 function floorCheck(floor,end){
   const infl=inflEng();
-  if(floor<=0)return{real:0,target:0,gap:0,below:false,infl,txt:'Dials at zero — set the start principal and floor to see the inflation check.'};
+  if(floor<=0)return{real:0,target:0,gap:0,below:false,infl,html:'Dials at zero — set the start principal and floor to see the inflation check.'};
   const yrs=realYrs(end); /* v1.38: the shared today→plan-end horizon */
   const real=floor/Math.pow(1+infl/100,yrs);
   /* v1.41: the home target grown FORWARD to the same date, at its OWN rate. below = the floor
      does not cover the house by then. Both sides nominal, both at plan end — no deflator. */
   const target=homeAt(end),gap=floor-target,below=gap<0;
+  /* v1.43 — OPTION A, his pick: same sentence, the figures stop hiding in it. The three
+     numbers he actually reads (the floor, its today’s-money value, the home target) go into
+     .fig — serif face, tabular numerals — and the GAP leaves the prose entirely to become a
+     .gapchip carrying a GLYPH AND A SIGN (▲ + / ▼ −) as well as colour, so the verdict is
+     never colour-only. The chip is now the sole state carrier: the old whole-line .floorwarn
+     amber is GONE (it fought the chip’s red, two warning hues for one fact). Chosen over the
+     ledger and bar layouts to spend no extra vertical space. All interpolated values are
+     machine-formatted numbers/labels — no user free text reaches this HTML. */
   return{real,target,gap,below,infl,
-    txt:'Ends '+endLabel(end)+' at '+fmtE(floor)+', held by construction (≈ '+fmtE(real)+' in today’s money at '+infl+'%/yr). A '+fmtE(homeToday())+' home today ≈ '+fmtE(target)+' by then at '+inflHome()+'%/yr — '+(below?'⚠ short by '+fmtE(-gap):'clears it by '+fmtE(gap))+'.'};
+    html:'Ends <b class="fig">'+endLabel(end)+'</b> at <b class="fig">'+fmtE(floor)+'</b>, held by construction (≈ <b class="fig dim">'+fmtE(real)+'</b> in today’s money at '+infl+'%/yr). A <b class="fig dim">'+fmtE(homeToday())+'</b> home today ≈ <b class="fig">'+fmtE(target)+'</b> by then at '+inflHome()+'%/yr — <span class="gapchip '+(below?'neg':'pos')+'">'+(below?'▼ −'+fmtE(-gap):'▲ +'+fmtE(gap))+'</span>'};
 }
 /* v1.15 SURPLUS LENS (v1.16: lives in MATCH, INFL const) — type the real all-in monthly
    spend; if it undercuts the mix yield the pot GROWS. Same declining-balance recurrence
@@ -203,14 +211,14 @@ function renderEngine(){
   h+='<div class="slrow"><div class="slhead"><span>Plan end — off-ramp &amp; possible return</span><span class="num" id="tmV">'+endLabel(p.end)+' · '+n+' mo</span></div><input type="range" id="tmS" min="6" max="156" step="6" value="'+p.end+'"></div>';
   /* v1.40: id was #chk2032 — a year baked into an element name back when the plan ended in
      2032. Renamed to #chkFloor; the id is referenced only here and in updateEngineNumbers. */
-  h+='<div class="foot'+(fc.below?' floorwarn':'')+'" id="chkFloor">'+fc.txt+'</div>';
+  h+='<div class="fchk" id="chkFloor">'+fc.html+'</div>';
   /* v1.33: inflation dial for the floor check — independent of the actual-spend lens rate (in Match) */
   h+='<div class="instog"><span class="instog-lbl">Inflation — floor check <span class="sub">deflates the plan-end floor to today’s money · today = '+nowLabel()+'</span></span><span class="cywrap"><input type="number" id="inEng" class="cyin" inputmode="decimal" min="0" max="20" step="0.1" value="'+inflEng()+'">%/yr</span></div>';
   /* v1.41: the home target — entered in TODAY’S euros, grown forward at its own rate. Two rows,
      one control each, mirroring the inflation-dial pattern. */
   h+='<div class="instog"><span class="instog-lbl">Home target <span class="sub">what the place would cost TODAY — grown forward to '+endLabel(p.end)+'</span></span><span class="cywrap">€<input type="number" id="hmIn" class="cyin" style="width:6.2em" inputmode="numeric" min="0" step="5000" value="'+homeToday()+'"></span></div>';
   h+='<div class="instog"><span class="instog-lbl">Inflation — housing <span class="sub">its own rate: Dutch house prices have run above CPI</span></span><span class="cywrap"><input type="number" id="inHome" class="cyin" inputmode="decimal" min="0" max="20" step="0.1" value="'+inflHome()+'">%/yr</span></div>';
-  h+='<div class="foot">The budget spreads the principal→floor drawdown over the plan window (start → end). Pull the start earlier or the end later to lengthen the runway and the monthly budget drops; a shorter window raises it. Defaults sit at Dec 2027 → Dec 2031 (48 months); the start dial reaches back to Jun 2027, the end dial out to Dec 2040.</div></div>';
+  h+='</div>';
   h+='<div class="card"><div class="lbl">Instrument mix</div>';
   for(const b of BLENDS){
     const y=blendYield(b.mix),w=monthlyBudget(p.principal,p.floor,y,n),open=ui.blend===b.id;
@@ -279,7 +287,7 @@ function updateEngineNumbers(){
   $('#prV').textContent=fmtE(p.principal);$('#flV').textContent=fmtE(p.floor);
   $('#stV').textContent=endLabel(p.start);
   $('#tmV').textContent=endLabel(p.end)+' · '+n+' mo';$('#heroSpan').textContent=endLabel(p.start)+' → '+endLabel(p.end);
-  const fc=floorCheck(p.floor,p.end),ck=$('#chkFloor');ck.textContent=fc.txt;ck.classList.toggle('floorwarn',fc.below);
+  const fc=floorCheck(p.floor,p.end),ck=$('#chkFloor');ck.innerHTML=fc.html; /* v1.43: HTML now — the .gapchip carries the state, no whole-line class toggle */
   const fl=$('#flS');fl.max=p.principal;if(+fl.value>p.principal)fl.value=p.principal;
   /* v1.32: keep the start dial below the end dial — its max tracks end−6 (mirrors the floor≤principal guard) */
   const st=$('#stS');if(st){st.max=p.end-6;if(+st.value>p.end-6)st.value=p.end-6;}

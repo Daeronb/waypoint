@@ -27,6 +27,20 @@ section{display:flex;flex-direction:column;gap:10px;scroll-margin-top:8px}
 .secdiv .secsub{flex:1;color:var(--sec);font-size:.8rem}
 .floorwarn{color:var(--warn)!important}
 
+/* floor check (v1.43, option A) — the sentence stays, the figures step forward.
+   .fig = serif + tabular numerals so the euro amounts are scannable inside prose;
+   .fig.dim = the two secondary figures (today's-money value, the home-today input).
+   .gapchip = the verdict, pulled out of the sentence. Glyph + sign + colour, never
+   colour alone. Its own hues, so it reads against the warm paper in both states. */
+.fchk{color:var(--sec);font-size:.8rem;margin-top:10px;line-height:1.7}
+.fig{font-family:var(--serif);color:var(--ink);font-variant-numeric:tabular-nums;
+  font-size:1.06em;letter-spacing:.01em;white-space:nowrap}
+.fig.dim{color:var(--sec);font-size:1em}
+.gapchip{display:inline-block;font-family:var(--serif);font-variant-numeric:tabular-nums;
+  font-size:1.02em;line-height:1.35;border-radius:6px;padding:0 9px;border:1px solid;white-space:nowrap}
+.gapchip.pos{color:var(--ok);background:var(--okbg);border-color:var(--okbd)}
+.gapchip.neg{color:var(--bad);background:var(--badbg);border-color:var(--badbd)}
+
 /* labels & footers */
 .lbl{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .lbl.sect{margin:14px 2px 0;padding-top:12px;border-top:1px dashed var(--line)}

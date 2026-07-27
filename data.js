@@ -140,7 +140,7 @@
    Not financial, tax, legal or immigration advice — verify load-bearing items locally. */
 
 const DATA_STAMP='2026-07-19';
-const ECB_STAMP={dfr:2.25,asOf:'2026-06-17',estr:2.18,note:'ECB decides again 23 Jul 2026 — hiking cycle; re-stamp snapshots after'};
+const ECB_STAMP={dfr:2.25,asOf:'2026-07-23',estr:2.18,note:'Held at the 23 Jul 2026 meeting — DFR unchanged since 17 Jun 2026; the Governing Council is explicitly meeting-by-meeting, no pre-commitment. Next decision 10 Sep 2026.'};
 const MMF_SPREAD=-0.08;   // MMF-ETF yield ≈ DFR − 0.08 (derivable live)
 const INSURANCE=120;      // IMG Global ~€120/mo — his researched pick, named so he remembers which one won
 /* v1.40: HORIZON_MO (60) and HORIZON_LABEL ('2028 → 2032') REMOVED — dead constants,
@@ -157,8 +157,8 @@ const STALE_DAYS=183;
    date of their own. Resolving a dated item = do the thing, then update/remove the
    entry in the next build (the app never silently un-flags itself). */
 const MONITORS=[
-  {due:'2026-07-23',t:'ECB decision — re-stamp the yield snapshots',
-    d:'Hiking cycle. After the decision: re-stamp DFR/€STR + the instrument yields (oldest stamps Apr–May 2026) and bump the data snapshot. The Engine drift line warns meanwhile. Path p4.'},
+  {due:'2026-09-10',t:'ECB decision — re-stamp the yield snapshots',
+    d:'Re-stamped 27 Jul 2026: the 23 Jul decision was a HOLD — DFR 2.25% / €STR 2.185%, unchanged since 17 Jun, ECB data-dependent and meeting-by-meeting (no hiking path pre-committed). Instrument yields deliberately NOT re-stamped: the front-end anchor did not move and every stamp is still inside the 183-day window, so their true age keeps showing. Next decision 10 Sep 2026 (Berlin) — after it, re-check DFR/€STR and the instrument yields (oldest stamps Apr–May 2026) and bump the data snapshot if anything moved. The Engine drift line warns meanwhile. Path p4.'},
   {prinsjesdag:true,t:'Prinsjesdag — NL exit-tax / inwonerschapsfictie check',
     d:'Check the Belastingplan package + the emigrant-exit-tax exploration AND the new cabinet’s formation/tax agenda. If a concrete bill lands, accelerate the exit — the fast path is ≈3.5 months to entry into force (see the Playbooks monitor card). Every September until departure.'},
   {due:'2027-12-31',t:'Hard deadline — NL deregistration complete before 1 Jan 2028',
@@ -432,7 +432,7 @@ const PATH=[
     {id:'p1',t:'Open IBKR while still NL-resident',dep:'Before deregistering — NL/EU brokers re-KYC or close on emigration; IBKR survives relocation and trades bonds.'},
     {id:'p2',t:'Open Swissquote BEFORE leaving NL — broker backup AND the off-ramp proceeds bank',dep:'Guardrail 3. Digital onboarding needs the NL address; it is where the Kraken sale lands (decision-tree Q3: destination = Swissquote, never a remittance-country bank). Holds LINK natively; CHF 10k min, expat-built, second regulator. Dukascopy = second choice.'},
     {id:'p3',t:'Verify Kraken fully while NL-resident',dep:'KYC is easiest as a resident. The address switch comes EARLY — set Kraken to the first real PH address at the START of travels (supersedes the old after-TRC rule; see Nomad).'},
-    {id:'p4',t:'Re-stamp yield snapshots after the 23 Jul 2026 ECB decision',dep:'Hiking cycle — the app warns when the live anchor moves off the snapshots.'},
+    {id:'p4',t:'Re-stamp yield snapshots after each ECB decision',dep:'Standing hygiene, not a one-off — the Agenda row carries the next date (10 Sep 2026). The app warns when the live anchor drifts off the snapshots.'},
     {id:'p5',t:'Deploy the ~€45k into the market; record lot dates',dep:'Lot dates feed the Koinly report + provenance dossier (source-of-funds proof). The old CZ 3-year-clock rationale is retired — CZ is not the fallback (per-lot resets, see the CZ card).'},
     {id:'p6',t:'Line up IMG Global insurance (~€120/mo)',dep:'His researched winner — already inside every burn number in Match.'},
     {id:'p7',t:'Skip term deposits — iBonds replaced them',dep:'Research-5: fixed-maturity iBonds ETFs beat Raisin deposits on yield, liquidity AND residency. Nothing residence-tied should hold the €350k.'},
