@@ -1,9 +1,9 @@
 'use strict';
-const APP_VERSION='1.44.0';
+const APP_VERSION='1.45.0';
 const LS='waypoint:v1';
 const INFL_DEFAULT=2.3; /* %/yr — the seed for both inflation rates (was the single const INFL). His call Jul 19 2026: 2.3 conservative, was 2.0. Declared here (before defaults()/state init) so the plan can seed inflEng+inflSpend from it. */
 const HOME_DEFAULT=250000;    /* v1.41: the home target in TODAY'S euros (his number Jul 26 2026). Declared HERE, not next to homeToday(), because defaults() runs at load — const TDZ, same trap as INFL_DEFAULT in v1.33. */
-const INFL_HOME_DEFAULT=3.0;  /* v1.41: %/yr for the home target — deliberately ABOVE INFL_DEFAULT (2.3); Dutch house prices have run above CPI, and that divergence is the whole reason this rate is separate. */
+const INFL_HOME_DEFAULT=3.5;  /* v1.41: %/yr for the home target — deliberately ABOVE INFL_DEFAULT (2.3); Dutch house prices have run above CPI, and that divergence is the whole reason this rate is separate. v1.45: 3.0 → 3.5 (his call, 29 Jul 2026). DNB forecasts +3.5/+3.0/+4.0 for 2026-28 and ABN +3/+4, so 3.5 sits mid-range. ⚠ THIS IS NOW THE MOST LOAD-BEARING ASSUMPTION IN THE PLAN: it sets the home target AND, through the floor dial, the entire drawdown budget. At a €310k pot and 3% housing there is ≈€16.5k of total drawdown room before the home target fails; at 4% there is ≈€0. */
 
 /* ---------- helpers ---------- */
 const $=s=>document.querySelector(s);
