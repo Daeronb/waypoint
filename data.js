@@ -163,8 +163,8 @@ const MONITORS=[
     d:'🚨 PRINSJESDAG 15 SEP 2026 IS NOW THE MOST IMPORTANT DATED ITEM IN THIS PLAN — the box-3 NOVELLE lands that day. ⚠ RETRACTION (29 Jul 2026): an earlier version of this app said the bill PASSED the Eerste Kamer on 7 Jul 2026. IT DID NOT. The EK debated on 30 Jun, tabled four motions, and POSTPONED the vote on the bill itself, until the plenary treatment of the announced novelle(s). On 7 Jul only motie-Schalk was voted — rejected; the other three were aangehouden. The bill is NOT law. See the 1 Jan 2028 row. WHAT TO READ ON THE DAY, in order: (1) THE NOVELLE — does it keep 1 Jan 2028, and which of the 19-Jun softenings survived (one year of carry-back, rate 36 → 35%, heffingvrij resultaat €1.800 → €1.900, doorschuif on marriage and divorce)? (2) 🎯 THE HOOFDLIJNENBRIEF ON THE FULL VERMOGENSWINSTBELASTING — scan it for the words emigratie, afrekening, eindafrekening, conserverende aanslag. That is the early-warning signal for the risk that actually matters now. (3) Belastingplan 2027: the 2027 forfait on overige bezittingen (~6,37%, still press-sourced only) and the heffingvrij vermogen. (4) The inwonerschapsfictie motion. (5) The trailing tax — studied and SHELVED Dec 2025 (yield only €16-38m/yr, ~90% of cases conflict with tax treaties, decision punted to a next cabinet); low priority now. Every September until departure.'},
   {due:'2027-12-31',t:'Hard deadline — NL deregistration complete before 1 Jan 2028',
     d:'⚖ NOT LAW — AND THE RISK HAS CHANGED SHAPE. ⚠ RETRACTED 29 Jul 2026: this row previously said the Wet werkelijk rendement box 3 (36748) was ENACTED on 7 Jul 2026. It was not — that was a motion vote read as passage of the bill. It passed the TWEEDE KAMER on 12 Feb 2026, but the EERSTE KAMER POSTPONED its vote on 30 Jun 2026 pending an announced novelle. Novelle due Prinsjesdag 15 Sep 2026 → Tweede Kamer into early 2027 → EK treatment from Jan 2027. 1 Jan 2028 remains the official intended start by koninklijk besluit, but it is now genuinely at risk rather than merely capable of slipping. WHAT THE BILL WOULD DO: vermogensaanwas — an annual tax on UNREALISED gains — as the MAIN rule, so a crypto position is taxed on paper gains every year it is held; flat 36%, heffingvrij resultaat €1.800, losses carry FORWARD only (carry-back dropped). 🚨 THE NEW #1 TAIL RISK IS NOT THIS BILL — IT IS ITS REPLACEMENT. Both the cabinet (19 Jun letter: the accrual bill is a tussenstap) and an Eerste Kamer majority (CDA and VVD on the record, 30 Jun) want the END STATE to be a full VERMOGENSWINSTBELASTING — realisation-based, every asset class. AND THE BILL ALREADY CONTAINS THE EXIT CHARGE THAT DESIGN NEEDS: art. 5.37 Wet IB 2001 (nieuw) deems a disposal at market value immediately before residence ends, for the assets already on a realisation basis (foreign immovable property, startersaandelen), made te conserveren inkomen via the art. 2.8 amendment → conserverende aanslag with uitstel van betaling. Treaty-tiebreaker deemed non-residence is expressly caught. ⇒ EXTENDING REALISATION TO CRYPTO EXTENDS ART. 5.37 TO CRYPTO. Accrual needs no exit charge because it taxes as you go; realisation structurally requires one — and the template is already drafted. ⚠ NEVER REPEAT THE OLD LINE THAT THE ACT CONTAINS NO EMIGRATION EXIT-CHARGE: true only of the version now being replaced. ⚠ AND THE MID-2028 FALLBACK NEVER EXISTED — art. 5.12 lid 2 closes the accrual window ON the departure date and settles every unrealised gain immediately, no deferral. TIMING: a full VWB needs ≈19 months after adoption (State Secretary) ⇒ 2030 at the earliest, and the novelle cannot create a crypto exit charge because it amends a bill whose crypto limb is accrual. ⇒ MID-2027 HAS REAL SLACK. Do not accelerate; do not slip. Path x5 is the master-shield checklist. Verified against eerstekamer.nl, 29 Jul 2026.'},
-  {due:'2030-01-01',t:'iBonds-2029 pays out ≈€77k cash (Priced powder)',
-    d:'The deploy sleeve matures at par — powder auto-refills for the 2030–31 home window. Decide then: re-park (MMF / next rung) or hold as the home tranche.'},
+  {due:'2030-01-01',t:'iBonds-2029 rung pays out at par — ≈€56–90k cash depending on the mix',
+    d:'The first ladder rung matures. EVERY mix holds one, so the powder refills itself for the 2030–31 home window with no sale and no mark: Never red ≈€90k · Ladder ≈€84k · Cash + ladder ≈€62k · Long ladder ≈€56k, on a €310k pot. Decide then: re-park it (MMF, or an iBonds 2032/2033 rung — those exist by now and extend the ladder if the plan runs longer) or hold it as the home tranche.'},
   {due:'2032-01-01',t:'iBonds-2031 pays out — the plan-end lock matures',
     d:'Cash lands at par exactly at the Dec 2031 plan end. The Fork decision (stay vs return) should already be made by now.'},
   {t:'TH remittance decree — monitor, never plan on it',
@@ -259,56 +259,70 @@ const INSTRUMENTS={
 
 const POWDER_RANK=['','pure dry powder','rallies in a crash','mild dip, quick recovery','hold through the storm','anti-powder (locked)'];
 
-/* Blends v1.10 (new iBonds shelf, 2026-07-17) — same spine: ≈29% (≈€90k on a €310k pot) dry powder
-   that never falls in a crash and sells in 2–4 business days, + a core locked to
-   printed maturity dates inside the 2030–2032 return window. Ids kept ('target3'
-   now renders "Early home") so a saved plan in localStorage survives.
-   v1.17 (2026-07-19): display names → the RISK-STORY set, his pick (ids unchanged):
-   safety "Never red" · target3 "Early home" · allig "Safe powder" · deploy "Priced
-   powder". Rationale: the %/€ column already tells the reward story, so the name
-   carries the risk story — what the powder is and which option each mix preserves
-   ("Max yield" had become false next to deploy's 3.39).
-   DUAL-DESTINATION POWDER (his framing, Jul 2026): the ≈€90k powder is an option on
-   whichever opportunity shows up — crash-deploy into cheap stocks/BTC, OR the first
-   tranche of an early NL home purchase. One pot, one choice, made at the moment;
-   a crash makes property AND stocks cheap at once, so using it one way foregoes
-   the other. The Early-home blend is built so powder + the 2030 rung together reach
-   apartment money (≈€208k) without ever breaking the 2031 lock.
-   All yields NET of fees — v1.1 blends for history: safety 2.71, target3 2.99, allig 3.08.
-   v1.12 (2026-07-18): per-instrument `why` — each slice's earned place, blend-specific
-   (the two-panic-flavours reasoning from the Jul 18 session now travels with the blend).
-   v1.14 (2026-07-19): + 'deploy' — the ONE blend that deliberately breaks the
-   crash-proof-powder spine: bounded-loss ib29 sleeve + €25k float instead of the
-   ≈€90k no-loss pot (his call; rationale in the header v1.14 block). */
+/* Blends v1.46 (2026-07-29) — THE LADDER REDESIGN. Back to the drawing table on his
+   ask, re-optimised for the CURRENT numbers: €310k pot (not €350k), €235k home target
+   in today's euros, housing 3.5%, inflation 2.7%, fresh shelf.
+
+   WHAT CHANGED AND WHY. All four previous mixes were BARBELLS — a fat cash tier plus a
+   single long bullet — and the shelf says that is the wrong shape. Price liquidity per
+   year bought: iBonds-2031 -> 2030 is 17bp for one year, 2031 -> 2029 is 31bp for two
+   (≈16bp/yr); but 2029 -> MMF is 108bp for 2.6 years (≈42bp/yr). The BACK of the curve
+   is nearly flat and the FRONT is steep, so spreading the core across maturity dates
+   costs almost nothing while holding cash is where all the yield actually goes. Every
+   mix below is therefore a LADDER: a tranche maturing AT PAR every ~12 months, which is
+   the structural answer to a need arriving at an unknown DATE — the money appears
+   without a sale and without a mark.
+
+   🚨 THE POWDER RE-DERIVATION. The old ≈29% powder budget was set for a €350k pot. It
+   still stands at ≈29%, but for a corrected reason: the ≈€52k at Kraken is NOT dry
+   powder — it buys BTC before departure (that is one of the reasons for leaving), so
+   every euro of crash-deploy firepower in the 2028–2032 window has to come from inside
+   this pot. What changed is the powder's COMPOSITION: a short iBonds rung is powder too,
+   at a priced mark, and it pays 77–108bp more than cash while it waits.
+
+   IDS DELIBERATELY KEPT so a saved plan in localStorage lands on its intended successor:
+   safety -> Never red (mix unchanged, it re-optimises to itself) · target3 -> "Cash +
+   ladder" (the Early home rebuild — SAME 3.17% yield, more cash earlier) · allig ->
+   "Ladder" (was Safe powder) · deploy -> "Long ladder" (was Priced powder).
+   RETIRED: Early home as a purpose (its tranche fell ≈€64–84k short of a house once the
+   pot was corrected to €310k) · Safe powder and Priced powder as shapes (single-bullet
+   books paying only 1–2bp for holding everything to Jan 2032).
+   Earlier history: v1.1 safety 2.71 / target3 2.99 / allig 3.08 · v1.10 the iBonds shelf
+   · v1.12 per-instrument `why` · v1.14 the bounded-loss 'deploy' sleeve · v1.17 the
+   risk-story names. All yields NET of fees. */
 const BLENDS=[
-  {id:'safety',name:'Never red',sub:'≈€90k powder (MMF+govt) + core in Schatz rolls & iBonds-2029 — nothing meaningfully red, ever; ≈€220k sellable within days',
+  {id:'safety',name:'Never red',sub:'NO MARKS, EVER. ≈€90k powder (MMF+govt) + core in Schatz rolls & iBonds-2029 — nothing meaningfully red in any year, ≈€220k sellable within days, and the WHOLE ≈€310k is cash at par by Jan 2030. Raising €90k into a severe crash costs ≈€3; buying the house early costs nothing at any date. ⚠ The honest catch, named here for the first time: the 42% Schatz slice must be ROLLED in 2029 at whatever the 2y pays then, so this is the one mix whose income is NOT locked for the full run. Costs ≈€146/mo against Long ladder. (Euro figures on a €310k pot — set the dials to match yours.)',
     mix:{mmf:.12,govt:.17,schatz:.42,ib29:.29},
     why:{
       mmf:'First-line cash. The one slice with no minus sign in ANY panic — including a 2022-style rate spike, where even short govts go red. Spendable in days, and it floats UP with ECB hikes.',
       govt:'Crash-rally powder. 1–3y govts are the flight-to-quality asset: in an equity crash they usually RISE — you sell high exactly when everything else is cheap.',
-      schatz:'The safe core. German 2y held to maturity: no fund fee, no credit worry, and mid-life price wobbles don’t matter — it pays out at par on a printed date, then rolls.',
+      schatz:'The safe core. German 2y held to maturity: no fund fee, no credit worry, and mid-life price wobbles do not matter — it pays out at par on a printed date. ⚠ But it then has to be ROLLED at the 2029 2y rate, which nobody can quote today. That reinvestment risk is the price of this blend paying no marks: the certainty is about VALUE, not about INCOME.',
       ib29:'The yield engine of this blend. IG corporates locked to Dec 2029: any dip must close by the printed maturity (pull-to-par) — a drawdown with an end date.'}},
-  {id:'target3',name:'Early home',sub:'DUAL-DESTINATION powder: ≈€90k powder + ≈€118k iBonds-2030 ≈ €208k in 2027 euros (≈flat in nominal terms while you live off the yield) — pointable at an NL home at ANY early-return date (early-exit ≈ −1–3% worst case, €0 from Jan 2031), or left invested as crash powder + apartment tranche if plans hold. ⚠ A €250k home in TODAY’S euros costs ≈€292k by Jan-2031 at 3.5%/yr, so the tranche lands ≈€84k short — see the iBonds-2030 slice. The ≈€102k iBonds-2031 lock rides to maturity untouched either way. (Euro figures on a €310k pot — set the dials to match yours.)',
-    mix:{mmf:.05,govt:.24,ib30:.38,ib31:.33},
+  {id:'target3',name:'Cash + ladder',sub:'ZERO-MARK POWDER + A RUNG A YEAR. ≈€53k instantly liquid plus a ≈€37k Schatz second line — ≈€90k of powder that costs ≈€4 to raise in a severe crash — then a tranche maturing at par every ~12 months: ≈€152k cash by Jan 2030, ≈€229k by Jan 2031. Replaces the old Early home at the IDENTICAL 3.17%: same yield, ≈€62k more cash in 2030 and ≈€21k more in 2031. Pick this if the crash powder has to be spendable at any moment without looking at a mark. (Euro figures on a €310k pot — set the dials to match yours.)',
+    mix:{mmf:.05,govt:.12,schatz:.12,ib29:.20,ib30:.25,ib31:.26},
     why:{
-      mmf:'The checking-account tier — known to the euro in EVERY panic flavour, even a 2022-style rate spike where govt paper is red too. Costs ≈€7/mo vs parking it in Schatz (on a €310k book): the price of a slice that can never show a minus at the worst moment.',
-      govt:'The crash powder. Flight-to-quality paper that usually rallies in exactly the panic you’d deploy into — bonus yield AND a bonus sale price, one-click ETF sale from anywhere.',
-      ib30:'The home-completion tranche. Cashes out Jan 2031; with the powder ≈ €208k — but that figure is in 2027 euros and stays FLAT, because you spend the yield rather than reinvest it. The target does not: a €250k home in today’s euros costs ≈€272k by Jan-2029, ≈€282k by Jan-2030, ≈€292k by Jan-2031 at 3.5%/yr housing. Closing the ≈€64–84k gap = shifting that much iBonds-2031 → here, at ≈€9–12/mo of forgone yield (3.56 vs 3.39) — a documented dial, deliberately NOT baked in. ⚠ ON A €310k POT THAT GAP NOW EXCEEDS MOST OF THE ≈€102k LOCK, so this blend can no longer fully fund an early home purchase without effectively dismantling it — the honest read is that an early buy needs either a bigger pot or a later date. Otherwise top up from the lock at sale: by Jan-2031 its duration is ≈1, so even a 2% rate shock costs ≈€560.',
-      ib31:'The plan-end lock. Top net yield on the shelf, pays out cash ~Jan 2032 exactly at plan end. The slice that never needs to move — which is why it can afford to be the longest.'}},
-  {id:'allig',name:'Safe powder',sub:'FRN-boosted powder + everything else locked in iBonds-2031 to plan end — max extraction; an early home purchase here means waiting for the Jan 2032 cash-out or shaving small slices off the lock early',
-    mix:{frn:.14,govt:.15,ib31:.71},
+      mmf:'The checking tier — ≈€15k that can never print a minus in any panic flavour, sized to bridge the QUARTERLY distributions into monthly spending. First euros out of any raise.',
+      govt:'First-line crash powder. Flight-to-quality paper that usually rallies in exactly the panic you would deploy into — bonus yield AND a bonus sale price, one-click ETF sale from anywhere.',
+      schatz:'The second powder line, at a yield. German 2y pays 34bp over the govt ETF and rallies in the same panics; the price is a bond-capable broker and one roll around 2029. This is what lets the blend hold ≈€90k of true zero-mark powder without paying MMF rates on all of it.',
+      ib29:'Rung one. Pays out ≈€62k cash AT PAR on ~1 Jan 2030 — the powder refills itself before the home window opens, with no sale and no mark. Sold early into a severe crash it prices at ≈−3–4%: a ≈9:1 exchange against a −30% market, clear of the 3:1 bar.',
+      ib30:'Rung two, ≈€78k at par on ~1 Jan 2031. Powder + rung one + rung two ≈ €229k of cash a full year before plan end — the slice that makes an unplanned early purchase cheap (≈€1,241 at Jan-2031 even in a severe shock) rather than free.',
+      ib31:'Rung three, ≈€81k at par ~1 Jan 2032. Deliberately the smallest 2031 slice on the menu: this blend spends the last 17bp buying earliness instead.'}},
+  {id:'allig',name:'Ladder',sub:'A RUNG A YEAR, LEAN CASH. ≈€47k liquid, then ≈€130k at par by Jan 2030 and ≈€217k by Jan 2031 — something turns into cash without a decision every ~12 months, so a need arriving at an unknown DATE is met by WAITING rather than by selling into whatever the market is doing. Raising €90k into a severe crash costs ≈€1,900: a ≈14:1 exchange against a −30% market, well clear of the 3:1 bar. Same yield as the old Safe powder with ≈€127k more cash by Jan 2031; the trade is ≈€43k less zero-mark powder on day one. (Euro figures on a €310k pot — set the dials to match yours.)',
+    mix:{mmf:.08,govt:.07,ib29:.27,ib30:.28,ib31:.30},
     why:{
-      frn:'Powder with a yield kicker. IG floating-rate notes ≈ MMF +30bp, coupons reset quarterly so it floats UP with hikes. Worst dip ever −3.8%, recovered in weeks — second-line powder, not first-line.',
-      govt:'Keeps one true crash-rally line in the powder: FRN dips a little in a panic, short govts usually rise — together they cover both panic flavours.',
-      ib31:'Everything else, locked to plan end at the shelf’s top net yield — max extraction, with a printed Jan 2032 payout so every drawdown has a date-certain end.'}},
-  {id:'deploy',name:'Priced powder',sub:'BOUNDED-LOSS powder (Jul 2026 rethink): ≈€25k MMF checking float + ≈€77k iBonds-2029 deploy sleeve — worst crash mark ≈ −4–8% today, shrinking every year and healed by the printed Dec 2029 date, after which it IS cash for the 2030-31 window — + ≈€248k locked to plan end. Sell the sleeve at ≈−3–4 to buy a −30% market (≈12:1 exchange): the crash-proof-powder rule traded for ≈+€38/mo over Safe powder.',
-    mix:{mmf:.07,ib29:.22,ib31:.71},
+      mmf:'The checking float, ≈€25k — the quarterly-distribution smoother and the first euros out of any raise. Never prints a minus, in any panic flavour.',
+      govt:'The one true crash-rally line, kept small on purpose. ≈€22k of flight-to-quality paper that tends to RISE in an equity panic, so there is always something to sell high even before a rung is touched.',
+      ib29:'Rung one AND the working powder, ≈€84k — the biggest 2029 slice on the menu. Short and shrinking duration: a severe-crash mark of ≈−3–4% today, ≈−2% by 2029, healed by the printed date. Then it IS cash, ≈€84k at par on ~1 Jan 2030.',
+      ib30:'Rung two, ≈€87k at par on ~1 Jan 2031 — one year before plan end, which is what makes an early or an on-time purchase equally fundable. Cumulative par cash by then ≈€217k.',
+      ib31:'Rung three, ≈€93k at par ~1 Jan 2032. The shelf top yield, and the only slice that would still be sold at a mark if the whole pot were needed before plan end — by Jan 2031 its duration is ≈1, so even a 2% shock on it costs ≈€560.'}},
+  {id:'deploy',name:'Long ladder',sub:'MAX YIELD INSIDE A LADDER. Back-weighted: ≈€19k float, ≈€74k at par by Jan 2030, ≈€152k by Jan 2031, the rest locked to plan end. Matches the old Priced powder to within €4/mo while putting ≈€62k more of the pot at par a year early — the strictly better version of a single-bullet book. The cost is comfort, and it is real: only ≈€19k of zero-mark cash, a ≈−6% book mark in a severe rate-and-spread panic, ≈€3,500 to raise €90k into a crash and ≈€3,380 to buy the house early at Jan 2031. Pick this if the plan happens roughly as written. (Euro figures on a €310k pot — set the dials to match yours.)',
+    mix:{mmf:.06,ib29:.18,ib30:.25,ib31:.51},
     why:{
-      mmf:'The checking float, not crash powder: ≈€25k that can never print a minus, sized to bridge living costs alongside the distributions until the 2029 rung matures. First euros out of any raise.',
-      ib29:'The bounded-loss deploy sleeve. Short and shrinking duration: crash marks ≈ −4% by 2028, healed by the printed date. Selling at −3–4 to buy stocks at −30 ≈ 12:1 in a credit crash, ≈5:1 even in a 2022-style rate spike — both clear the 3:1 crypto bar (sell BTC −10, buy alts −30). Pays out ≈€77k cash Jan 2030: the powder refills itself for the home window.',
-      ib31:'The plan-end lock, same slice as Safe powder: the shelf’s top net yield, paying out cash ~Jan 2032 exactly at plan end. Deploys come from the float and the 2029 sleeve — this slice never needs to move.'}}
+      mmf:'The float, not crash powder: ≈€19k that can never print a minus, sized to bridge living costs alongside the quarterly distributions. Thin by design — this blend buys yield with the powder budget.',
+      ib29:'Rung one, ≈€56k at par ~1 Jan 2030, and the whole of the bounded-loss powder. Selling it at ≈−3–4 to buy a −30% market is still ≈9:1, but with only ≈€19k of cash behind it this rung IS the crash response, not a supplement to it.',
+      ib30:'Rung two, ≈€78k at par ~1 Jan 2031. The one concession to bendability in this mix — and the reason it beats the single-bullet book it replaces at the same yield.',
+      ib31:'The plan-end lock, ≈€158k — half the book, at the shelf top net yield, paying out cash ~Jan 2032. This slice never needs to move if the plan holds; if it does, it is the expensive one to touch.'}}
 ];
-
 const BROKERS=[
   {n:'IBKR',star:true,v:'ok',glyph:'✓',word:'survives',d:'Keeps clients on relocation. Open while still NL-resident (signup wants A tax residency), update to the anchor later. Trades bonds (Schatz). Withholding follows declared residency.'},
   {n:'Swissquote',star:true,v:'ok',glyph:'✓',word:'survives',d:'Built for expats — “keep the same account every time you move”. CHF 10k min, non-resident surcharge ~CHF 10–30/mo (cheap insurance). Swiss custody = outside the EU regulator, still CRS-reports to declared residence.'},
