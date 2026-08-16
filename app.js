@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.51.1';
+const APP_VERSION='1.52.0';
 const LS='waypoint:v1';
 const INFL_DEFAULT=2.3; /* %/yr — the seed for both inflation rates (was the single const INFL). His call Jul 19 2026: 2.3 conservative, was 2.0. Declared here (before defaults()/state init) so the plan can seed inflEng+inflSpend from it. */
 const HOME_DEFAULT=250000;    /* v1.41: the home target in TODAY'S euros (his number Jul 26 2026). Declared HERE, not next to homeToday(), because defaults() runs at load — const TDZ, same trap as INFL_DEFAULT in v1.33. */
@@ -367,9 +367,10 @@ function renderMatch(){
     h+='<div class="card cc'+(open?' open':'')+'" data-cc="'+c.cc+'"><div class="chead"><div><b>'+c.f+' '+esc(c.n)+'</b> <span class="sub">'+esc(c.col.city)+'</span>'+(c.col.verified?'':' '+estmark())+tags;
     h+='<div class="sub num">'+(insOn?fmtE(col)+' + '+fmtE(INSURANCE)+' insurance = ':'')+'<span class="tot">'+fmtE(r.req)+'</span>'+(insOn?'':' <span class="insoff">insurance off</span>')+'</div></div>';
     h+='<span class="chip '+r.v.cls+'"><b>'+r.v.glyph+'</b> '+r.v.word+' '+(r.v.m>=0?'+':'−')+fmtE(Math.abs(r.v.m))+'</span></div>';
+    /* v1.52: place NOTES render only when the country card is OPEN — the rows (name, sub, badges, total, verdict) stay visible collapsed because that IS the at-a-glance comparison. His call 16 Aug 2026: the prose belongs behind the uncollapse, the numbers do not. */
     if(c.places){h+='<div class="places"><div class="placelbl">Places costed'+(state.plan.colMode==='n'?' · real figures (hand-costed basis)':'')+'</div>';
       for(const pl of c.places){const preq=pl.f+visaOf(c)+insAmt(),pv=verdict(en.w,preq);
-        h+='<div class="placerow"><span class="chip '+pv.cls+' pmini"><b>'+pv.glyph+'</b></span><div class="pinfo"><b>'+esc(pl.name)+'</b> <span class="sub">'+esc(pl.sub||'')+'</span>'+(pl.verified?'':' '+estmark())+(pl.pool?' '+poolmark():'')+(pl.beefMix?' '+mixmark():'')+'<div class="sub num">'+(insOn?fmtE(pl.f+visaOf(c))+' + '+fmtE(INSURANCE)+' = ':'')+'<span class="tot">'+fmtE(preq)+'</span> · '+pv.word+' '+(pv.m>=0?'+':'−')+fmtE(Math.abs(pv.m))+'</div>'+(pl.note?'<div class="pnote sub">'+esc(pl.note)+'</div>':'')+'</div></div>';}
+        h+='<div class="placerow"><span class="chip '+pv.cls+' pmini"><b>'+pv.glyph+'</b></span><div class="pinfo"><b>'+esc(pl.name)+'</b> <span class="sub">'+esc(pl.sub||'')+'</span>'+(pl.verified?'':' '+estmark())+(pl.pool?' '+poolmark():'')+(pl.beefMix?' '+mixmark():'')+'<div class="sub num">'+(insOn?fmtE(pl.f+visaOf(c))+' + '+fmtE(INSURANCE)+' = ':'')+'<span class="tot">'+fmtE(preq)+'</span> · '+pv.word+' '+(pv.m>=0?'+':'−')+fmtE(Math.abs(pv.m))+'</div>'+(open&&pl.note?'<div class="pnote sub">'+esc(pl.note)+'</div>':'')+'</div></div>';}
       h+='</div>';}
     if(open){h+='<div class="cbody">'+stampLine(c.stamp);
       h+='<div class="kv"><span>Stay</span>'+esc(c.stay||'—')+'</div>';
@@ -391,10 +392,19 @@ function renderMatch(){
     const a=c.anchor,on=p.anchor===c.cc;
     h+='<label class="pick anch'+(on?' on':'')+'"><input type="radio" name="anchor" value="'+c.cc+'"'+(on?' checked':'')+'>';
     h+='<span class="pickbody"><span class="pickhead"><b>'+c.f+' '+esc(c.n)+'</b>'+(c.primary?' <span class="star">⭐ primary</span>':'')+'<span class="sub">'+esc(a.verdict)+'</span></span>';
-    h+='<span class="kv"><span>TRC</span>'+esc(a.trc)+'</span>';
-    h+='<span class="kv"><span>Coaching</span>'+esc(a.coach)+'</span>';
-    h+='<span class="kv"><span>Off-ramp</span>'+esc(a.off)+'</span>';
-    for(const g of a.gates)h+='<span class="gate"><b>⚠</b> '+esc(g)+'</span>';
+    /* v1.52: the anchor DETAIL renders only for the SELECTED anchor. Unselected candidates keep
+       their one-line verdict, which is what you compare on; the TRC/coaching/off-ramp prose and the
+       ⚠ gates only matter for the one you are actually choosing, and they were 5,208 chars of
+       always-on text — half of everything visible in Match. Selecting a card reveals its own detail,
+       so no new control was added. His call 16 Aug 2026. */
+    if(on){
+      h+='<span class="kv"><span>TRC</span>'+esc(a.trc)+'</span>';
+      h+='<span class="kv"><span>Coaching</span>'+esc(a.coach)+'</span>';
+      h+='<span class="kv"><span>Off-ramp</span>'+esc(a.off)+'</span>';
+      for(const g of a.gates)h+='<span class="gate"><b>⚠</b> '+esc(g)+'</span>';
+    }else{
+      h+='<span class="pickcomp">'+a.gates.length+' gate'+(a.gates.length===1?'':'s')+' · select to see the TRC route, the coaching tax and the off-ramp</span>';
+    }
     h+='</span></label>';
   }
   h+='<div class="lbl sect">Hubs — execution venues, never places to live</div><div class="card">';
