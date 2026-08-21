@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.52.0';
+const APP_VERSION='1.53.0';
 const LS='waypoint:v1';
 const INFL_DEFAULT=2.3; /* %/yr — the seed for both inflation rates (was the single const INFL). His call Jul 19 2026: 2.3 conservative, was 2.0. Declared here (before defaults()/state init) so the plan can seed inflEng+inflSpend from it. */
 const HOME_DEFAULT=250000;    /* v1.41: the home target in TODAY'S euros (his number Jul 26 2026). Declared HERE, not next to homeToday(), because defaults() runs at load — const TDZ, same trap as INFL_DEFAULT in v1.33. */
