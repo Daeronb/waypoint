@@ -128,6 +128,12 @@ input[type=range]{width:100%;accent-color:var(--sec)}
 .instog-lbl b{color:var(--ink)}
 .insoff{font-size:.62rem;letter-spacing:.04em;color:var(--sec);background:rgba(109,98,80,.11);border:1px solid var(--line);border-radius:4px;padding:0 5px;vertical-align:middle;white-space:nowrap}
 .brow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.85rem}
+/* v1.57 — collapsible agenda rows: the row is the toggle, mgrow takes the slack so the
+   +/- sits hard right. Prose lives in .bdet, which is only in the DOM when open. */
+.brow.mrow{cursor:pointer}
+.brow .mgrow{flex:1;min-width:0}
+.brow .mtog{color:var(--muted);font-size:.9rem;line-height:1}
+[hidden]{display:none!important}
 .brow:last-of-type{border-bottom:none}
 /* hub rows: keep flag+name on one line, aligned column so the weekly figures line up */
 .hubrow{align-items:baseline}

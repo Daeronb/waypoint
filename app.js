@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.56.0';
+const APP_VERSION='1.58.0';
 const LS='waypoint:v1';
 const INFL_DEFAULT=2.3; /* %/yr — the seed for both inflation rates (was the single const INFL). His call Jul 19 2026: 2.3 conservative, was 2.0. Declared here (before defaults()/state init) so the plan can seed inflEng+inflSpend from it. */
 const HOME_DEFAULT=250000;    /* v1.41: the home target in TODAY'S euros (his number Jul 26 2026). Declared HERE, not next to homeToday(), because defaults() runs at load — const TDZ, same trap as INFL_DEFAULT in v1.33. */
@@ -246,7 +246,7 @@ function renderEngine(){
   h+='<span class="pickbody"><span class="pickhead"><b>Custom yield</b><span class="num cywrap"><input type="number" id="cyIn" class="cyin" inputmode="decimal" min="0" max="12" step="0.01" value="'+cy+'">% · <span id="cyW">'+fmtE(cw)+'/mo</span></span></span>';
   h+='<span class="picksub">What-if dial — type any net yield and this row shows the sustainable monthly. Select it and the hero + Match run on it; the four mixes above stay untouched.</span></span></label>';
   h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
-  h+='<div class="foot">All four are now LADDERS, or a ladder behind a cash tier — the Jul-2026 redesign. The shelf back end is nearly flat (iBonds-2030 → 2031 is only 17bp, ≈16bp per year of lock) while its front end is steep (iBonds-2029 → MMF is 103bp, ≈40bp/yr), so spreading the core across maturity dates costs almost nothing and holding cash is where the yield actually goes. The axis is WHEN money turns into cash at par, and at what mark: Never red → Long ladder is ≈€143/mo, and the floor dial moves more than that on its own (€305k → €295k ≈ €172/mo). 🚨 THE YIELDS ABOVE ARE NOT ALL LOCKED FOR THE FULL RUN, and the menu differs sharply on this. Weighting each slice by how many of the plan’s 54 months it actually locks: Long ladder 80% locked · Ladder 67% · Cash + ladder 57% · Never red 16%. The rest REPRICES inside the plan — iBonds-2029 turns to cash in month 30 and iBonds-2030 in month 42, and with the floor only €5k under the pot almost nothing is drawn down first, so the full weight rolls at whatever 2030 and 2031 pay. Worked case on Ladder: if maturing rungs reinvest at 1.00%, the effective rate over the run is ≈2.63% ⇒ ≈€766/mo, not €914. That is a REAL branch, not a stress test — use the Custom-yield row to sit in it. ⚠ Effective duration TODAY, for reading rate headlines against: Never red 1.9y · Cash + ladder 3.0y · Ladder 3.2y · Long ladder 3.7y. A 10-year or 30-year record in the news is NOT your instrument. ⚠ The ≈€52k at Kraken is NOT powder — it buys BTC before departure, so every euro of crash-deploy firepower in the 2028–2032 window comes from inside this pot. The iBonds core is also marginable — a second line of crisis firepower without selling (see Playbooks → Crash). Core on fixed maturity dates, yields NET of fund fees. RETIRED Jul 2026: Early home (its tranche fell ≈€64–84k short of a house at a €310k pot), Safe powder and Priced powder (single-bullet books paying only 1–2bp for holding everything to Jan 2032). Saved plans migrate: Safe powder → Ladder, Priced powder → Long ladder, Early home → Cash + ladder.</div></div>';
+  h+='<div class="foot">All four are now LADDERS, or a ladder behind a cash tier — the Jul-2026 redesign. The shelf back end is nearly flat (iBonds-2030 → 2031 is only 17bp, ≈16bp per year of lock) while its front end is steep (iBonds-2029 → MMF is 127bp, ≈49bp/yr), so spreading the core across maturity dates costs almost nothing and holding cash is where the yield actually goes. The axis is WHEN money turns into cash at par, and at what mark: Never red → Long ladder is ≈€172/mo — and after the 4 Sep re-stamp that is now EXACTLY what the floor dial is worth (€305k → €295k ≈ €172/mo), where the mix used to be worth less than €10k of floor. The two dials have drawn level. 🚨 THE YIELDS ABOVE ARE NOT ALL LOCKED FOR THE FULL RUN, and the menu differs sharply on this. Weighting each slice by how many of the plan’s 54 months it actually locks: Long ladder 80% locked · Ladder 67% · Cash + ladder 57% · Never red 16%. The rest REPRICES inside the plan — iBonds-2029 turns to cash in month 30 and iBonds-2030 in month 42, and with the floor only €5k under the pot almost nothing is drawn down first, so the full weight rolls at whatever 2030 and 2031 pay. Worked case on Ladder: if maturing rungs reinvest at 1.00%, the effective rate over the run is ≈2.77% ⇒ ≈€802/mo, not €969. (Method: each slice earns its own yield for the months it is locked and 1.00% after — 2029 for 30 of 54 months, 2030 for 42, 2031 for all 54, cash tiers for none. ⚠ Recomputing the same way puts the pre-re-stamp figures at 2.60% / ≈€758, not the 2.63% / ≈€766 shipped in v1.50 — corrected here.) That is a REAL branch, not a stress test — use the Custom-yield row to sit in it. ⚠ Effective duration TODAY, for reading rate headlines against: Never red 1.9y · Cash + ladder 3.0y · Ladder 3.2y · Long ladder 3.6y. A 10-year or 30-year record in the news is NOT your instrument. ⚠ The ≈€52k at Kraken is NOT powder — it buys BTC before departure, so every euro of crash-deploy firepower in the 2028–2032 window comes from inside this pot. The iBonds core is also marginable — a second line of crisis firepower without selling (see Playbooks → Crash). Core on fixed maturity dates, yields NET of fund fees. RETIRED Jul 2026: Early home (its tranche fell ≈€64–84k short of a house at a €310k pot), Safe powder and Priced powder (single-bullet books paying only 1–2bp for holding everything to Jan 2032). Saved plans migrate: Safe powder → Ladder, Priced powder → Long ladder, Early home → Cash + ladder.</div></div>';
   h+='<div class="card"><div class="lbl">Crypto sleeve — a lens, not a branch</div>';
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';
   h+='<div id="lensT"></div></div>';
@@ -331,7 +331,7 @@ function bindEngine(){
 }
 
 /* ---------- MATCH view ---------- */
-const ui={cc:null,book:null,blend:null}; /* blend = which mix breakdown is open (v1.12; v1.13 removed inst — instrument cards retired, breakdowns carry the shelf) */
+const ui={cc:null,book:null,blend:null,mon:null}; /* blend = which mix breakdown is open (v1.12; v1.13 removed inst — instrument cards retired, breakdowns carry the shelf) */
 function visaOf(c){return c.visa||0;} /* v1.27: per-country amortised visa €/mo (blended convention, from research-11 / ledger Visa tab), folded into every COL total */
 function insOnState(){return state.plan.insOn!==false;} /* v1.28: master insurance switch */
 function insAmt(){return insOnState()?INSURANCE:0;} /* v1.28: €120 IMG Global insurance, one master toggle for every location at once */
@@ -448,14 +448,28 @@ function nextDue(list,now){const n=startOfDay(now||new Date());
 function dTo(d){return Math.ceil((d-new Date())/864e5);}
 const MN3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function shortDate(d){return MN3[d.getMonth()]+' '+d.getFullYear();}
-function agendaRow(chipHtml,t,d){return '<div class="brow">'+chipHtml+'<div><b>'+esc(t)+'</b><div class="sub">'+esc(d)+'</div></div></div>';}
+/* v1.57 — THE AGENDA ROWS COLLAPSE. Every monitor body rendered unconditionally at the
+   top of Path: 12 rows, 16,194 characters of prose, above everything else in the view.
+   That is the same structural fault v1.52.0 fixed in Match, in a card that never got the
+   treatment. His rule, unchanged: numbers, names, badges and VERDICTS always visible;
+   PROSE behind the click. So a row now shows chip + title + a one-line `lede` (the
+   verdict), and the body only when open. No new control — the row itself is the toggle,
+   same as the Playbooks and Match cards. Rows always start collapsed; sticky open state
+   was declined by him in v1.52 and is not re-pitched here. Fallback if a monitor has no
+   lede: its first sentence, so an un-leded row degrades instead of rendering empty. */
+function monLede(m){return m.lede||String(m.d||'').split('. ')[0].slice(0,140);}
+function agendaRow(chipHtml,t,lede,d,key,open){
+  return '<div class="brow mrow'+(open?' open':'')+'" data-mon="'+esc(key)+'">'+chipHtml+
+    '<div class="mgrow"><b>'+esc(t)+'</b><div class="sub">'+esc(lede)+'</div>'+
+    (open?'<div class="bdet">'+esc(d)+'</div>':'')+'</div><span class="sub mtog">'+(open?'−':'+')+'</span></div>';
+}
 function agendaCard(){
   const dated=[],standing=[];
   for(const m of MONITORS){
-    if(m.prinsjesdag)dated.push({due:nextPrinsjesdag(),t:m.t,d:m.d});
-    else if(m.dues){const r=nextDue(m.dues);dated.push({due:r.due,t:m.t,
+    if(m.prinsjesdag)dated.push({due:nextPrinsjesdag(),t:m.t,d:m.d,lede:monLede(m)});
+    else if(m.dues){const r=nextDue(m.dues);dated.push({due:r.due,t:m.t,lede:monLede(m),
       d:m.d+(r.exhausted?' ⚠ The published date list has run out — restock it from the source calendar.':'')});}
-    else if(m.due)dated.push({due:new Date(m.due+'T00:00:00'),t:m.t,d:m.d});
+    else if(m.due)dated.push({due:new Date(m.due+'T00:00:00'),t:m.t,d:m.d,lede:monLede(m)});
     else standing.push(m);
   }
   dated.sort((a,b)=>a.due-b.due);
@@ -465,9 +479,9 @@ function agendaCard(){
     if(n<0)c=chip('bad','✕','overdue');
     else if(n<=60)c=chip('warn','!',n+'d');
     else c=chip('muted','◌',shortDate(i.due));
-    h+=agendaRow(c,i.t,i.d);
+    h+=agendaRow(c,i.t,i.lede,i.d,i.t,ui.mon===i.t);
   }
-  for(const m of standing)h+=agendaRow(chip('muted','◌','watch'),m.t,m.d);
+  for(const m of standing)h+=agendaRow(chip('muted','◌','watch'),m.t,monLede(m),m.d,m.t,ui.mon===m.t);
   let oldest=DATA_STAMP;for(const k in INSTRUMENTS){if(INSTRUMENTS[k].stamp<oldest)oldest=INSTRUMENTS[k].stamp;}
   const stale=stampAge(oldest)>STALE_DAYS||stampAge(DATA_STAMP)>STALE_DAYS;
   h+='<div class="foot'+(stale?' floorwarn':'')+'">Freshness: data snapshot '+DATA_STAMP+' ('+stampAge(DATA_STAMP)+'d) · oldest instrument stamp '+oldest+' ('+stampAge(oldest)+'d) · ECB stamp '+ECB_STAMP.asOf+' (drift line in Engine watches it live). Stamps go amber past '+STALE_DAYS+' days.</div>';
@@ -488,6 +502,7 @@ function renderPath(){
     h+='</div>';
   }
   $('#view-path').innerHTML=h;
+  document.querySelectorAll('#view-path .mrow').forEach(r=>r.onclick=()=>{const k=r.dataset.mon;ui.mon=(ui.mon===k?null:k);renderPath();});
   document.querySelectorAll('#view-path input[type=checkbox]').forEach(cb=>cb.onchange=()=>{state.steps[cb.dataset.step]=cb.checked;if(!cb.checked)delete state.steps[cb.dataset.step];save();renderPath();});
 }
 
