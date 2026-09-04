@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='1.58.0';
+const APP_VERSION='1.60.0';
 const LS='waypoint:v1';
 const INFL_DEFAULT=2.3; /* %/yr — the seed for both inflation rates (was the single const INFL). His call Jul 19 2026: 2.3 conservative, was 2.0. Declared here (before defaults()/state init) so the plan can seed inflEng+inflSpend from it. */
 const HOME_DEFAULT=250000;    /* v1.41: the home target in TODAY'S euros (his number Jul 26 2026). Declared HERE, not next to homeToday(), because defaults() runs at load — const TDZ, same trap as INFL_DEFAULT in v1.33. */
@@ -10,6 +10,11 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtE=v=>'€'+Math.round(v).toLocaleString('nl-NL');
 const fmtK=v=>'€'+Math.round(v/1000)+'k';
+/* v1.60: sign-aware euro. fmtE alone renders a negative as "€-223.000" — the app's own
+   convention everywhere else is the sign OUTSIDE the symbol ("−€223.000"), and the spend
+   lens was mixing both inside one card. Use this wherever a figure can legitimately go
+   negative; fmtE stays for quantities that cannot. */
+const fmtS=v=>(v<0?'−':'')+fmtE(Math.abs(v));
 const pct=v=>v.toFixed(2)+'%';
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._h);toast._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
@@ -96,7 +101,12 @@ function anchorC(){return COUNTRIES.find(c=>c.cc===state.plan.anchor)||COUNTRIES
    the risk he is trying to see. Hence its own rate, defaulting ABOVE INFL_DEFAULT. */
 /* (HOME_DEFAULT / INFL_HOME_DEFAULT are declared at the TOP with INFL_DEFAULT — const TDZ:
    defaults() runs at load, long before this line. Same trap as v1.33.) */
-function homeToday(){const v=+state.plan.home;return isFinite(v)&&v>=0?Math.round(v):HOME_DEFAULT;}
+/* v1.60: a NEGATIVE typed value used to fall through to HOME_DEFAULT, so typing "-5"
+   silently replaced it with €250,000 — a plausible-looking number he never entered, while
+   every OTHER dial (inflEng, inflHome, custY, spend) clamps out-of-range input to its
+   bound. Now it clamps to 0 the same way; the HOME_DEFAULT fallback is kept for genuinely
+   non-numeric junk (NaN / Infinity), which is what it was there for. */
+function homeToday(){const v=+state.plan.home;return isFinite(v)?Math.max(0,Math.round(v)):HOME_DEFAULT;}
 function inflHome(){const v=+state.plan.inflHome;return isFinite(v)?Math.min(20,Math.max(0,Math.round(v*100)/100)):INFL_HOME_DEFAULT;}
 /* the target grown forward over the SAME horizon everything else uses (v1.38/v1.39) */
 function homeAt(end){return homeToday()*Math.pow(1+inflHome()/100,realYrs(end));}
@@ -216,7 +226,7 @@ function renderEngine(){
   h+='<div class="instog"><span class="instog-lbl">Inflation — floor check <span class="sub">deflates the plan-end floor to today’s money · today = '+nowLabel()+'</span></span><span class="cywrap"><input type="number" id="inEng" class="cyin" inputmode="decimal" min="0" max="20" step="0.1" value="'+inflEng()+'">%/yr</span></div>';
   /* v1.41: the home target — entered in TODAY’S euros, grown forward at its own rate. Two rows,
      one control each, mirroring the inflation-dial pattern. */
-  h+='<div class="instog"><span class="instog-lbl">Home target <span class="sub">what the place would cost TODAY — grown forward to '+endLabel(p.end)+'</span></span><span class="cywrap">€<input type="number" id="hmIn" class="cyin" style="width:6.2em" inputmode="numeric" min="0" step="5000" value="'+homeToday()+'"></span></div>';
+  h+='<div class="instog"><span class="instog-lbl">Home target <span class="sub">what the place would cost TODAY — grown forward to <span id="hmWhen">'+endLabel(p.end)+'</span></span></span><span class="cywrap">€<input type="number" id="hmIn" class="cyin" style="width:6.2em" inputmode="numeric" min="0" step="5000" value="'+homeToday()+'"></span></div>';
   h+='<div class="instog"><span class="instog-lbl">Inflation — housing <span class="sub">its own rate: Dutch house prices have run above CPI</span></span><span class="cywrap"><input type="number" id="inHome" class="cyin" inputmode="decimal" min="0" max="20" step="0.1" value="'+inflHome()+'">%/yr</span></div>';
   h+='</div>';
   h+='<div class="card"><div class="lbl">Instrument mix</div>';
@@ -246,7 +256,7 @@ function renderEngine(){
   h+='<span class="pickbody"><span class="pickhead"><b>Custom yield</b><span class="num cywrap"><input type="number" id="cyIn" class="cyin" inputmode="decimal" min="0" max="12" step="0.01" value="'+cy+'">% · <span id="cyW">'+fmtE(cw)+'/mo</span></span></span>';
   h+='<span class="picksub">What-if dial — type any net yield and this row shows the sustainable monthly. Select it and the hero + Match run on it; the four mixes above stay untouched.</span></span></label>';
   h+='<div class="anchorline chip-'+di.cls+'"><b>'+di.glyph+'</b> '+esc(di.txt)+'</div>';
-  h+='<div class="foot">All four are now LADDERS, or a ladder behind a cash tier — the Jul-2026 redesign. The shelf back end is nearly flat (iBonds-2030 → 2031 is only 17bp, ≈16bp per year of lock) while its front end is steep (iBonds-2029 → MMF is 127bp, ≈49bp/yr), so spreading the core across maturity dates costs almost nothing and holding cash is where the yield actually goes. The axis is WHEN money turns into cash at par, and at what mark: Never red → Long ladder is ≈€172/mo — and after the 4 Sep re-stamp that is now EXACTLY what the floor dial is worth (€305k → €295k ≈ €172/mo), where the mix used to be worth less than €10k of floor. The two dials have drawn level. 🚨 THE YIELDS ABOVE ARE NOT ALL LOCKED FOR THE FULL RUN, and the menu differs sharply on this. Weighting each slice by how many of the plan’s 54 months it actually locks: Long ladder 80% locked · Ladder 67% · Cash + ladder 57% · Never red 16%. The rest REPRICES inside the plan — iBonds-2029 turns to cash in month 30 and iBonds-2030 in month 42, and with the floor only €5k under the pot almost nothing is drawn down first, so the full weight rolls at whatever 2030 and 2031 pay. Worked case on Ladder: if maturing rungs reinvest at 1.00%, the effective rate over the run is ≈2.77% ⇒ ≈€802/mo, not €969. (Method: each slice earns its own yield for the months it is locked and 1.00% after — 2029 for 30 of 54 months, 2030 for 42, 2031 for all 54, cash tiers for none. ⚠ Recomputing the same way puts the pre-re-stamp figures at 2.60% / ≈€758, not the 2.63% / ≈€766 shipped in v1.50 — corrected here.) That is a REAL branch, not a stress test — use the Custom-yield row to sit in it. ⚠ Effective duration TODAY, for reading rate headlines against: Never red 1.9y · Cash + ladder 3.0y · Ladder 3.2y · Long ladder 3.6y. A 10-year or 30-year record in the news is NOT your instrument. ⚠ The ≈€52k at Kraken is NOT powder — it buys BTC before departure, so every euro of crash-deploy firepower in the 2028–2032 window comes from inside this pot. The iBonds core is also marginable — a second line of crisis firepower without selling (see Playbooks → Crash). Core on fixed maturity dates, yields NET of fund fees. RETIRED Jul 2026: Early home (its tranche fell ≈€64–84k short of a house at a €310k pot), Safe powder and Priced powder (single-bullet books paying only 1–2bp for holding everything to Jan 2032). Saved plans migrate: Safe powder → Ladder, Priced powder → Long ladder, Early home → Cash + ladder.</div></div>';
+  h+='<div class="foot">All four are now LADDERS, or a ladder behind a cash tier — the Jul-2026 redesign. The shelf back end is nearly flat (iBonds-2030 → 2031 is only 17bp, ≈16bp per year of lock) while its front end is steep (iBonds-2029 → MMF is 127bp, ≈49bp/yr), so spreading the core across maturity dates costs almost nothing and holding cash is where the yield actually goes. The axis is WHEN money turns into cash at par, and at what mark: Never red → Long ladder is ≈€172/mo — and after the 4 Sep re-stamp that is now EXACTLY what the floor dial is worth (€305k → €295k ≈ €172/mo), where the mix used to be worth less than €10k of floor. The two dials have drawn level. (Those euro figures are a €310k pot with a €305k floor over 54 months — set the dials to match yours.) 🚨 THE YIELDS ABOVE ARE NOT ALL LOCKED FOR THE FULL RUN, and the menu differs sharply on this. Weighting each slice by how many of a 54-MONTH RUN (Jun 2027 → Dec 2031) it actually locks — this paragraph is worked at THAT span and at a €310k pot, so re-read it against your own two date dials: Long ladder 80% locked · Ladder 67% · Cash + ladder 57% · Never red 16%. The rest REPRICES inside the plan — iBonds-2029 turns to cash in month 30 and iBonds-2030 in month 42, and with the floor only €5k under the pot almost nothing is drawn down first, so the full weight rolls at whatever 2030 and 2031 pay. Worked case on Ladder: if maturing rungs reinvest at 1.00%, the effective rate over the run is ≈2.77% ⇒ ≈€802/mo, not €969. (Method: each slice earns its own yield for the months it is locked and 1.00% after — 2029 for 30 of 54 months, 2030 for 42, 2031 for all 54, cash tiers for none. ⚠ Recomputing the same way puts the pre-re-stamp figures at 2.60% / ≈€758, not the 2.63% / ≈€766 shipped in v1.50 — corrected here.) That is a REAL branch, not a stress test — use the Custom-yield row to sit in it. ⚠ Effective duration TODAY, for reading rate headlines against: Never red 1.9y · Cash + ladder 3.0y · Ladder 3.2y · Long ladder 3.6y. A 10-year or 30-year record in the news is NOT your instrument. ⚠ The ≈€56k at Kraken (MEASURED €55,739.49 on 30 Aug 2026 — the older ≈€45k and ≈€52k readings are both superseded, the drift is 2026 LINK sales) is NOT powder — it buys LINK and, likely, BTC before departure, so every euro of crash-deploy firepower in the 2028–2032 window comes from inside this pot. The iBonds core is also marginable — a second line of crisis firepower without selling (see Playbooks → Crash). Core on fixed maturity dates, yields NET of fund fees. RETIRED Jul 2026: Early home (its tranche fell ≈€64–84k short of a house at a €310k pot), Safe powder and Priced powder (single-bullet books paying only 1–2bp for holding everything to Jan 2032). Saved plans migrate: Safe powder → Ladder, Priced powder → Long ladder, Early home → Cash + ladder.</div></div>';
   h+='<div class="card"><div class="lbl">Crypto sleeve — a lens, not a branch</div>';
   h+='<input type="number" id="slv" class="numin" min="0" step="5000" value="'+p.sleeve+'">';
   h+='<div id="lensT"></div></div>';
@@ -263,8 +273,11 @@ function renderSpend(){
   if(!(p.spend>0)){el.innerHTML='<div class="foot">Type your real all-in monthly spend (COL + €120 insurance + visa amortisation). Spend under the mix yield and the pot GROWS — this shows where it lands by plan end, nominal and in today’s euros. The budget above stays the sustainable MAXIMUM; this lens runs the other direction.</div>';return;}
   if(!(p.principal>0)){el.innerHTML='<div class="foot">Set the start-principal dial first — this lens projects it forward at your typed spend.</div>';return;}
   const s=surplusProj(p.spend),d=s.end-p.principal,m1=p.principal*s.y/100/12-p.spend;
-  let h='<div class="lrow"><span>pot at '+endLabel(p.end)+'</span><span class="num">'+fmtE(s.end)+'</span></div>';
-  h+='<div class="lrow"><span>in today’s euros ('+s.infl+'%/yr)</span><span class="num">'+fmtE(s.real)+'</span></div>';
+  /* v1.60: fmtS, not fmtE. A spend above the sustainable draw runs the pot negative by plan
+   end, and these two lines printed "€-223.000" while the two lines directly below them
+   printed "−€228.000" — two sign conventions inside one card. */
+  let h='<div class="lrow"><span>pot at '+endLabel(p.end)+'</span><span class="num">'+fmtS(s.end)+'</span></div>';
+  h+='<div class="lrow"><span>in today’s euros ('+s.infl+'%/yr)</span><span class="num">'+fmtS(s.real)+'</span></div>';
   h+='<div class="lrow"><span>vs start principal</span><span class="num">'+(d>=0?'+':'−')+fmtE(Math.abs(d))+'</span></div>';
   h+='<div class="lrow"><span>first-month surplus (yield − spend)</span><span class="num">'+(m1>=0?'+':'−')+fmtE(Math.abs(m1))+'/mo</span></div>';
   h+='<div class="foot">Runs on the selected mix ('+pct(s.y)+') and the plan-end dial, before any crash-deploy. Real-preservation spend at this mix ≈ '+fmtE(s.keep)+'/mo — under that, the pot grows in REAL terms too, not just on paper.</div>';
@@ -287,6 +300,18 @@ function updateEngineNumbers(){
   $('#prV').textContent=fmtE(p.principal);$('#flV').textContent=fmtE(p.floor);
   $('#stV').textContent=endLabel(p.start);
   $('#tmV').textContent=endLabel(p.end)+' · '+n+' mo';$('#heroSpan').textContent=endLabel(p.start)+' → '+endLabel(p.end);
+  /* v1.59 — HIS CATCH: the Home-target sub-label read “grown forward to <date>” and was
+     written ONCE by renderEngine(), which no dial handler calls — the dials all route to
+     updateEngineNumbers(). So the date froze at whatever it was on the last full render
+     while the target euro figure and the gap chip beside it updated live: a stale label
+     next to live numbers, which is worse than either being wrong on its own. Fixed at the
+     root — the label is an id like every other live figure and is patched here — NOT by
+     calling renderEngine() from a dial, which would rebuild the sliders mid-drag and steal
+     focus from the number inputs. ⚠ AUDITED THE WHOLE CLASS: this was the only dial-derived
+     string in renderEngine() outside this function. #spT (the spend lens) also depends on
+     the dials but is refreshed by renderMatch() on dial RELEASE, and #lensT depends only on
+     the sleeve and the anchor. */
+  const hw=$('#hmWhen');if(hw)hw.textContent=endLabel(p.end);
   const fc=floorCheck(p.floor,p.end),ck=$('#chkFloor');ck.innerHTML=fc.html; /* v1.43: HTML now — the .gapchip carries the state, no whole-line class toggle */
   const fl=$('#flS');fl.max=p.principal;if(+fl.value>p.principal)fl.value=p.principal;
   /* v1.32: keep the start dial below the end dial — its max tracks end−6 (mirrors the floor≤principal guard) */
@@ -327,7 +352,7 @@ function bindEngine(){
     hm.onchange=e=>{state.plan.home=homeToday();e.target.value=state.plan.home;save();updateEngineNumbers();};}
   const ih=$('#inHome');if(ih){ih.oninput=e=>{state.plan.inflHome=+e.target.value;save();updateEngineNumbers();};
     ih.onchange=e=>{state.plan.inflHome=inflHome();e.target.value=state.plan.inflHome;save();updateEngineNumbers();};}
-  $('#slv').onchange=e=>{state.plan.sleeve=Math.max(0,+e.target.value||0);save();renderLens();};
+  $('#slv').onchange=e=>{const v=+e.target.value;state.plan.sleeve=isFinite(v)?Math.max(0,v):0;save();renderLens();}; /* v1.60: same isFinite guard as #spIn */
 }
 
 /* ---------- MATCH view ---------- */
@@ -417,8 +442,17 @@ function renderMatch(){
   document.querySelectorAll('.colswitch button[data-m]').forEach(b=>b.onclick=()=>{state.plan.colMode=b.dataset.m;save();renderMatch();});
   document.querySelectorAll('.colswitch button[data-ins]').forEach(b=>b.onclick=()=>{state.plan.insOn=(b.dataset.ins==='on');save();renderMatch();toast('Insurance '+(state.plan.insOn?'included (+€'+INSURANCE+'/mo everywhere)':'off — totals show COL + visa only'));});
   document.querySelectorAll('#view-match .cc .chead').forEach(hd=>hd.onclick=()=>{const cc=hd.parentElement.dataset.cc;ui.cc=(ui.cc===cc?null:cc);renderMatch();});
-  document.querySelectorAll('input[name=anchor]').forEach(r=>r.onchange=e=>{state.plan.anchor=e.target.value;save();renderMatch();toast('Anchor set: '+e.target.value+' — Engine lens + Path follow');});
-  $('#spIn').oninput=e=>{state.plan.spend=Math.max(0,+e.target.value||0);save();renderSpend();}; /* oninput + #spT-only rewrite keeps focus while typing (cyIn pattern) */
+  /* v1.60 — THE SAME FAULT v1.59 FIXED, IN THE OTHER DIRECTION. The Engine's crypto-sleeve
+   card renders anchorC(): the off-ramp verdict AND the anchor's ⚠ gate. Switching the anchor
+   in Match re-rendered Match only, so the Engine kept showing the PREVIOUS country's off-ramp
+   line and its tax gate — and the toast asserted 'Engine lens + Path follow', which was false
+   on both counts (renderPath output is byte-identical across anchors; the anchor does not
+   enter Path at all). renderLens() is the narrow repaint: #lensT lives in #view-engine, which
+   renderMatch never touches, so this cannot steal focus from any input. */
+  document.querySelectorAll('input[name=anchor]').forEach(r=>r.onchange=e=>{state.plan.anchor=e.target.value;save();renderMatch();renderLens();toast('Anchor set: '+e.target.value+' — the Engine sleeve lens follows');});
+  /* v1.60: isFinite guard. '1e999' is a VALID floating-point string for input[type=number],
+   so +value returned Infinity and the lens printed '€-∞' on all four rows. */
+  $('#spIn').oninput=e=>{const v=+e.target.value;state.plan.spend=isFinite(v)?Math.max(0,v):0;save();renderSpend();}; /* oninput + #spT-only rewrite keeps focus while typing (cyIn pattern) */
   /* v1.33: actual-spend inflation dial — lives OUTSIDE #spT so renderSpend() (which rewrites only #spT) keeps focus while typing */
   const isp=$('#inSpend');if(isp){isp.oninput=e=>{state.plan.inflSpend=+e.target.value;save();renderSpend();};
     isp.onchange=e=>{state.plan.inflSpend=inflSpend();e.target.value=state.plan.inflSpend;save();renderSpend();};}
